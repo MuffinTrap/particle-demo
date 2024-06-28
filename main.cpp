@@ -51,11 +51,6 @@ int main()
 
     gdl::ConsoleMode();
 
-    // Test loading files
-    gdl::Image font;
-    gdl::FFont debugFont;
-    font.LoadImage("font8x16.png", gdl::TextureFilterModes::Nearest, gdl::TextureFormatModes::RGBA8);
-    debugFont.BindSheet(font, 8, 16, ' ');
 
     // Init your Game here
     /*
@@ -71,20 +66,11 @@ int main()
     cloudY.Init(size, gdl::Color::Yellow);
 
     u64 deltaTimeStart = gettime();
-    u64 programStart = gettime();
+    //u64 programStart = gettime();
     float deltaTime = 0.0f;
-    float mainElapsed = 0.0f;
+    //float mainElapsed = 0.0f;
 
     DeltaHistogram cpu = DeltaHistogram();
-
-    while(true)
-    {
-        gdl::WiiInput::StartFrame();
-        if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_HOME)){
-            break;
-        }
-        VIDEO_WaitVSync();
-    }
 
     // Update once to get all values set
     cloudM.Update(0.0f, Seek);
@@ -102,7 +88,7 @@ int main()
         deltaTime = (float)(now - deltaTimeStart) / (float)(TB_TIMER_CLOCK * 1000); // division is to convert from ticks to seconds
         deltaTimeStart = now;
 
-        mainElapsed= (float)(now- programStart) / (float)(TB_TIMER_CLOCK * 1000); // division is to convert from ticks to seconds
+        //mainElapsed= (float)(now- programStart) / (float)(TB_TIMER_CLOCK * 1000); // division is to convert from ticks to seconds
 
         modeCounter += deltaTime;
         if (modeCounter > 2.0f)
@@ -146,15 +132,6 @@ int main()
             glRectf(-25.0f, -25.0f, 25.0f, 25.0f);
             glPopMatrix();
 
-            if (false)
-            {
-            cpu.Draw(gdl::ScreenXres-256, 16, 64, gdl::Color::Yellow);
-            // TODO How to draw the font?
-            debugFont.Printf(gdl::ScreenXres-250, 18, 1.0f, gdl::Color::Black, "Delta");
-
-            debugFont.Printf(10, 10, 1.0f, gdl::Color::Magenta, "Mode %u", (u32)mode);
-            debugFont.Printf(10, 16, 1.0f, gdl::Color::Magenta, "mainElapsed %.2f", mainElapsed);
-            }
         }
 
 
