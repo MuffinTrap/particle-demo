@@ -37,7 +37,7 @@ int main()
     ParticleCloud cloudC;
     ParticleCloud cloudY;
     int size = 4096;
-    cloudM.Init(size, gdl::Color::Magenta);
+    cloudM.Init(size, gdl::Color::White);
     cloudC.Init(size, gdl::Color::Cyan);
     cloudY.Init(size, gdl::Color::Yellow);
 
@@ -45,9 +45,9 @@ int main()
 
 
     u64 deltaTimeStart = gettime();
-    //u64 programStart = gettime();
+    u64 programStart = gettime();
     float deltaTime = 0.0f;
-    // float mainElapsed = 0.0f;
+    float mainElapsed = 0.0f;
 
     DeltaHistogram cpu = DeltaHistogram();
 
@@ -65,9 +65,13 @@ int main()
     }
 
     // Update once to get all values set
-    cloudM.Update(0.0f);
-    cloudC.Update(0.0f);
-    cloudY.Update(0.0f);
+    cloudM.Update(0.0f, Seek);
+    cloudC.Update(0.0f, Seek);
+    cloudY.Update(0.0f, Seek);
+    ParticleMode modes[4] = {Loop, Rotate, SinWave, Seek};
+    ParticleMode mode = modes[0];
+    float modeCounter = 0.0f;
+
 
     bool gameRunning = true;
     while(true)
@@ -76,7 +80,15 @@ int main()
         deltaTime = (float)(now - deltaTimeStart) / (float)(TB_TIMER_CLOCK * 1000); // division is to convert from ticks to seconds
         deltaTimeStart = now;
 
-        //mainElapsed= (float)(now- programStart) / (float)(TB_TIMER_CLOCK * 1000); // division is to convert from ticks to seconds
+        mainElapsed= (float)(now- programStart) / (float)(TB_TIMER_CLOCK * 1000); // division is to convert from ticks to seconds
+
+        modeCounter += deltaTime;
+        if (modeCounter > 2.0f)
+        {
+            mode = (ParticleMode)(gdl::GetRandomInt(0,4));
+            modeCounter -= 2.0f;
+            guMtxIdentity(cloudM.rotationMatrix);
+        }
 
         cpu.Update(gdl::Delta);
         gdl::WiiInput::StartFrame();
@@ -108,7 +120,7 @@ int main()
             {
                 camera.position.z -= 10.0f;
             }
-            cloudM.Update(deltaTime);
+            cloudM.Update(deltaTime, mode);
             // cloudC.Update(deltaTime);
             // cloudY.Update(deltaTime);
         }
@@ -121,12 +133,15 @@ int main()
             gdl::Set3DMode(1000.0f);
             gdl::Perspective::ApplyDefaultCamera();
             cloudM.Draw();
-            cloudC.Draw();
-            cloudY.Draw();
+            // cloudC.Draw();
+            //cloudY.Draw();
 
             gdl::Set2DMode();
             cpu.Draw(gdl::ScreenXres-256, 16, 64, gdl::Color::Yellow);
             debugFont.Printf(gdl::ScreenXres-250, 18, 1.0f, gdl::Color::Black, "Delta");
+
+            debugFont.Printf(10, 10, 1.0f, gdl::Color::Magenta, "Mode %u", (u32)mode);
+            debugFont.Printf(10, 16, 1.0f, gdl::Color::Magenta, "mainElapsed %.2f", mainElapsed);
         }
         gdl::Display();
     }
