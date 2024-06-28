@@ -1,6 +1,7 @@
 #pragma once
 #include <mgdl-wii.h>
 #include "vehicle.h"
+#include <GL/opengx.h>
 
 struct RGB8
 {
@@ -26,10 +27,10 @@ class ParticleCloud
 
 		void Quit();
 
-		void* listPtr = nullptr;
-		u32 displayListSize = 0;
+		GLuint listIndex;
 		guVector* positionsArray = nullptr;
-		RGB8* colorsArray= nullptr;
+		GLushort* indicesArray = nullptr;
+
 
 		guVector target;
 		u32 amountParticles;
@@ -38,7 +39,6 @@ class ParticleCloud
 		float elapsed = 0.0f;
 		float interval = 1.0f;
 
-		Mtx rotationMatrix;
 		float rotationAngleDeg = 0.0f;
 		float sinPhase = 0.0f;
 };

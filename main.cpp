@@ -6,19 +6,48 @@
 #include "particlecloud.h"
 #include "quad.h"
 #include "deltahistogram.h"
+#include <GL/opengx.h>
+#include <GL/glu.h>
 
 void init()
 {
     fatInitDefault();
-	gdl::InitSystem(gdl::ModeAuto, gdl::AspectAuto, gdl::HiRes);
+	gdl::InitSystem(gdl::ModeAuto, gdl::AspectAuto, gdl::HiRes, gdl::InitFlags::OpenGX);
     gdl::SetClearColor(gdl::Color::Black);
     gdl::WiiInput::Init();
     gdl::ConsoleMode();
 }
 
+void glRectf(float x1, float y1, float x2, float y2)
+{
+    glBegin(GL_QUADS);
+        glVertex3f(x1, y1, -1.0f);
+        glVertex3f(x2, y1, -1.0f);
+        glVertex3f(x2, y2, -1.0f);
+        glVertex3f(x1, y2, -1.0f);
+    glEnd();
+}
 int main()
 {
     init();
+    ogx_initialize();
+    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glShadeModel(GL_FLAT);
+    glViewport(0, 0, gdl::ScreenXres, gdl::ScreenYres);
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    double aspect = (double)gdl::ScreenXres/(double)gdl::ScreenYres;
+
+
+    // TODO How to set up the camera to look at particles???
+    //glFrustum(aspect, aspect, -1.0, 1.0, 0.1f, 1000.0f);
+    glOrtho(-40.0f * aspect, 40.0f * aspect, -40.0f, 40.0f, -0.1f, 1000.0f);
+    glMatrixMode(GL_MODELVIEW);
+    glLoadIdentity();
+
+    // Use arrays and indices to draw particles
+    glEnableClientState(GL_VERTEX_ARRAY);
+    glEnableClientState(GL_INDEX_ARRAY);
 
     gdl::ConsoleMode();
 
@@ -41,19 +70,12 @@ int main()
     cloudC.Init(size, gdl::Color::Cyan);
     cloudY.Init(size, gdl::Color::Yellow);
 
-    gdl::Perspective::InitDefaultCamera();
-
-
     u64 deltaTimeStart = gettime();
     u64 programStart = gettime();
     float deltaTime = 0.0f;
     float mainElapsed = 0.0f;
 
     DeltaHistogram cpu = DeltaHistogram();
-
-	GX_SetVtxAttrFmt(GX_VTXFMT1, GX_VA_POS, GX_POS_XYZ, GX_F32,0);
-	GX_SetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR0, GX_CLR_RGB, GX_RGB8, 0);
-
 
     while(true)
     {
@@ -87,7 +109,6 @@ int main()
         {
             mode = (ParticleMode)(gdl::GetRandomInt(0,4));
             modeCounter -= 2.0f;
-            guMtxIdentity(cloudM.rotationMatrix);
         }
 
         cpu.Update(gdl::Delta);
@@ -100,26 +121,8 @@ int main()
         }
 
 
-        if (gameRunning)
+        if (gameRunning && false)
         {
-            // Update your game here
-            gdl::Camera& camera = gdl::Perspective::GetDefaultCamera();
-            if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_UP))
-            {
-                camera.position.z += 1.0f;
-            }
-            if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_DOWN))
-            {
-                camera.position.z -= 1.0f;
-            }
-            if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_LEFT))
-            {
-                camera.position.z += 10.0f;
-            }
-            if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_RIGHT))
-            {
-                camera.position.z -= 10.0f;
-            }
             cloudM.Update(deltaTime, mode);
             // cloudC.Update(deltaTime);
             // cloudY.Update(deltaTime);
@@ -127,22 +130,34 @@ int main()
 
 
         gdl::PrepDisplay();
+        glClear(GL_COLOR_BUFFER_BIT);
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
 
         if (gameRunning)
         {
-            gdl::Set3DMode(1000.0f);
-            gdl::Perspective::ApplyDefaultCamera();
             cloudM.Draw();
             // cloudC.Draw();
             //cloudY.Draw();
 
-            gdl::Set2DMode();
+            // Test square
+            glPushMatrix();
+            glColor3f(1.0f, 0.0f, 1.0f);
+            glRectf(-25.0f, -25.0f, 25.0f, 25.0f);
+            glPopMatrix();
+
+            if (false)
+            {
             cpu.Draw(gdl::ScreenXres-256, 16, 64, gdl::Color::Yellow);
+            // TODO How to draw the font?
             debugFont.Printf(gdl::ScreenXres-250, 18, 1.0f, gdl::Color::Black, "Delta");
 
             debugFont.Printf(10, 10, 1.0f, gdl::Color::Magenta, "Mode %u", (u32)mode);
             debugFont.Printf(10, 16, 1.0f, gdl::Color::Magenta, "mainElapsed %.2f", mainElapsed);
+            }
         }
+
+
         gdl::Display();
     }
     cloudM.Quit();
