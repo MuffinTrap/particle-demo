@@ -41,18 +41,15 @@ int main()
     cloudC.Init(size, gdl::Color::Cyan);
     cloudY.Init(size, gdl::Color::Yellow);
 
-    QuadMesh quad;
-    quad.Init(-10.0f);
     gdl::Perspective::InitDefaultCamera();
 
 
-    // u64 deltaTimeStart = gettime();
+    u64 deltaTimeStart = gettime();
     //u64 programStart = gettime();
-    //float deltaTime = 0.0f;
+    float deltaTime = 0.0f;
     // float mainElapsed = 0.0f;
 
     DeltaHistogram cpu = DeltaHistogram();
-    DeltaHistogram gpu = DeltaHistogram();
 
 	GX_SetVtxAttrFmt(GX_VTXFMT1, GX_VA_POS, GX_POS_XYZ, GX_F32,0);
 	GX_SetVtxAttrFmt(GX_VTXFMT1, GX_VA_CLR0, GX_CLR_RGB, GX_RGB8, 0);
@@ -67,18 +64,21 @@ int main()
         VIDEO_WaitVSync();
     }
 
-            cloudM.Update(0.0f);
-            cloudC.Update(0.0f);
-            cloudY.Update(0.0f);
+    // Update once to get all values set
+    cloudM.Update(0.0f);
+    cloudC.Update(0.0f);
+    cloudY.Update(0.0f);
+
     bool gameRunning = true;
     while(true)
     {
-        // u64 now = gettime();
+        u64 now = gettime();
+        deltaTime = (float)(now - deltaTimeStart) / (float)(TB_TIMER_CLOCK * 1000); // division is to convert from ticks to seconds
+        deltaTimeStart = now;
+
         //mainElapsed= (float)(now- programStart) / (float)(TB_TIMER_CLOCK * 1000); // division is to convert from ticks to seconds
-        //deltaTime = (float)(now - deltaTimeStart) / (float)(TB_TIMER_CLOCK * 1000); // division is to convert from ticks to seconds
-        // deltaTimeStart = now;
+
         cpu.Update(gdl::Delta);
-        gpu.Update(gdl::wii::GPUdelta);
         gdl::WiiInput::StartFrame();
 
         if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_HOME)){
@@ -108,7 +108,7 @@ int main()
             {
                 camera.position.z -= 10.0f;
             }
-            cloudM.Update(0.016f);
+            cloudM.Update(deltaTime);
             // cloudC.Update(deltaTime);
             // cloudY.Update(deltaTime);
         }
@@ -123,11 +123,9 @@ int main()
             cloudM.Draw();
             cloudC.Draw();
             cloudY.Draw();
-            //quad.Draw();
 
             gdl::Set2DMode();
             cpu.Draw(gdl::ScreenXres-256, 16, 64, gdl::Color::Yellow);
-            gpu.Draw(gdl::ScreenXres-256, 16 + 64 + 16, 64, gdl::Color::Green);
             debugFont.Printf(gdl::ScreenXres-250, 18, 1.0f, gdl::Color::Black, "Delta");
         }
         gdl::Display();

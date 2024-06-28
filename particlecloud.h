@@ -15,11 +15,12 @@ class ParticleCloud
 		void Init(u32 amount, u32 color);
 		void Draw();
 		void Update(float deltaTime);
+
 		void Quit();
 
 		void* listPtr = nullptr;
 		u32 displayListSize = 0;
-		gdl::wii::VERT3f32* positionsArray = nullptr;
+		guVector* positionsArray = nullptr;
 		RGB8* colorsArray= nullptr;
 
 		guVector target;

@@ -5,7 +5,7 @@ void ParticleCloud::Init ( u32 amount, u32 color)
 	amountParticles = amount;
 
 	// Reserve size for positions
-	positionsArray = (gdl::wii::VERT3f32*)aligned_alloc(32, sizeof(gdl::wii::VERT3f32) * amount);
+	positionsArray = (guVector*)aligned_alloc(32, sizeof(gdl::wii::VERT3f32) * amount);
 	colorsArray = (RGB8*)aligned_alloc(32, sizeof(RGB8) * 4 );
 
 
@@ -94,17 +94,28 @@ void ParticleCloud::Draw()
 
 void ParticleCloud::Update ( float deltaTime )
 {
+	elapsed += deltaTime;
 	for (u32 i = 0; i < amountParticles; i++)
 	{
-		vehicleList[i].Arrive(target, 1.0f);
-		vehicleList[i].Update(deltaTime);
+		// Go towards the target
+		guVector position = positionsArray[i];
+		Vehicle& v = vehicleList[i];
+		guVector desired = (target + v.targetOffset) - position;
+		guVecNormalize(&desired);
+		desired *= v.maxSpeed;
+		guVector steer = desired - v.velocity;
 
-		positionsArray[i].x = vehicleList[i].position.x;
-		positionsArray[i].y = vehicleList[i].position.y;
-		positionsArray[i].z = vehicleList[i].position.z;
+		guVecLimit(steer, v.maxForce);
+
+		// Apply the acceleration and velocity
+		vehicleList[i].acceleration = v.acceleration + steer;
+		v.velocity = v.velocity + (v.acceleration * deltaTime);
+		v.velocity = guVecLimit(v.velocity, v.maxSpeed);
+		guVecZero(v.acceleration);
+
+		positionsArray[i] = position + v.velocity * deltaTime;
 	}
 
-	elapsed += deltaTime;
 	if (elapsed > interval )
 	{
 		target = guVector{gdl::GetRandomFloat(-60, 60), gdl::GetRandomFloat(-40, 40), gdl::GetRandomFloat(-100, -40.0f)};
