@@ -1,6 +1,7 @@
 #include <mgdl-wii.h>
 #include <wiiuse/wpad.h>
 #include <ogc/lwp_watchdog.h>
+#include <ogc/if_config.h>
 
 #include "mgdl-input-wii.h"
 #include "particlecloud.h"
@@ -8,6 +9,10 @@
 #include "deltahistogram.h"
 #include <GL/opengx.h>
 #include <GL/glu.h>
+#include "device.h"
+#include <string>
+
+static sync_device* rocket = nullptr;
 
 void init()
 {
@@ -16,6 +21,25 @@ void init()
     gdl::SetClearColor(gdl::Color::Black);
     gdl::WiiInput::Init();
     gdl::ConsoleMode();
+
+    // Set up networking
+    bool use_dhcp = true;
+    int retries = 10;
+
+    char* ip = new char[16]{"127.0.0.1"}; // ??? TODO What should these values be?
+    char* mask = new char[16]{"255.255.255.255"};
+    char* gate = new char[16]{"255.255.255.255"};
+    s32 if_config_status = if_config(ip, mask, gate, use_dhcp, retries);
+    gdl_assert(if_config_status == 0, "if_config failed");
+
+    // Init and connect Rocket
+    rocket = sync_create_device("sync");
+    bool connectOk = sync_tcp_connect(rocket, "localhost", SYNC_DEFAULT_PORT);
+    gdl_assert(connectOk, "Could not connect rocket");
+
+    delete[](ip);
+    delete[](mask);
+    delete[](gate);
 }
 
 void glRectf(float x1, float y1, float x2, float y2)
@@ -168,9 +192,7 @@ int main()
         gdl::WiiInput::StartFrame();
 
         if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_HOME)){
-            gameRunning = false;
-            // This starts the exit process
-            gdl::wii::Exit();
+            break;
         }
 
 
@@ -213,4 +235,14 @@ int main()
     cloudM.Quit();
     cloudC.Quit();
     cloudY.Quit();
+
+    // Close rocket connection
+    if (rocket != nullptr)
+    {
+        sync_save_tracks(rocket);
+        sync_destroy_device(rocket);
+    }
+
+    // Manual exit instead of gdl exit
+    exit(0);
 }
