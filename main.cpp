@@ -8,6 +8,7 @@
 #include "deltahistogram.h"
 #include <GL/opengx.h>
 #include <GL/glu.h>
+#include "radarfx.h"
 
 void init()
 {
@@ -98,17 +99,15 @@ int main()
 {
     init();
     ogx_initialize();
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glShadeModel(GL_FLAT);
     glViewport(0, 0, gdl::ScreenXres, gdl::ScreenYres);
+
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    double aspect = (double)gdl::ScreenXres/(double)gdl::ScreenYres;
+    float aspect = (float)gdl::ScreenXres/(float)gdl::ScreenYres;
+    gluPerspective(45.0, aspect, 0.1, 100.0);
 
-
-    // TODO How to set up the camera to look at particles???
-    //glFrustum(aspect, aspect, -1.0, 1.0, 0.1f, 1000.0f);
-    glOrtho(-40.0f * aspect, 40.0f * aspect, -40.0f, 40.0f, -0.1f, 1000.0f);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
@@ -132,6 +131,12 @@ int main()
     cloudC.Init(size, gdl::Color::Cyan);
     cloudY.Init(size, gdl::Color::Yellow);
 
+    // Radar effect
+    RadarFX radar;
+    radar.Init(64);
+    radar.centerPosition.z = -1.0f;
+
+
     u64 deltaTimeStart = gettime();
     u64 programStart = gettime();
     float deltaTime = 0.0f;
@@ -148,7 +153,6 @@ int main()
     float modeCounter = 0.0f;
 
 
-    bool gameRunning = true;
     while(true)
     {
         u64 now = gettime();
@@ -168,18 +172,18 @@ int main()
         gdl::WiiInput::StartFrame();
 
         if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_HOME)){
-            gameRunning = false;
-            // This starts the exit process
-            gdl::wii::Exit();
+            // Break the game loop.
+            break;
         }
 
 
-        if (gameRunning && false)
+        if (false)
         {
             cloudM.Update(deltaTime, mode);
             // cloudC.Update(deltaTime);
             // cloudY.Update(deltaTime);
         }
+        radar.Update(deltaTime);
 
 
         gdl::PrepDisplay();
@@ -188,29 +192,44 @@ int main()
         // Set the projection matrix
         glMatrixMode(GL_PROJECTION);
         glLoadIdentity();
-        gluPerspective(45.0, 640.0/480.0, 0.1, 100.0);
+        gluPerspective(45.0, gdl::ScreenXres/gdl::ScreenYres, 0.1, 100.0);
+        // Make square things appear square on screen
+        glMatrixMode(GL_MODELVIEW);
+        glLoadIdentity();
+        glPushMatrix(); // Push aspect correction
+        glScalef(1.0f/aspect, 1.0f, 1.0f);
 
-        if (gameRunning)
+        if (true)
         {
             // Set the modelview matrix
-            glMatrixMode(GL_MODELVIEW);
-            glLoadIdentity();
-            gluLookAt(sin(mainElapsed)*10.0f, 0.0, -10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+            gluLookAt(sin(mainElapsed)*0.0f, 0.0, 10.0,
+                      0.0, 0.0, 0.0,
+                      0.0, 1.0, 0.0);
             cloudM.Draw();
             // cloudC.Draw();
             //cloudY.Draw();
 
             // Test square
+            /*
             glPushMatrix();
             glColor3f(1.0f, 0.0f, 0.0f);
             glRectf(-2.0f, -2.0f, 2.0f, 2.0f);
             glPopMatrix();
+            */
+
+            radar.Draw();
+
         }
-
-
+        glPopMatrix(); // Pop aspect correction
         gdl::Display();
     }
+
+    // Free memory
     cloudM.Quit();
     cloudC.Quit();
     cloudY.Quit();
+    radar.Quit();
+
+    // Quit the program
+    exit(0);
 }
