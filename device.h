@@ -55,6 +55,9 @@
 
 #endif /* !defined(SYNC_PLAYER) */
 
+#define SYNC_DEVICE_ERROR_CONNECTION_FAILED -1
+#define SYNC_DEVICE_ERROR_TRACK_FETCH_FAIL -2
+
 struct sync_device {
 	char *base;
 	struct sync_track **tracks;

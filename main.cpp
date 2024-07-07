@@ -1,7 +1,6 @@
 #include <mgdl-wii.h>
 #include <wiiuse/wpad.h>
 #include <ogc/lwp_watchdog.h>
-#include <ogc/if_config.h>
 
 #include "mgdl-input-wii.h"
 #include "particlecloud.h"
@@ -11,48 +10,12 @@
 #include <GL/glu.h>
 #include "device.h"
 #include <string>
+#include "rocket_sync.h"
 
 // ROCKET
 //////////////////////////
 static sync_device* rocket = nullptr;
-static bool use_rocket = false;
-static float sync_row = 0.0f;
-
-// Functions needed by rocket update
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-parameter"
-static void music_pause(void *d, int flag)
-{
-    if (flag)
-    {
-        // Pause music
-
-    }
-    else
-    {
-        // Play music
-    }
-}
-
-static void music_set_row(void *d, int row)
-{
-    // Set music playback position to given row
-    sync_row = row;
-}
-
-static int music_is_playing(void *d)
-{
-    // return 1 if music is playing
-    // return 0 if not
-    return 0;
-}
-#pragma GCC diagnostic pop
-
-static struct sync_cb sync_functions = {
-    music_pause,
-    music_set_row,
-    music_is_playing
-};
+static bool use_rocket = true;
 
 void init()
 {
@@ -64,26 +27,12 @@ void init()
 
     if (use_rocket)
     {
-        // Set up networking
-        bool use_dhcp = true;
-        int retries = 10;
-
-        char* ip = new char[16]{"127.0.0.1"}; // ??? TODO What should these values be?
-        char* mask = new char[16]{"255.255.255.255"};
-        char* gate = new char[16]{"255.255.255.255"};
-        s32 if_config_status = if_config(ip, mask, gate, use_dhcp, retries);
-        gdl_assert(if_config_status == 0, "if_config failed");
-
-        // Init and connect Rocket
-        rocket = sync_create_device("sync");
-        bool connectOk = sync_tcp_connect(rocket, "localhost", SYNC_DEFAULT_PORT);
-        gdl_assert(connectOk, "Could not connect rocket");
-
-        use_rocket = (if_config_status == 0 && connectOk);
-
-        delete[](ip);
-        delete[](mask);
-        delete[](gate);
+        std::string rocketHost = "192.168.10.52";//"localhost"
+        rocket = ConnectRocket(rocketHost);
+        if (rocket == nullptr)
+        {
+            use_rocket = false;
+        }
     }
 }
 
@@ -188,11 +137,6 @@ int main()
     gdl::ConsoleMode();
 
 
-    // Init your Game here
-    /*
-             Uncomment to see console messages
-             before game starts
-    */
     ParticleCloud cloudM;
     ParticleCloud cloudC;
     ParticleCloud cloudY;
@@ -216,6 +160,18 @@ int main()
     ParticleMode mode = modes[0];
     float modeCounter = 0.0f;
 
+
+    // Uncomment this block to see console messages before game starts
+    /*
+    while(true)
+    {
+        gdl::WiiInput::StartFrame();
+        if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_HOME)) {
+            break;
+        }
+        VIDEO_WaitVSync();
+    }
+    */
 
     bool gameRunning = true;
     while(true)
@@ -243,13 +199,7 @@ int main()
         // Update rocket sync
         if (use_rocket)
         {
-            sync_row += deltaTime; // DEBUG: Just advance anyway :3
-            if (sync_update(rocket, (int)floor(sync_row), &sync_functions, nullptr))
-            {
-                // Reconnect
-                sync_tcp_connect(rocket, "localhost", SYNC_DEFAULT_PORT);
-
-            }
+            UpdateRocket(rocket);
         }
 
 
@@ -294,10 +244,9 @@ int main()
     cloudY.Quit();
 
     // Close rocket connection
-    if (rocket != nullptr)
+    if (rocket != nullptr && use_rocket)
     {
-        sync_save_tracks(rocket);
-        sync_destroy_device(rocket);
+        DisconnectRocket(rocket);
     }
 
     // Manual exit instead of gdl exit

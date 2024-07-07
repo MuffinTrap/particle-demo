@@ -489,7 +489,7 @@ int sync_tcp_connect(struct sync_device *d, const char *host, unsigned short por
 
 	d->sock = server_connect(host, port);
 	if (d->sock == INVALID_SOCKET)
-		return -1;
+		return SYNC_DEVICE_ERROR_CONNECTION_FAILED;
 
 	for (i = 0; i < (int)d->num_tracks; ++i) {
 		free(d->tracks[i]->keys);
@@ -501,7 +501,7 @@ int sync_tcp_connect(struct sync_device *d, const char *host, unsigned short por
 		if (fetch_track_data(d, d->tracks[i])) {
 			closesocket(d->sock);
 			d->sock = INVALID_SOCKET;
-			return -1;
+			return SYNC_DEVICE_ERROR_TRACK_FETCH_FAIL;
 		}
 	}
 	return 0;
