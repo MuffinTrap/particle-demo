@@ -1,3 +1,4 @@
+#ifdef GEKKO
 #include "mgdl-input-wii.h"
 #include "mgdl-wii.h"
 #include <wiiuse/wpad.h>
@@ -78,4 +79,4 @@ void gdl::WiiInput::StartFrame() {
 
   mote1.roll = DegToRad(data1->orient.roll);
 }
-
+#endif
