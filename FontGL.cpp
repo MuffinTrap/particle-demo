@@ -1,4 +1,5 @@
 #include "FontGL.h"
+#include <string.h>
 
 void FontGL::LoadFromImage(const char* filename, short charw, short charh, char firstCharacter )
 {
@@ -47,7 +48,7 @@ void FontGL::LoadFromImage(const char* filename, short charw, short charh, char 
 
 #pragma GCC diagnostic pop
 
-void FontGL::Printf (float scale, const char* format, ... )
+void FontGL::Printf(float scale, gdl::AlignmentModes alignmentX, gdl::AlignmentModes alignmentY, const char* format, ... )
 {
 	// Draw quads
 	va_list args;
@@ -58,10 +59,30 @@ void FontGL::Printf (float scale, const char* format, ... )
 	va_end(args);
 
 	float aspect = (float)GetCharacterWidth()/(float)GetHeight();
+	float step = aspect * scale;
 
 	float dx = 0.0f;
 	float dy = 0.0f;
 	float dz = 0.0f;
+
+	if (alignmentX == gdl::AlignmentModes::RJustify)
+	{
+		float width = step * strlen(buff);
+		dx -= width;
+	}
+	else if (alignmentX == gdl::AlignmentModes::Centered)
+	{
+		float width = step * strlen(buff);
+		dx -= width / 2;
+	}
+	if (alignmentY == gdl::AlignmentModes::RJustify)
+	{
+		dy += scale;
+	}
+	else if (alignmentY == gdl::AlignmentModes::Centered)
+	{
+		dy += scale/2.0f;
+	}
 
 	glBindTexture(GL_TEXTURE_2D, textureName);
     // Discard pixels with low alpha
@@ -84,17 +105,17 @@ void FontGL::Printf (float scale, const char* format, ... )
 
 		// TOP RIGHT
 		glTexCoord2f(tx1.u, tx1.v);
-		glVertex3f(dx + aspect * scale, dy, dz);
+		glVertex3f(dx + step, dy, dz);
 
 		// LOW RIGHT
 		glTexCoord2f(tx2.u, tx2.v);
-		glVertex3f(dx + aspect * scale, dy - scale, dz);
+		glVertex3f(dx + step, dy - scale, dz);
 
 		// LOW LEFT!
 		glTexCoord2f(tx3.u, tx3.v);
 		glVertex3f(dx, dy - scale, dz);
 
-		dx += aspect * scale;
+		dx += step;
 	}
 	glEnd();
 	glDisable(GL_ALPHA_TEST);

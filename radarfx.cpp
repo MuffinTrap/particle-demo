@@ -1,12 +1,13 @@
 #include "radarfx.h"
 #include <GL/opengx.h>
 #include <stdlib.h>
+#include "FontGL.h"
+#include <random>
+#include <stdio.h>
 
 RadarFX::RadarFX()
 {
-	centerPosition = {0.0f, 0.0f, 0.0f};
 	gridSize = 16;
-	cellSize = 1.0f;
 }
 
 void RadarFX::Init ( u32 dotAmount )
@@ -15,7 +16,7 @@ void RadarFX::Init ( u32 dotAmount )
 	dotsArray = (guVector*)malloc(sizeof(guVector)*dotAmount);
 	for(u32 i = 0; i < dotAmount; i++)
 	{
-		dotsArray[i] = guVector{gdl::GetRandomFloat(0.0f, 1.0f), gdl::GetRandomFloat(0.0f, 1.0f), 0.0f};
+		dotsArray[i] = guVector{gdl::GetRandomFloat(0.2f, 0.8f), gdl::GetRandomFloat(0.2f, 0.8f), 0.0f};
 	}
 
 	// TODO Sort the dots so that it start from the middle of y
@@ -48,9 +49,9 @@ void RadarFX::Update ( float deltaTime )
 
 void RadarFX::DrawGrid(float left, float right, float top, float bottom)
 {
-	float x = centerPosition.x;
-	float y = centerPosition.y;
-	float z = centerPosition.z;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
 
 	// Draw the grid
 	// TODO
@@ -161,21 +162,26 @@ void RadarFX::DrawGrid(float left, float right, float top, float bottom)
 }
 
 
+static char numberbuffer[64];
 
-void RadarFX::Draw()
+void RadarFX::Draw(FontGL* font)
 {
-	float z = centerPosition.z;
-	float x = centerPosition.x;
-	float y = centerPosition.y;
-	float wh = cellSize * gridSize;
+	float x = 0.0f;
+	float y = 0.0f;
+	float z = 0.0f;
+
+	cellSize = 1.0f/(float)gridSize;
+	float wh = 1.0f;
 	float left = x - wh/2.0f;
 	float right = left + wh;
 	float top = y + wh/2.0f;
 	float bottom = top - wh;
 
+	float lineLength = wh/8.0f;
+
+
+
 	glPushMatrix();
-	glScalef(0.25f, 0.25f, 1.0f);
-	glTranslatef(-wh/2.0f, 0.0f, 0.0f);
 
 	DrawGrid(left, right, top, bottom);
 
@@ -183,17 +189,21 @@ void RadarFX::Draw()
 	// TODO DrawArrays and increase amount with time
 	float dz = cellSize/8.0f;
 	glBegin(GL_QUADS);
-	for(u32 di = 0; di < drawAmount; di++)
-	{
-		glVertex3f(left + dotsArray[di].x * wh - dz, top - dotsArray[di].y * wh + dz, z);
-		glVertex3f(left + dotsArray[di].x * wh + dz, top - dotsArray[di].y * wh + dz, z);
-		glVertex3f(left + dotsArray[di].x * wh + dz, top - dotsArray[di].y * wh - dz, z);
-		glVertex3f(left + dotsArray[di].x * wh - dz, top - dotsArray[di].y * wh - dz, z);
-	}
-
+		for(u32 di = 0; di < drawAmount; di++)
+		{
+			float dx = left + dotsArray[di].x * wh;
+			float dy = top - dotsArray[di].y * wh ;
+			glVertex3f(dx - dz, dy + dz, z);
+			glVertex3f(dx + dz, dy + dz, z);
+			glVertex3f(dx + dz, dy - dz, z);
+			glVertex3f(dx - dz, dy - dz, z);
+		}
 	glEnd();
 
 	// Draw lines
+	// Draw random thing the same way every time
+	unsigned seed = 100;
+	srand(seed);
 
 	// TODO Lines start vertically from the center
 	// Orange + or - on line start point
@@ -206,7 +216,7 @@ void RadarFX::Draw()
 	glBegin(GL_LINES);
 	for(u32 di = 0; di < drawAmount; di++)
 	{
-		if (di % 4 == 0)
+		if (gdl::GetRandomInt(0, 4) == 0)
 		{
 			glColor3f(1.0f, 1.0f, 1.0f);
 			if (di == drawAmount-1)
@@ -237,7 +247,19 @@ void RadarFX::Draw()
 				glVertex3f(lx, ly, z);
 
 				glVertex3f(lx, ly, z);
-				glVertex3f(left - wh/2, ly, z);
+				glVertex3f(left - lineLength, ly, z);
+
+				// Add to numbers vector if it is not there yet
+				if (numberEntries.size() <= di)
+				{
+					NumberEntry e;
+					e.lineEnd = {left-lineLength, ly, z};
+					sprintf(numberbuffer, "%.4f %.4f %.4f", e.lineEnd.x, e.lineEnd.y, e.lineEnd.z);
+					e.text = numberbuffer;
+					e.alignmentX = gdl::RJustify;
+					e.index = di;
+					numberEntries.push_back(e);
+				}
 			}
 			else
 			{
@@ -258,12 +280,25 @@ void RadarFX::Draw()
 				glVertex3f(rx, ry, z);
 
 				glVertex3f(rx, ry, z);
-				glVertex3f(right + wh/2, ry, z);
+				glVertex3f(right + lineLength, ry, z);
+
+				if (numberEntries.size() <= di)
+				{
+					NumberEntry e;
+					e.lineEnd = {right + lineLength, ry, z};
+					sprintf(numberbuffer, "%.4f %.4f %.4f", e.lineEnd.x, e.lineEnd.y, e.lineEnd.z);
+					e.text = numberbuffer;
+					e.alignmentX = gdl::LJustify;
+					e.index = di;
+					numberEntries.push_back(e);
+				}
 			}
 		}
 	}
 	glEnd();
 
+	// Reset generator to get the marks on the same dots as lines
+	srand(seed);
 
 	// Center cross and chevrons
 	float c2= cellSize/4.0f;
@@ -275,7 +310,7 @@ void RadarFX::Draw()
 	bool plus = true;
 	for(u32 di = 0; di < drawAmount; di++)
 	{
-		if (di % 4 == 0)
+		if (gdl::GetRandomInt(0,4)==0)
 		{
 			float px = left + dotsArray[di].x * wh;
 			float py = top - dotsArray[di].y * wh;
@@ -295,8 +330,24 @@ void RadarFX::Draw()
 	}
 	glEnd();
 
+	glColor3f(1.0f, 1.0f, 1.0f);
 	// Draw texts
 	// TODO Three words for each line
+	for (u32 di = 0; di < drawAmount; di++)
+	{
+		if (di >= numberEntries.size())
+		{
+			break;
+		}
+		NumberEntry &e = numberEntries[di];
+		if (e.index == di)
+		{
+			glPushMatrix();
+			glTranslatef(e.lineEnd.x, e.lineEnd.y, e.lineEnd.z);
+			font->Printf(textHeight, e.alignmentX, gdl::Centered, e.text.c_str());
+			glPopMatrix();
+		}
+	}
 
 	glPopMatrix();
 

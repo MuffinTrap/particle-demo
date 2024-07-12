@@ -77,7 +77,6 @@ int main()
     // Radar effect
     RadarFX radar;
     radar.Init(64);
-    radar.centerPosition.z = -1.0f;
 
 
     u64 deltaTimeStart = gettime();
@@ -142,13 +141,17 @@ int main()
             camera.Draw3DAxii();
         glPopMatrix();
 
+        /*
         glPushMatrix();
             glColor3f(0.87, 0.46, 0.76);
             guVector fp = {0.2f, 0.2f, 0.2f};
             glTranslatef(fp.x, fp.y, fp.z);
             glRotatef(mainElapsed * 90.0f, 0.0f, 1.0f, 0.0f);
-            ibmFont.Printf(0.25f, "Henlo :3");
+            ibmFont.Printf(0.25f, gdl::LJustify, gdl::LJustify, "Henlo :3");
         glPopMatrix();
+        */
+
+        radar.Draw(&ibmFont);
 
 
         glFlush();
