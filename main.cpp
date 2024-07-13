@@ -160,6 +160,8 @@ int initComputer(int argc, char** argv) {
     glutTimerFunc(1000/60, timerFunc, 0);
 
     glutMainLoop();
+
+    return 0;
 }
 
  

@@ -1,6 +1,8 @@
 BUILD_DIR = build
 SRC_DIRS := src rocket .
 
+# Use only CXX to compile all files
+
 # Use find to gather all .cpp and .c files in SRC_DIRS
 cpp_src := $(shell find $(SRC_DIRS) -name '*.cpp')
 c_src := $(shell find $(SRC_DIRS) -name '*.c')
@@ -20,30 +22,24 @@ else
 	endif
 endif
 
+CXX_FLAGS := -Werror=unused-function -Wall -Wextra
+
 ifeq ($(OS_TYPE),windows)
 	# Windows specific settings
 	CXX = g++
-	CC = gcc
-	CXX_FLAGS = -Werror=unused-function
-	CC_FLAGS = -Werror=unused-function
 	LD_FLAGS = -L"/mingw64/include/GL/" -L"/mingw64/include/GL/" -lsndfile -lopenal -lfreeglut -lopengl32 -lglu32 -lws2_32 -Wl,--allow-multiple-definition
 endif
 
 ifeq ($(OS_TYPE),macos)
 	# macOS specific settings
 	CXX = clang++
-	CC = clang
-	CXX_FLAGS = -I/opt/homebrew/Cellar/libsndfile/1.2.2/include -I/opt/homebrew/Cellar/openal-soft/1.23.1/include -Werror=unused-function
-	CC_FLAGS = -I/opt/homebrew/Cellar/libsndfile/1.2.2/include -I/opt/homebrew/Cellar/openal-soft/1.23.1/include -Werror=unused-function
+	CXX_FLAGS = $(CXX_FLAGS) -I/opt/homebrew/Cellar/libsndfile/1.2.2/include -I/opt/homebrew/Cellar/openal-soft/1.23.1/include
 	LD_FLAGS = -L/opt/homebrew/Cellar/libsndfile/1.2.2/lib -L/opt/homebrew/Cellar/openal-soft/1.23.1/lib -lsndfile -lopenal -framework OpenGL -framework GLUT -Wno-unused-function -Wl,-flat_namespace -Wl
 endif
 
 ifeq ($(OS_TYPE),linux)
 	# Linux specific settings
 	CXX = g++
-	CC = gcc
-	CXX_FLAGS = -Werror=unused-function
-	CC_FLAGS = -Werror=unused-function
 	LD_FLAGS = -lsndfile -lopenal -lGL -lGLU -lglut -Wno-unused-function -Wl,-z,muldefs
 	GLUT_INCLUDE = -I/usr/include/GL/
 endif
@@ -59,7 +55,7 @@ $(BUILD_DIR)/%.o: %.cpp | $(BUILD_DIR)
 
 $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
-	$(CC) -c -o $@ $< $(CC_FLAGS) $(GLUT_INCLUDE)
+	$(CXX) -c -o $@ $< $(CXX_FLAGS) $(GLUT_INCLUDE)
 
 $(BUILD_DIR):
 	mkdir -p $@

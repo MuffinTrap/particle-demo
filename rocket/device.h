@@ -1,6 +1,10 @@
 #ifndef SYNC_DEVICE_H
 #define SYNC_DEVICE_H
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 #include "base.h"
 #include "sync.h"
 
@@ -74,5 +78,9 @@ struct sync_device {
 	struct sync_io_cb io_cb;
 };
 #endif /* !define(N64)*/
+
+#ifdef __cplusplus
+	}
+#endif
 
 #endif /* SYNC_DEVICE_H */

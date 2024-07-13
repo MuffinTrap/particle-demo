@@ -1,6 +1,10 @@
 #ifndef SYNC_TRACK_H
 #define SYNC_TRACK_H
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 #include <string.h>
 #include <stdlib.h>
 #include "base.h"
@@ -45,5 +49,9 @@ static inline int is_key_frame(const struct sync_track *t, int row)
 }
 
 #endif /* !defined(SYNC_PLAYER) */
+
+#ifdef __cplusplus
+	}
+#endif
 
 #endif /* SYNC_TRACK_H */

@@ -41,8 +41,8 @@ static int valid_path_char(char ch)
 static const char *path_encode(const char *path)
 {
 	static char temp[FILENAME_MAX];
-	int i, pos = 0;
-	int path_len = (int)strlen(path);
+	size_t i, pos = 0;
+	size_t path_len = strlen(path);
 	for (i = 0; i < path_len; ++i) {
 		int ch = path[i];
 		if (valid_path_char(ch)) {

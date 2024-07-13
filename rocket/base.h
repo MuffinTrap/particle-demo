@@ -1,6 +1,10 @@
 #ifndef SYNC_BASE_H
 #define SYNC_BASE_H
 
+#ifdef __cplusplus
+    extern "C" {
+#endif
+
 #ifdef _MSC_VER
  #define _CRT_SECURE_NO_WARNINGS 1
  #define _CRT_NONSTDC_NO_DEPRECATE 1
@@ -32,4 +36,7 @@
  typedef unsigned int uint32_t;
 #endif
 
+#ifdef __cplusplus
+    } // extern
+#endif
 #endif /* SYNC_BASE_H */
