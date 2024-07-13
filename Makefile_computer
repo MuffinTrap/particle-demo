@@ -22,7 +22,7 @@ else
 	endif
 endif
 
-CXX_FLAGS := -Werror=unused-function -Wall -Wextra
+CXX_FLAGS = -Werror=unused-function -Wall -Wextra
 
 ifeq ($(OS_TYPE),windows)
 	# Windows specific settings
@@ -33,7 +33,7 @@ endif
 ifeq ($(OS_TYPE),macos)
 	# macOS specific settings
 	CXX = clang++
-	CXX_FLAGS = $(CXX_FLAGS) -I/opt/homebrew/Cellar/libsndfile/1.2.2/include -I/opt/homebrew/Cellar/openal-soft/1.23.1/include
+	CXX_FLAGS += -I/opt/homebrew/Cellar/libsndfile/1.2.2/include -I/opt/homebrew/Cellar/openal-soft/1.23.1/include
 	LD_FLAGS = -L/opt/homebrew/Cellar/libsndfile/1.2.2/lib -L/opt/homebrew/Cellar/openal-soft/1.23.1/lib -lsndfile -lopenal -framework OpenGL -framework GLUT -Wno-unused-function -Wl,-flat_namespace -Wl
 endif
 
