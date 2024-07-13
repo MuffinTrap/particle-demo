@@ -44,22 +44,22 @@ ifeq ($(OS_TYPE),linux)
 	CC = gcc
 	CXX_FLAGS = -Werror=unused-function
 	CC_FLAGS = -Werror=unused-function
-	LD_FLAGS = -lsndfile -lopenal -lGL -lglut -Wno-unused-function -Wl,-z,muldefs
+	LD_FLAGS = -lsndfile -lopenal -lGL -lGLU -lglut -Wno-unused-function -Wl,-z,muldefs
 	GLUT_INCLUDE = -I/usr/include/GL/
 endif
 
 .PHONY: clean
 
 gldemo: $(src:%.cpp=$(BUILD_DIR)/%.o) $(src:%.c=$(BUILD_DIR)/%.o)
-	$(CXX) -I/opt/homebrew/include -v -o $@ $^ $(CXX_FLAGS) $(LD_FLAGS)
+	$(CXX) -v -o $@ $^ $(CXX_FLAGS) $(LD_FLAGS)
 
 $(BUILD_DIR)/%.o: %.cpp | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
-	$(CXX) -c -I/opt/homebrew/include -o $@ $< $(CXX_FLAGS) $(GLUT_INCLUDE)
+	$(CXX) -c -o $@ $< $(CXX_FLAGS) $(GLUT_INCLUDE)
 
 $(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
-	$(CC) -c -I/opt/homebrew/include -o $@ $< $(CC_FLAGS) $(GLUT_INCLUDE)
+	$(CC) -c -o $@ $< $(CC_FLAGS) $(GLUT_INCLUDE)
 
 $(BUILD_DIR):
 	mkdir -p $@
