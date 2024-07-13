@@ -70,15 +70,18 @@ double get_row()
 }
 void pause( int __attribute__((__unused__)) flag) 
 {
+    printf("pause %i\n", flag);
 #ifndef GEKKO
 	if (flag)
     	alSourcePause(source);
 	else
     	alSourcePlay(source);
 #endif
+    set_row(get_row());
 }
 void set_row( int __attribute__((__unused__)) row)
 {
+    printf("set_row %i\n", row);
 #ifndef GEKKO
     double frow = row - 0.01;
 	alSourcef(source, AL_SEC_OFFSET, frow / row_rate);

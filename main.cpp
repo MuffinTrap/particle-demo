@@ -66,7 +66,16 @@ void glRectf(float x1, float y1, float x2, float y2)
 float mainElapsed = 0.0f;
 
 void renderLoop() {
-    glClear(GL_COLOR_BUFFER_BIT);
+    double row = get_row();
+    #ifndef GECKO
+        #ifndef SYNC_PLAYER
+            struct sync_cb cb = { pause, set_row, is_playing };
+            if (sync_update(rocket, (int)floor(row), &cb))
+                sync_tcp_connect(rocket, "localhost", SYNC_DEFAULT_PORT);
+        #endif
+    #endif
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+    glClearColor(sync_get_val(clear_r, row), sync_get_val(clear_g, row), sync_get_val(clear_b, row), 1);
 
     // Set the projection matrix
     glMatrixMode(GL_PROJECTION);
@@ -99,13 +108,13 @@ int initComputer(int argc, char** argv) {
     setupDirection();
     // Open the WAV file
     SF_INFO sfinfo;
-    printf("Opening Music File: %s", filename);
+    printf("Opening Music File: %s\n", filename);
     sndfile = sf_open(filename, SFM_READ, &sfinfo);
     if (!sndfile) {
         printf("Error opening the file '%s'\n", filename);
         return 1;
     }
-    printf("Setting up OpenAL Audio Device.");
+    printf("Setting up OpenAL Audio Device.\n");
     // Initialize OpenAL
     device = alcOpenDevice(NULL);
     if (!device) {
@@ -113,7 +122,7 @@ int initComputer(int argc, char** argv) {
         sf_close(sndfile);
         return 1;
     }
-    printf("Setting up OpenAL Audio Contex.");
+    printf("Setting up OpenAL Audio Contex.\n");
     context = alcCreateContext(device, NULL);
     if (!context) {
         printf("Failed to create OpenAL context\n");
@@ -124,7 +133,7 @@ int initComputer(int argc, char** argv) {
 
     rocket = sync_create_device("sync");
     if (!rocket) {
-        printf("Out of memory?? GNU Rocket.");
+        printf("Out of memory?? GNU Rocket.\n");
         return 1;
     }
     clear_r = sync_get_track(rocket, "clear_r");

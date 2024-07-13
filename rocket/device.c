@@ -563,6 +563,7 @@ int sync_update(struct sync_device *d, int row, struct sync_cb *cb)
 sockerr:
 	closesocket(d->sock);
 	d->sock = INVALID_SOCKET;
+	
 	return -1;
 }
 
