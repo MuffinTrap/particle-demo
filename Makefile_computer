@@ -6,7 +6,7 @@ SRC_DIRS := src rocket
 # Use find to gather all .cpp and .c files in SRC_DIRS
 cpp_src := $(shell find $(SRC_DIRS) -name '*.cpp')
 c_src := $(shell find $(SRC_DIRS) -name '*.c')
-src := $(cpp_src) $(c_src) main.cpp 
+src := $(cpp_src) $(c_src)
 
 MKSPRITE_FLAGS ?=
 
