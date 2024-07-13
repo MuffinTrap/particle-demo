@@ -90,6 +90,9 @@ int main()
     FontGL ibmFont;
     ibmFont.LoadFromImage("font8x16.png", 8, 16, ' ');
 
+    FontGL andvariFont;
+    andvariFont.LoadFromImage("andvari.png", 34, 38, ' ');
+
     // Uncomment this block to see console messages before game starts
     /*
     while(true)
