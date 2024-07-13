@@ -6,7 +6,6 @@
     #include <sndfile.h>
     #include <AL/al.h>
     #include <AL/alc.h>
-    #include "rocket/sync.h"
     extern SNDFILE* sndfile;
     extern ALCdevice* device;
     extern ALCcontext* context;

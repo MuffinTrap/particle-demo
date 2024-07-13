@@ -251,42 +251,42 @@ void sync_set_io_cb(struct sync_device *d, struct sync_io_cb *cb)
 #ifdef NEED_STRDUP
 static inline char *rocket_strdup(const char *str)
 {
-	char *ret = malloc(strlen(str) + 1);
-	if (ret)
-		strcpy(ret, str);
-	return ret;
+    char *ret = (char *)malloc(strlen(str) + 1);
+    if (ret)
+        strcpy(ret, str);
+    return ret;
 }
 #define strdup rocket_strdup
 #endif
 
 struct sync_device *sync_create_device(const char *base)
 {
-	struct sync_device *d = malloc(sizeof(*d));
-	if (!d)
-		return NULL;
+    struct sync_device *d = (struct sync_device *)malloc(sizeof(*d));
+    if (!d)
+        return NULL;
 
-	if (!base || base[0] == '/')
-		return NULL;
+    if (!base || base[0] == '/')
+        return NULL;
 
-	d->base = strdup(path_encode(base));
-	if (!d->base) {
-		free(d);
-		return NULL;
-	}
+    d->base = strdup(path_encode(base));
+    if (!d->base) {
+        free(d);
+        return NULL;
+    }
 
-	d->tracks = NULL;
-	d->num_tracks = 0;
+    d->tracks = NULL;
+    d->num_tracks = 0;
 
 #ifndef SYNC_PLAYER
-	d->row = -1;
-	d->sock = INVALID_SOCKET;
+    d->row = -1;
+    d->sock = INVALID_SOCKET;
 #endif
 
-	d->io_cb.open = (void *(*)(const char *, const char *))fopen;
-	d->io_cb.read = (size_t (*)(void *, size_t, size_t, void *))fread;
-	d->io_cb.close = (int (*)(void *))fclose;
+    d->io_cb.open = (void *(*)(const char *, const char *))fopen;
+    d->io_cb.read = (size_t (*)(void *, size_t, size_t, void *))fread;
+    d->io_cb.close = (int (*)(void *))fclose;
 
-	return d;
+    return d;
 }
 
 void sync_destroy_device(struct sync_device *d)
@@ -323,7 +323,7 @@ static int read_track_data(struct sync_device *d, struct sync_track *t)
 		return -1;
 
 	d->io_cb.read(&t->num_keys, sizeof(int), 1, fp);
-	t->keys = malloc(sizeof(struct track_key) * t->num_keys);
+    t->keys = (struct track_key *)malloc(sizeof(struct track_key) * t->num_keys);
 	if (!t->keys)
 		return -1;
 
@@ -570,28 +570,27 @@ sockerr:
 
 static int create_track(struct sync_device *d, const char *name)
 {
-	void *tmp;
-	struct sync_track *t;
-	assert(find_track(d, name) < 0);
+    struct sync_track *t;
+    assert(find_track(d, name) < 0);
 
-	t = malloc(sizeof(*t));
-	if (!t)
-		return -1;
+    t = (struct sync_track *)malloc(sizeof(*t));
+    if (!t)
+        return -1;
 
-	t->name = strdup(name);
-	t->keys = NULL;
-	t->num_keys = 0;
+    t->name = strdup(name);
+    t->keys = NULL;
+    t->num_keys = 0;
 
-	tmp = realloc(d->tracks, sizeof(d->tracks[0]) * (d->num_tracks + 1));
-	if (!tmp) {
-		free(t);
-		return -1;
-	}
+    void *tmp = realloc(d->tracks, sizeof(d->tracks[0]) * (d->num_tracks + 1));
+    if (!tmp) {
+        free(t);
+        return -1;
+    }
 
-	d->tracks = tmp;
-	d->tracks[d->num_tracks++] = t;
+    d->tracks = (struct sync_track **)tmp;
+    d->tracks[d->num_tracks++] = t;
 
-	return (int)d->num_tracks - 1;
+    return (int)d->num_tracks - 1;
 }
 
 const struct sync_track *sync_get_track(struct sync_device *d, const char *name)

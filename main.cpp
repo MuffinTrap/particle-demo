@@ -6,8 +6,7 @@
     #include "mgdl-input-wii.h"
 #endif
 #include <math.h>
-#include "particles.h"
-#include "direction.h"
+#include "src/direction.hpp"
 #include "rocket/sync.h"
 #ifdef GEKKO 
     #include <GL/opengx.h>
@@ -22,14 +21,13 @@
         #include <GL/glu.h>
         #include <GL/glut.h>
     #endif
-    extern void start_save_sync(const char *filename);
-    extern void save_sync(const struct sync_track *t, const char *filename);
 
     #include <stdbool.h>
     #include <stdlib.h>
     #include <stdio.h>
     #include <sndfile.h>
     #include <AL/al.h>
+    #include "rocket/track.h"
     struct sync_device *rocket;
     const struct sync_track *clear_r;
     const struct sync_track *clear_g;
@@ -95,8 +93,9 @@ void timerFunc(int value) {
 #endif
 
 
-int initComputer(int argc, char *argv[]) {
+int initComputer(int argc, char** argv) {
     const char* filename = "test_music.wav"; // Replace with your WAV file path
+    printf("Setting up direction.");
     setupDirection();
     // Open the WAV file
     SF_INFO sfinfo;
@@ -106,6 +105,7 @@ int initComputer(int argc, char *argv[]) {
         printf("Error opening the file '%s'\n", filename);
         return 1;
     }
+    printf("Setting up OpenAL Audio Device.");
     // Initialize OpenAL
     device = alcOpenDevice(NULL);
     if (!device) {
@@ -113,6 +113,7 @@ int initComputer(int argc, char *argv[]) {
         sf_close(sndfile);
         return 1;
     }
+    printf("Setting up OpenAL Audio Contex.");
     context = alcCreateContext(device, NULL);
     if (!context) {
         printf("Failed to create OpenAL context\n");
@@ -162,7 +163,7 @@ int initComputer(int argc, char *argv[]) {
 }
 
  
-int main()
+int main(int argc, char** argv)
 {
 #ifdef GEKKO 
     init();

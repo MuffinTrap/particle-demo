@@ -1,8 +1,10 @@
 BUILD_DIR = build
-SRC_DIRS := . rocket
+SRC_DIRS := src rocket .
 
-# Use find to gather all .cpp files in SRC_DIRS
-src := $(shell find $(SRC_DIRS) -name '*.cpp')
+# Use find to gather all .cpp and .c files in SRC_DIRS
+cpp_src := $(shell find $(SRC_DIRS) -name '*.cpp')
+c_src := $(shell find $(SRC_DIRS) -name '*.c')
+src := $(cpp_src) $(c_src)
 
 MKSPRITE_FLAGS ?=
 
@@ -20,21 +22,27 @@ endif
 
 ifeq ($(OS_TYPE),windows)
 	# Windows specific settings
-	CC = g++
+	CXX = g++
+	CC = gcc
+	CXX_FLAGS = -Werror=unused-function
 	CC_FLAGS = -Werror=unused-function
 	LD_FLAGS = -L"/mingw64/include/GL/" -L"/mingw64/include/GL/" -lsndfile -lopenal -lfreeglut -lopengl32 -lglu32 -lws2_32 -Wl,--allow-multiple-definition
 endif
 
 ifeq ($(OS_TYPE),macos)
 	# macOS specific settings
-	CC = clang++
+	CXX = clang++
+	CC = clang
+	CXX_FLAGS = -I/opt/homebrew/Cellar/libsndfile/1.2.2/include -I/opt/homebrew/Cellar/openal-soft/1.23.1/include -Werror=unused-function
 	CC_FLAGS = -I/opt/homebrew/Cellar/libsndfile/1.2.2/include -I/opt/homebrew/Cellar/openal-soft/1.23.1/include -Werror=unused-function
-	LD_FLAGS = -L/opt/homebrew/Cellar/libsndfile/1.2.2/lib -L/opt/homebrew/Cellar/openal-soft/1.23.1/lib -lsndfile -lopenal -framework OpenGL -framework GLUT -Wno-unused-function -Wl,-flat_namespace -Wl,-undefined,dynamic_lookup
+	LD_FLAGS = -L/opt/homebrew/Cellar/libsndfile/1.2.2/lib -L/opt/homebrew/Cellar/openal-soft/1.23.1/lib -lsndfile -lopenal -framework OpenGL -framework GLUT -Wno-unused-function -Wl,-flat_namespace -Wl
 endif
 
 ifeq ($(OS_TYPE),linux)
 	# Linux specific settings
-	CC = g++
+	CXX = g++
+	CC = gcc
+	CXX_FLAGS = -Werror=unused-function
 	CC_FLAGS = -Werror=unused-function
 	LD_FLAGS = -lsndfile -lopenal -lGL -lglut -Wno-unused-function -Wl,-z,muldefs
 	GLUT_INCLUDE = -I/usr/include/GL/
@@ -42,10 +50,14 @@ endif
 
 .PHONY: clean
 
-gldemo: $(src:%.cpp=$(BUILD_DIR)/%.o)
-	$(CC) -I/opt/homebrew/include -v -o $@ $^ $(CC_FLAGS) $(LD_FLAGS)
+gldemo: $(src:%.cpp=$(BUILD_DIR)/%.o) $(src:%.c=$(BUILD_DIR)/%.o)
+	$(CXX) -I/opt/homebrew/include -v -o $@ $^ $(CXX_FLAGS) $(LD_FLAGS)
 
 $(BUILD_DIR)/%.o: %.cpp | $(BUILD_DIR)
+	@mkdir -p $(dir $@)
+	$(CXX) -c -I/opt/homebrew/include -o $@ $< $(CXX_FLAGS) $(GLUT_INCLUDE)
+
+$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
 	@mkdir -p $(dir $@)
 	$(CC) -c -I/opt/homebrew/include -o $@ $< $(CC_FLAGS) $(GLUT_INCLUDE)
 
