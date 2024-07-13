@@ -1,11 +1,27 @@
 #include "FontGL.h"
 #include <string.h>
 
+void FontGL::LoadFromBuffer ( const void* buffer, size_t size, short charw, short charh, char firstCharacter )
+{
+	gdl::Image fontImage;
+	bool imageOk = fontImage.LoadImageBuffer(buffer, size, gdl::Nearest, gdl::RGBA8);
+	gdl_assert(imageOk, "Could not load font image from buffer");
+	Bind(fontImage, charw, charh, firstCharacter);
+}
+
+
+
 void FontGL::LoadFromImage(const char* filename, short charw, short charh, char firstCharacter )
 {
 	gdl::Image fontImage;
 	bool imageOk = fontImage.LoadImage(filename, gdl::Nearest, gdl::RGBA8);
 	gdl_assert(imageOk, "Did not find font image file: %s", filename);
+	Bind(fontImage, charw, charh, firstCharacter);
+
+}
+void FontGL::Bind ( gdl::Image& fontImage, short charw, short charh, char firstCharacter )
+{
+
 	// Calculate the vertex and texture coordinates (vertices are not used)
 	BindSheet(fontImage, charw, charh, firstCharacter);
 
@@ -48,7 +64,7 @@ void FontGL::LoadFromImage(const char* filename, short charw, short charh, char 
 
 #pragma GCC diagnostic pop
 
-void FontGL::Printf(float scale, gdl::AlignmentModes alignmentX, gdl::AlignmentModes alignmentY, const char* format, ... )
+void FontGL::Printf(ColorName color, float scale, gdl::AlignmentModes alignmentX, gdl::AlignmentModes alignmentY, const char* format, ... )
 {
 	// Draw quads
 	va_list args;
@@ -90,6 +106,7 @@ void FontGL::Printf(float scale, gdl::AlignmentModes alignmentX, gdl::AlignmentM
     glAlphaFunc(GL_GREATER, 0.3f);
 
 	glBegin(GL_QUADS);
+	PaletteColor3f(color);
 	for (short c = 0; buff[c] != '\0'; c++)
 	{
 		char character = buff[c];
@@ -119,6 +136,7 @@ void FontGL::Printf(float scale, gdl::AlignmentModes alignmentX, gdl::AlignmentM
 	}
 	glEnd();
 	glDisable(GL_ALPHA_TEST);
+	glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void FontGL::DrawSheet ( guVector center)

@@ -184,10 +184,6 @@ void RadarFX::Draw(FontGL* font)
 
 	float lineLength = wh/8.0f;
 
-
-
-	glPushMatrix();
-
 	DrawGrid(left, right, top, bottom);
 
 	// Draw the dots/points
@@ -337,7 +333,6 @@ void RadarFX::Draw(FontGL* font)
 	}
 	glEnd();
 
-	PaletteColor3f(WHITE);
 	// Draw texts
 	// TODO Three words for each line
 	for (u32 di = 0; di < drawAmount; di++)
@@ -351,11 +346,8 @@ void RadarFX::Draw(FontGL* font)
 		{
 			glPushMatrix();
 			glTranslatef(e.lineEnd.x, e.lineEnd.y, e.lineEnd.z);
-			font->Printf(textHeight, e.alignmentX, gdl::Centered, e.text.c_str());
+			font->Printf(WHITE, textHeight, e.alignmentX, gdl::Centered, e.text.c_str());
 			glPopMatrix();
 		}
 	}
-
-	glPopMatrix();
-
 }

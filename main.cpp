@@ -11,10 +11,6 @@
 //
 #include "palette.h"
 
-// Effects
-#include "particlecloud.h"
-#include "FontGL.h"
-#include "radarfx.h"
 
 // Debug
 #include "deltahistogram.h"
@@ -77,21 +73,11 @@ int main()
 
     DebugCamera camera;
 
-    // Radar effect
-    RadarFX radar;
-    radar.Init(64);
-
-
     u64 deltaTimeStart = gettime();
     u64 programStart = gettime();
     float deltaTime = 0.0f;
     float mainElapsed = 0.0f;
 
-    FontGL ibmFont;
-    ibmFont.LoadFromImage("font8x16.png", 8, 16, ' ');
-
-    FontGL andvariFont;
-    andvariFont.LoadFromImage("andvari.png", 34, 38, ' ');
 
     // Uncomment this block to see console messages before game starts
     /*
@@ -126,7 +112,6 @@ int main()
         {
             UpdateRocket(rocket);
         }
-        radar.Update(deltaTime);
 
         camera.Update(deltaTime);
 
@@ -148,19 +133,6 @@ int main()
             camera.Draw3DAxii();
         glPopMatrix();
         */
-
-        /*
-        glPushMatrix();
-            glColor3f(0.87, 0.46, 0.76);
-            guVector fp = {0.2f, 0.2f, 0.2f};
-            glTranslatef(fp.x, fp.y, fp.z);
-            glRotatef(mainElapsed * 90.0f, 0.0f, 1.0f, 0.0f);
-            ibmFont.Printf(0.25f, gdl::LJustify, gdl::LJustify, "Henlo :3");
-        glPopMatrix();
-        */
-
-        radar.Draw(&ibmFont);
-
 
         glFlush();
         gdl::Display();
