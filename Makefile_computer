@@ -1,12 +1,12 @@
 BUILD_DIR = build
-SRC_DIRS := src rocket .
+SRC_DIRS := src rocket
 
 # Use only CXX to compile all files
 
 # Use find to gather all .cpp and .c files in SRC_DIRS
 cpp_src := $(shell find $(SRC_DIRS) -name '*.cpp')
 c_src := $(shell find $(SRC_DIRS) -name '*.c')
-src := $(cpp_src) $(c_src)
+src := $(cpp_src) $(c_src) main.cpp 
 
 MKSPRITE_FLAGS ?=
 
