@@ -4,6 +4,7 @@
 #include "FontGL.h"
 #include <random>
 #include <stdio.h>
+#include "palette.h"
 
 RadarFX::RadarFX()
 {
@@ -42,6 +43,7 @@ void RadarFX::Update ( float deltaTime )
 		if (drawAmount == dotAmount)
 		{
 			drawAmount = 0;
+			seed = gdl::GetRandomInt(0, 256);
 		}
 	}
 }
@@ -58,9 +60,11 @@ void RadarFX::DrawGrid(float left, float right, float top, float bottom)
 	// Bold white cross in the origo
 	// Chevrons in corners and sides
 	// zero axes with bright grey
-	// grid with light transparent grey (crossings are a bit lighter then lines)
+	// grid with light transparent grey (crossings are a bit lighter than lines)
 	glBegin(GL_LINES);
-	glColor3f(0.3f, 0.3f, 0.3f);
+
+	// Grey grid
+	PaletteColor3f(GREY);
 	for (u32 c = 0; c <= gridSize; c++)
 	{
 		// horizontal line
@@ -71,7 +75,8 @@ void RadarFX::DrawGrid(float left, float right, float top, float bottom)
 		glVertex3f(left + c * cellSize, top, z);
 		glVertex3f(left + c * cellSize, bottom, z);
 	}
-	glColor3f(0.6f, 0.6f, 0.6f);
+
+	// Borders
 	// Vertical axis
 	glVertex3f(left, y, z);
 	glVertex3f(right, y, z);
@@ -94,13 +99,13 @@ void RadarFX::DrawGrid(float left, float right, float top, float bottom)
 	glVertex3f(right, top, z);
 	glVertex3f(right, bottom, z);
 
-
 	glEnd();
-	// Center cross and chevrons
+
+	// Center cross and chevrons in white
 	float c2= cellSize/4.0f;
 	float c8= cellSize/8.0f;
 	glBegin(GL_QUADS);
-	glColor3f(1.0f, 1.0f, 1.0f);
+	PaletteColor3f(WHITE);
 
 	// Center
 	glVertex3f(x-c2, y+c8, z);
@@ -189,6 +194,7 @@ void RadarFX::Draw(FontGL* font)
 	// TODO DrawArrays and increase amount with time
 	float dz = cellSize/8.0f;
 	glBegin(GL_QUADS);
+		PaletteColor3f(WHITE);
 		for(u32 di = 0; di < drawAmount; di++)
 		{
 			float dx = left + dotsArray[di].x * wh;
@@ -202,12 +208,10 @@ void RadarFX::Draw(FontGL* font)
 
 	// Draw lines
 	// Draw random thing the same way every time
-	unsigned seed = 100;
 	srand(seed);
 
-	// TODO Lines start vertically from the center
+	// Lines start vertically from the center
 	// Orange + or - on line start point
-	// Line is orange when it appears
 	float textHeight = wh / 32.0f;
 	u32 leftUpIndex = 1;
 	u32 leftDownIndex = 1;
@@ -218,10 +222,14 @@ void RadarFX::Draw(FontGL* font)
 	{
 		if (gdl::GetRandomInt(0, 4) == 0)
 		{
-			glColor3f(1.0f, 1.0f, 1.0f);
 			if (di == drawAmount-1)
 			{
-				glColor3f(1.0f, 0.4f, 0.2f); // ORANGE
+				// Line is orange when it appears
+				PaletteColor3f(ORANGE);
+			}
+			else
+			{
+				PaletteColor3f(GREY);
 			}
 			// Dot position
 			float dotx = left + dotsArray[di].x * wh;
@@ -297,16 +305,15 @@ void RadarFX::Draw(FontGL* font)
 	}
 	glEnd();
 
+	// Plus or minus symbols
 	// Reset generator to get the marks on the same dots as lines
 	srand(seed);
 
-	// Center cross and chevrons
 	float c2= cellSize/4.0f;
 	float c8= cellSize/8.0f;
-	// Plus or minus
-	glColor3f(1.0f, 0.4f, 0.2f); // ORANGE
 
 	glBegin(GL_QUADS);
+	PaletteColor3f(ORANGE);
 	bool plus = true;
 	for(u32 di = 0; di < drawAmount; di++)
 	{
@@ -330,7 +337,7 @@ void RadarFX::Draw(FontGL* font)
 	}
 	glEnd();
 
-	glColor3f(1.0f, 1.0f, 1.0f);
+	PaletteColor3f(WHITE);
 	// Draw texts
 	// TODO Three words for each line
 	for (u32 di = 0; di < drawAmount; di++)

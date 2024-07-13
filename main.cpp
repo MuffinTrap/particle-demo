@@ -8,6 +8,9 @@
 #include <GL/opengx.h>
 #include <GL/glu.h>
 
+//
+#include "palette.h"
+
 // Effects
 #include "particlecloud.h"
 #include "FontGL.h"
@@ -52,7 +55,7 @@ int main()
 {
     init();
     ogx_initialize();
-    glClearColor(0.1f, 0.1f, 0.1f, 0.0f);
+    PaletteClearColor3f(BLACK);
     glShadeModel(GL_FLAT);
     glCullFace(GL_BACK);
     glViewport(0, 0, gdl::ScreenXres, gdl::ScreenYres);
@@ -137,9 +140,11 @@ int main()
         glLoadIdentity();
         camera.ApplyMatrix(); // Calls gluLookAt()
 
+        /*
         glPushMatrix();
             camera.Draw3DAxii();
         glPopMatrix();
+        */
 
         /*
         glPushMatrix();

@@ -32,6 +32,7 @@ public:
 	// How many points and lines to draw?
 	float elapsed = 0.0f;
 	u32 drawAmount = 0;
+	unsigned seed = 100;
 
 	std::vector<NumberEntry> numberEntries;
 };
