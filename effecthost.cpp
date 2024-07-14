@@ -1,16 +1,30 @@
 #include "effecthost.h"
+#include <wiiuse/wpad.h>
+#include <mgdl-wii.h>
 #include "mgdl-input-wii.h"
-#include "wiiuse/wpad.h"
 
+EffectHost::EffectHost()
+{
 
+}
 
-#include "andvari_png.h"
-
+EffectHost::~EffectHost()
+{
+	radar.Quit();
+}
 
 void EffectHost::Init()
 {
-	font.LoadFromImage("font8x16.png", 8, 16, ' ');
+	printf("effecthost::Init()\n");
+	// NOTE: Andvari is 30x30
+	//font.LoadFromBuffer(NES30x30_png, NES30x30_png_size, 30, 30, ' ' );
+	font.LoadFromImage("andvari30x30.png", 30, 30, ' ');
+	//font.LoadFromImage("font8x16.png", 8, 16, ' ');
+	// font.LoadFromBuffer(font8x16_png, font8x16_png_size, 8, 16, ' ');
+	//font.LoadFromBuffer(font_test_png, font_test_png_size, 8, 16, ' ');
+	printf("Radar init\n");
     radar.Init(64);
+	printf("Tuner init\n");
 	tuner.Init();
 	activeEffect = Radar;
 }

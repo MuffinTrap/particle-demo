@@ -3,6 +3,11 @@
 #include "tunerfx.h"
 #include "FontGL.h"
 
+namespace gdl
+{
+	class Image;
+};
+
 enum EffectName
 {
 	Radar,
@@ -12,6 +17,8 @@ enum EffectName
 class EffectHost
 {
 public:
+	EffectHost();
+	~EffectHost();
 	void Init();
 	void Update(float deltaTime);
 	void Draw();

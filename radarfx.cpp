@@ -14,11 +14,13 @@ RadarFX::RadarFX()
 void RadarFX::Init ( u32 dotAmount )
 {
 	this->dotAmount = dotAmount;
-	dotsArray = (guVector*)malloc(sizeof(guVector)*dotAmount);
+	size_t dotArraySize = dotAmount* sizeof(guVector);
+	dotsArray = (guVector*)malloc(dotArraySize);
 	for(u32 i = 0; i < dotAmount; i++)
 	{
 		dotsArray[i] = guVector{gdl::GetRandomFloat(0.2f, 0.8f), gdl::GetRandomFloat(0.2f, 0.8f), 0.0f};
 	}
+	DCFlushRange(dotsArray, dotArraySize);
 
 	// TODO Sort the dots so that it start from the middle of y
 }

@@ -10,7 +10,7 @@
 
 //
 #include "palette.h"
-
+#include "effecthost.h"
 
 // Debug
 #include "deltahistogram.h"
@@ -50,6 +50,9 @@ void init()
 int main()
 {
     init();
+    gdl::ConsoleMode();
+
+    // Grapchis init
     ogx_initialize();
     PaletteClearColor3f(BLACK);
     glShadeModel(GL_FLAT);
@@ -69,8 +72,8 @@ int main()
     glEnableClientState(GL_INDEX_ARRAY);
 	glEnable(GL_TEXTURE_2D);
 
-    gdl::ConsoleMode();
 
+    // Demo variables init
     DebugCamera camera;
 
     u64 deltaTimeStart = gettime();
@@ -78,6 +81,8 @@ int main()
     float deltaTime = 0.0f;
     float mainElapsed = 0.0f;
 
+    EffectHost host;
+    host.Init();
 
     // Uncomment this block to see console messages before game starts
     /*
@@ -114,8 +119,10 @@ int main()
         }
 
         camera.Update(deltaTime);
+        host.Update(deltaTime);
 
         // Start drawing
+
         gdl::PrepDisplay();
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -134,6 +141,8 @@ int main()
         glPopMatrix();
         */
 
+        host.Draw();
+
         glFlush();
         gdl::Display();
     }
@@ -144,7 +153,6 @@ int main()
         DisconnectRocket(rocket);
     }
 
-    // Manual exit instead of gdl exit
-    exit(0);
+    gdl::wii::DoProgramExit();
 }
 #pragma GCC diagnostic pop
