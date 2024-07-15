@@ -62,7 +62,7 @@ int main()
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     float aspect = (float)gdl::ScreenXres/(float)gdl::ScreenYres;
-    gluPerspective(45.0, aspect, 0.1, 100.0);
+    gluPerspective(75.0, aspect, 0.1, 100.0);
 
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();

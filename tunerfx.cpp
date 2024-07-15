@@ -4,50 +4,52 @@
 #include "FontGL.h"
 #include "palette.h"
 
+
 void TunerFx::Init()
 {
-	names.push_back({0, 4,"Henlo"});
-	names.push_back({2, 13, "Muffins!"});
+	aspect = (float)gdl::ScreenXres/(float)gdl::ScreenYres;
+	width = aspect * 2.0f;
+	left = -aspect;
+	right = +aspect;
+	top = 1.0f;
+	bottom = -1.0f;
+
+	names.push_back(CreateName(0.2f, 0, "Beans"));
+	names.push_back(CreateName(0.42f, 2, "Muffins"));
+	names.push_back(CreateName(0.7f, 2, "and you"));
 }
 
 void TunerFx::Update ( float deltaTime )
 {
 	// Move the orange line
-	float aspect = (float)gdl::ScreenXres/(float)gdl::ScreenYres;
-	linePos += deltaTime;
-	if (linePos > aspect * 2.0f)
+	linePos += lineSpeed * deltaTime;
+	if (linePos > width)
 	{
 		linePos = 0.0f;
 	}
 }
 
-guVector TunerFx::ColRowPos ( float left, short row, short col )
-{
-	return {
-		left + (float)col * step,
-		1.0f - ((float)row +0.5f) * 2.0f/(float)rows,
-		0.0f};
-}
 
 void TunerFx::Draw ( FontGL* font )
 {
 	// Draw the border frame
 
-	float aspect = (float)gdl::ScreenXres/(float)gdl::ScreenYres;
-	float left = -aspect;
-	float right = +aspect;
-	float top = 1.0f;
-	float bottom = -1.0f;
 	float z = 0.0f;
-
 	float rowHeight = 2.0f/(float)rows;
-
-
-
 	// Draw the guide lines
 	float mid = 0.0f;
+	float lineWidth = 0.01f;
 
-	glBegin(GL_LINES);
+	glBegin(GL_QUADS);
+		PaletteColor3f(ORANGE);
+		// Draw the orange line
+		glVertex3f(left + linePos, top, z);
+		glVertex3f(left + linePos + step/2.0f, top, z);
+		glVertex3f(left + linePos + step/2.0f, bottom, z);
+		glVertex3f(left + linePos, bottom, z);
+	glEnd();
+
+	glBegin(GL_QUADS);
 		// Draws
 		// |----|----|----|----|
 		//
@@ -58,34 +60,25 @@ void TunerFx::Draw ( FontGL* font )
 		for (int h = 1; h < rows; h++)
 		{
 			mid = top - rowHeight * (float)h;
-			glVertex3f(left, mid, z);
-			glVertex3f(right, mid, z);
+			glVertex3f(left, mid+lineWidth, z);
+			glVertex3f(right, mid+lineWidth, z);
+			glVertex3f(right, mid-lineWidth, z);
+			glVertex3f(left, mid-lineWidth, z);
 
-			short steps = (aspect*2.0f)/0.05f;
+			short steps = (width)/0.05f;
 			for (short s = 0; s < steps; s += 1)
 			{
+				float h = step;
 				if (s % 5 == 0)
 				{
-					glVertex3f(left+s*step, mid+step*2.0f, z);
-					glVertex3f(left+s*step, mid-step*2.0f, z);
+					h *= 2.0f;
 				}
-				else
-				{
-					glVertex3f(left+s*step, mid+step, z);
-					glVertex3f(left+s*step, mid-step, z);
-				}
+				glVertex3f(left+s*step, mid-h, z);
+				glVertex3f(left+s*step+lineWidth, mid-h, z);
+				glVertex3f(left+s*step+lineWidth, mid+h, z);
+				glVertex3f(left+s*step, mid+h, z);
 			}
 		}
-	glEnd();
-
-
-	glBegin(GL_LINE_LOOP);
-		PaletteColor3f(ORANGE);
-		// Draw the orange line
-		glVertex3f(left + linePos, top, z);
-		glVertex3f(left + linePos + step, top, z);
-		glVertex3f(left + linePos + step, bottom, z);
-		glVertex3f(left + linePos, bottom, z);
 	glEnd();
 
 	// Borders
@@ -100,10 +93,55 @@ void TunerFx::Draw ( FontGL* font )
 	// Draw names
 	for (size_t ni = 0; ni < names.size(); ni++)
 	{
-		guVector p = ColRowPos(left, names[ni].row, names[ni].column);
-		glPushMatrix();
-		glTranslatef(p.x, p.y, p.z);
-		font->Printf(WHITE, rowHeight/2.0f, gdl::LJustify, gdl::Centered, names[ni].text.c_str());
-		glPopMatrix();
+		guVector& p = names[ni].pos;
+		if (p.x < left+linePos)
+		{
+			// Draw cross on the position.
+			// Draw in orange if found recently
+			float diff = left+linePos - p.x;
+			bool close = diff < step;
+			ColorName nameColor = WHITE;
+			if (close) {
+				nameColor = ORANGE;
+			}
+
+			glPushMatrix();
+			float crossSize = rowHeight * textToRowScale * 0.25f;
+			glTranslatef(p.x-crossSize, p.y, p.z);
+			// Draw name
+			font->Printf(nameColor, rowHeight * textToRowScale, gdl::RJustify, gdl::Centered, names[ni].text.c_str());
+
+			// Draw cross on position
+			glTranslatef(crossSize, -crossSize, 0.0f);
+			glBegin(GL_LINES);
+				if (close) {
+					PaletteColor3f(ORANGE);
+				} else{
+					PaletteColor3f(GREY);
+				}
+				glVertex3f(-crossSize, 0.0f, 0.0f);
+				glVertex3f(crossSize, 0.0f, 0.0f);
+
+				glVertex3f(0.0f, -crossSize, 0.0f);
+				glVertex3f(0.0f, crossSize, 0.0f);
+			glEnd();
+			glPopMatrix();
+		}
 	}
+}
+
+guVector TunerFx::GetNamePos(float x, short row)
+{
+	return {
+		left + x * width,
+		1.0f - ((float)row +0.5f) * 2.0f/(float)rows,
+		0.0f};
+}
+Name TunerFx::CreateName(float x, short row, const char* text)
+{
+	Name n;
+	n.pos = GetNamePos(x, row);
+	n.found = false;
+	n.text = text;
+	return n;
 }

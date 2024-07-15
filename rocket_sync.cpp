@@ -1,6 +1,5 @@
 #include "rocket_sync.h"
 
-#include <ogc/if_config.h>
 #include <math.h>
 
 static float sync_row = 0.0f;
