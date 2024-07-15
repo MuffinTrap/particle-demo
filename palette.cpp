@@ -8,7 +8,7 @@ struct Col
 };
 
 static Col Black = {0.133f, 0.137f, 0.137f};
-static Col Grey = {0.612, 0.616, 0.612};
+static Col Grey = {0.612f, 0.616f, 0.612f};
 static Col White = {0.941f, 0.965f, 0.941f};
 static Col Orange = {0.941f, 0.502f, 0.137f};
 

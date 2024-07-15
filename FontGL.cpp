@@ -59,11 +59,12 @@ void FontGL::Printf(ColorName color, float scale, gdl::AlignmentModes alignmentX
 	{
 		dy += scale/2.0f;
 	}
-
-	glBindTexture(GL_TEXTURE_2D, textureName);
-    // Discard pixels with low alpha
     glEnable(GL_ALPHA_TEST);
     glAlphaFunc(GL_GREATER, 0.3f);
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textureName);
+    // Discard pixels with low alpha
 
 	glBegin(GL_QUADS);
 	PaletteColor3f(color);
@@ -95,8 +96,9 @@ void FontGL::Printf(ColorName color, float scale, gdl::AlignmentModes alignmentX
 		dx += step;
 	}
 	glEnd();
-	glDisable(GL_ALPHA_TEST);
 	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_ALPHA_TEST);
+	glDisable(GL_TEXTURE_2D);
 }
 
 void FontGL::DrawSheet ( guVector center)

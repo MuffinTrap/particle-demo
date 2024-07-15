@@ -7,8 +7,8 @@ class FontGL;
 
 struct Name
 {
-	short row;
-	short column;
+	guVector pos;
+	bool found = false;
 	std::string text;
 };
 
@@ -19,11 +19,22 @@ public:
 	void Update(float deltaTime);
 	void Draw(FontGL* font);
 
-	guVector ColRowPos(float left, short row, short col);
 
-	float linePos = 0.0f;
-	short rows = 4;
+	// Configuration values
+	short rows = 6;
 	float step = 0.05f;
+	float textToRowScale = 0.25f;
+	float lineSpeed = 0.5f;
+
+	// Update values
+	float linePos = 0.0f;
 
 	std::vector<Name> names;
+private:
+	guVector GetNamePos(float x, short row);
+	Name CreateName(float x, short row, const char* text);
+
+	float aspect;
+	float width;
+	float left, right, top, bottom;
 };
