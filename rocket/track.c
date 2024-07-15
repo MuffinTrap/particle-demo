@@ -1,6 +1,11 @@
 #include <stdlib.h>
 #include <assert.h>
 #include <math.h>
+#include <stdio.h>
+
+#ifdef __cplusplus
+    extern "C" {
+#endif
 #ifndef M_PI
 #define M_PI 3.141926
 #endif
@@ -104,6 +109,34 @@ int sync_set_key(struct sync_track *t, const struct track_key *k)
     return 0;
 }
 
+void start_save_sync(const char *filename) {
+    FILE *file = fopen(filename, "w");
+    fprintf(file, "// sync data\n");
+    fprintf(file, "#include \"../rocket/track.h\"\n");
+    fclose(file);
+}
+void save_sync(const struct sync_track *t, const char *filename) {
+    FILE *file = fopen(filename, "a");
+    if (file == NULL) {
+        perror("Error opening file");
+        return;
+    }
+
+    fprintf(file, "struct track_key %s_keys[] = {", t->name);
+    for (int i = 0; i < t->num_keys; i++) {
+        int row = t->keys[i].row;
+        float value = t->keys[i].value;
+        enum key_type type = t->keys[i].type;
+
+        fprintf(file, "{ %d, %f, %d}, ", row, value, type);
+    }
+    fprintf(file, "};\n");
+
+    fprintf(file, "const struct sync_track %s = { \"%s\", ", t->name, t->name);
+    fprintf(file, "%s_keys", t->name);
+    fprintf(file, ",%d};\n", t->num_keys);
+    fclose(file);
+}
 int sync_del_key(struct sync_track *t, int pos)
 {
     struct track_key *tmp;
@@ -120,4 +153,8 @@ int sync_del_key(struct sync_track *t, int pos)
     t->keys = tmp;
     return 0;
 }
+#endif
+
+#ifdef __cplusplus
+	}
 #endif
