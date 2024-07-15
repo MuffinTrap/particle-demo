@@ -68,6 +68,15 @@ double get_row()
 {
 	return time_secs * row_rate + 0.016;
 }
+void set_row( int __attribute__((__unused__)) row)
+{
+    printf("set_row %i\n", row);
+#ifndef GEKKO
+    double frow = row - 0.01;
+    alSourcef(source, AL_SEC_OFFSET, frow / row_rate);
+#endif
+}
+
 void pause( int __attribute__((__unused__)) flag) 
 {
     printf("pause %i\n", flag);
@@ -79,15 +88,6 @@ void pause( int __attribute__((__unused__)) flag)
 #endif
     set_row(get_row());
 }
-void set_row( int __attribute__((__unused__)) row)
-{
-    printf("set_row %i\n", row);
-#ifndef GEKKO
-    double frow = row - 0.01;
-	alSourcef(source, AL_SEC_OFFSET, frow / row_rate);
-#endif
-}
-
 int is_playing() 
 {
 #ifndef GEKKO

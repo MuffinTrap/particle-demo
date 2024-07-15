@@ -1,28 +1,31 @@
 BUILD_DIR = build
 SRC_DIRS := src rocket
 
+# Use only CXX to compile all files
+
+# Use find to gather all .cpp and .c files in SRC_DIRS
 cpp_src := $(shell find $(SRC_DIRS) -name '*.cpp')
 c_src := $(shell find $(SRC_DIRS) -name '*.c')
 src := $(cpp_src) $(c_src) main.cpp
 
 MKSPRITE_FLAGS ?=
 
+# Determine the operating system
 ifeq ($(OS),Windows_NT)
-    OS_TYPE = windows
+	OS_TYPE = windows
 else
-    UNAME_S := $(shell uname -s)
-    ifeq ($(UNAME_S),Darwin)
-        OS_TYPE = macos
-    else
-        OS_TYPE = linux
-    endif
+	UNAME_S := $(shell uname -s)
+	ifeq ($(UNAME_S),Darwin)
+		OS_TYPE = macos
+	else
+		OS_TYPE = linux
+	endif
 endif
 
 CXX_FLAGS = -Werror=unused-function -Wall -Wextra
 EXE_SUFFIX = ""
 
 ifeq ($(OS_TYPE),windows)
-<<<<<<< Updated upstream
 	# Windows specific settings
 	CXX = g++
 	EXE_SUFFIX = ".exe"
@@ -44,58 +47,20 @@ ifeq ($(OS_TYPE),linux)
 	LD_FLAGS = -lsndfile -lopenal -lGL -lGLU -lglut -Wno-unused-function -Wl,-z,muldefs
 	GLUT_INCLUDE = -I/usr/include/GL/
 	CXX_FLAGS += $(GLUT_INCLUDE)
-=======
-    CXX = g++
-    LD_FLAGS = -L"/mingw64/include/GL/" -L"/mingw64/include/GL/" -lsndfile -lopenal -lfreeglut -lopengl32 -lglu32 -lws2_32 -Wl,--allow-multiple-definition
-endif
-
-ifeq ($(OS_TYPE),macos)
-    CXX = clang++
-    CXX_FLAGS += -I/opt/homebrew/Cellar/libsndfile/1.2.2/include -I/opt/homebrew/Cellar/openal-soft/1.23.1/include
-    LD_FLAGS = -L/opt/homebrew/Cellar/libsndfile/1.2.2/lib -L/opt/homebrew/Cellar/openal-soft/1.23.1/lib -lsndfile -lopenal -framework OpenGL -framework GLUT -Wno-unused-function
-endif
-
-ifeq ($(OS_TYPE),linux)
-    CXX = g++
-    LD_FLAGS = -lsndfile -lopenal -lGL -lGLU -lglut -Wno-unused-function -Wl,-z,muldefs
-    GLUT_INCLUDE = -I/usr/include/GL/
->>>>>>> Stashed changes
 endif
 
 .PHONY: clean
 
-<<<<<<< Updated upstream
 gldemo:
 	$(CXX) $(src) $(CXX_FLAGS) $(LD_FLAGS) -o gldemo$(EXE_SUFFIX)
-=======
-# Target for building the executable
-gldemo:
-	$(CXX) $(src) $(CXX_FLAGS) $(LD_FLAGS) -o gldemo
 
-# Compilation rule for C++ source files
-$(BUILD_DIR)/%.o: %.cpp | $(BUILD_DIR)
-	@mkdir -p $(dir $@)
-	$(CXX) -c -o $@ $< $(CXX_FLAGS) $(GLUT_INCLUDE)
-
-# Compilation rule for C source files
-$(BUILD_DIR)/%.o: %.c | $(BUILD_DIR)
-	@mkdir -p $(dir $@)
-	$(CXX) -c -o $@ $< $(CXX_FLAGS) $(GLUT_INCLUDE)
->>>>>>> Stashed changes
-
-# Rule for creating the build directory
 $(BUILD_DIR):
 	mkdir -p $@
 
-# Clean up the build directory and the executable
 clean:
-<<<<<<< Updated upstream
 	rm -rf $(BUILD_DIR) filesystem/ gldemo$(EXE_SUFFIX)
 
 -include $(wildcard $(BUILD_DIR)/*.d)
-=======
-	rm -rf $(BUILD_DIR) gldemo
->>>>>>> Stashed changes
 
 # Debugging step: print the source files
 $(info Source files: $(src))
