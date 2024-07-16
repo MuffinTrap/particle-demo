@@ -42,7 +42,7 @@ endif
 
 ifeq ($(OS_TYPE),linux)
 	# Linux specific settings
-	CXX = g++
+	CXX = clang++
 	EXE_SUFFIX = ".elf"
 	LD_FLAGS = -lsndfile -lopenal -lGL -lGLU -lglut -Wno-unused-function -Wl,-z,muldefs
 	GLUT_INCLUDE = -I/usr/include/GL/

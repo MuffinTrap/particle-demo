@@ -1,4 +1,4 @@
-static bool gameRunning = true;
+static bool ESC_PRESSED = false;
 
 #define GL_SILENCE_DEPRECATION 1
 #ifdef GEKKO
@@ -38,6 +38,13 @@ static bool gameRunning = true;
     const struct sync_track *clear_g;
     const struct sync_track *clear_b;
     static bool rocket_in_use = false; // Record if connection was succesfull
+
+    // Glut keyboard callback
+#pragma GCC diagnostic push
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
     void keyboard(unsigned char key, int x, int y) {
         if (key == 27) { // ASCII code for 'Escape'
             printf("exit pressed: save tracks\n");
@@ -61,10 +68,13 @@ static bool gameRunning = true;
 
             // This is noticed in the next sceneUpdate
             printf("Game running: false\n");
-            gameRunning = false;
+            ESC_PRESSED = true;
         }
     }
 #endif
+
+#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 
 void glRectf(float x1, float y1, float x2, float y2)
 {
@@ -83,7 +93,7 @@ static float angle = 0.0f;
 
 void sceneUpdate() {
 
-    if (gameRunning == false)
+    if (ESC_PRESSED)
     {
         printf("Free resources\n");
         // Time to go
@@ -171,11 +181,19 @@ void renderLoop() {
 }
 
 #ifndef GEKKO 
+
+#pragma GCC diagnostic push
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wunused-parameter"
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+
 void timerFunc(int value) {
     renderLoop();
     glutPostRedisplay();
     glutTimerFunc(1000/60, timerFunc, 0); // Re-register the timer callback
 }
+#pragma clang diagnostic pop
+#pragma GCC diagnostic pop
 #endif
 
 
@@ -332,10 +350,8 @@ int main(int argc, char** argv)
 #ifdef GEKKO 
     unsigned long deltaTimeStart = gettime();
     unsigned long programStart = gettime();
-#endif
     float deltaTime = 0.0f;
-
-    float modeCounter = 0.0f;
+#endif
 
     bool gameRunning = true;
     while(true)
@@ -350,7 +366,6 @@ int main(int argc, char** argv)
         mainElapsed= (float)(now- programStart) / (float)(TB_TIMER_CLOCK * 1000); // division is to convert from ticks to seconds
 #endif
 
-        modeCounter += deltaTime;
 
 #ifdef GEKKO 
         cpu.Update(gdl::Delta);
