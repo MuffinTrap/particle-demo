@@ -1,4 +1,7 @@
-#ifdef GEKKO 
+static bool gameRunning = true;
+
+#define GL_SILENCE_DEPRECATION 1
+#ifdef GEKKO
     #include <mgdl-wii.h>
     #include <wiiuse/wpad.h>
     #include <ogc/lwp_watchdog.h>
@@ -29,26 +32,36 @@
     #include <AL/al.h>
     #include "rocket/track.h"
     struct sync_device *rocket;
+    // Struct for rocket callbacsk
+    static sync_cb rocket_callbacks;
     const struct sync_track *clear_r;
     const struct sync_track *clear_g;
     const struct sync_track *clear_b;
+    static bool rocket_in_use = false; // Record if connection was succesfull
     void keyboard(unsigned char key, int x, int y) {
         if (key == 27) { // ASCII code for 'Escape'
-            // Clean up resources and exit the program
-            free(data);
-            alDeleteSources(1, &source);
-            alDeleteBuffers(1, &buffer);
-            alcMakeContextCurrent(NULL);
-            alcDestroyContext(context);
-            alcCloseDevice(device);
-            sf_close(sndfile);
+            printf("exit pressed: save tracks\n");
+            printf("Start save sync\n");
+#ifndef SYNC_PLAYER
+
+// #define SAVE_TO_HEADER
+#ifdef SAVE_TO_HEADER
+            // This tries to write to a header file, but on Linux it segfaults
             start_save_sync("src/sync_data.h");
+            printf("save track clear_r\n");
             save_sync(clear_r, "src/sync_data.h");
             save_sync(clear_g, "src/sync_data.h");
             save_sync(clear_b, "src/sync_data.h");
+#else
+            // Save as binary file
+            sync_save_tracks(rocket);
+#endif
 
-            //sync_destroy_device(rocket);
-            exit(0); // Exit the program
+#endif// Syncplayer
+
+            // This is noticed in the next sceneUpdate
+            printf("Game running: false\n");
+            gameRunning = false;
         }
     }
 #endif
@@ -65,7 +78,60 @@ void glRectf(float x1, float y1, float x2, float y2)
 
 float mainElapsed = 0.0f;
 
+// Scene update values
+static float angle = 0.0f;
+
+void sceneUpdate() {
+
+    if (gameRunning == false)
+    {
+        printf("Free resources\n");
+        // Time to go
+        // Game over time
+            // Clean up resources and exit the program
+        alSourceStop(source);
+        alcMakeContextCurrent(NULL);
+        alcDestroyContext(context);
+        alcCloseDevice(device);
+        sf_close(sndfile);
+
+        alDeleteSources(1, &source);
+        alDeleteBuffers(1, &buffer);
+        free(data);
+
+        sync_destroy_device(rocket);
+
+        // Dont draw anymore
+        exit(0);
+    }
+    // Update music in direction.cpp
+    updateAudio();
+    // Here would update object positions etc.
+    angle += 0.01f;
+
+
+    // Update frame counter in direction.cpp
+    frameCounterIncrement();
+
+    // Tell glut that the window needs to be
+    // redrawn.
+    glutPostRedisplay();
+
+}
+
 void renderLoop() {
+
+// Read track values from rocket
+#ifndef SYNC_PLAYER
+    if (rocket_in_use)
+    {
+        if (sync_update(rocket, (int)floor(get_row()), &rocket_callbacks))
+        {
+            // Reconnect if sync fails
+            sync_tcp_connect(rocket, "localhost", SYNC_DEFAULT_PORT);
+        }
+    }
+#endif
     glClear(GL_COLOR_BUFFER_BIT);
 
     // Set the projection matrix
@@ -79,9 +145,29 @@ void renderLoop() {
     gluLookAt(sin(mainElapsed)*10.0f, 0.0, -10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
     // Test square
     glPushMatrix();
-    glColor3f(1.0f, 0.0f, 0.0f);
+    if (rocket_in_use)
+    {
+        glColor3f(
+            (float)(sync_get_val(clear_r, get_row())),
+            (float)(sync_get_val(clear_g, get_row())),
+            (float)(sync_get_val(clear_b, get_row()))
+        );
+    }
+    else
+    {
+        glColor3f(1.0f, 1.0f, 0.0f);
+    }
+
+    glRotatef(angle, 0.0f, 0.0f, 1.0f);
+
     glRectf(-2.0f, -2.0f, 2.0f, 2.0f);
     glPopMatrix();
+
+    // End drawing and process all commands
+    glFlush();
+
+    // Wait for v sync and swap
+    glutSwapBuffers();
 }
 
 #ifndef GEKKO 
@@ -95,17 +181,17 @@ void timerFunc(int value) {
 
 int initComputer(int argc, char** argv) {
     const char* filename = "test_music.wav"; // Replace with your WAV file path
-    printf("Setting up direction.");
+    printf("Setting up direction.\n");
     setupDirection();
     // Open the WAV file
     SF_INFO sfinfo;
-    printf("Opening Music File: %s", filename);
+    printf("Opening Music File: %s\n", filename);
     sndfile = sf_open(filename, SFM_READ, &sfinfo);
     if (!sndfile) {
         printf("Error opening the file '%s'\n", filename);
         return 1;
     }
-    printf("Setting up OpenAL Audio Device.");
+    printf("Setting up OpenAL Audio Device.\n");
     // Initialize OpenAL
     device = alcOpenDevice(NULL);
     if (!device) {
@@ -113,7 +199,7 @@ int initComputer(int argc, char** argv) {
         sf_close(sndfile);
         return 1;
     }
-    printf("Setting up OpenAL Audio Contex.");
+    printf("Setting up OpenAL Audio Contex.\n");
     context = alcCreateContext(device, NULL);
     if (!context) {
         printf("Failed to create OpenAL context\n");
@@ -122,15 +208,40 @@ int initComputer(int argc, char** argv) {
         return 1;
     }
 
+    // Connect to rocket
+    printf("Establishing rocket connection\n");
     rocket = sync_create_device("sync");
     if (!rocket) {
         printf("Out of memory?? GNU Rocket.");
         return 1;
     }
-    clear_r = sync_get_track(rocket, "clear_r");
-    clear_g = sync_get_track(rocket, "clear_g");
-    clear_b = sync_get_track(rocket, "clear_b");
+#ifndef SYNC_PLAYER
+    // Connect rocket editor
+    if (sync_tcp_connect(rocket, "localhost", SYNC_DEFAULT_PORT))
+    {
+        printf("Failed to connect to rocket\n");
+        rocket_in_use = false;
+    }
+    else
+    {
+        printf("Rocket connected\n");
+        rocket_in_use = true;
+        clear_r = sync_get_track(rocket, "clear_r");
+        clear_g = sync_get_track(rocket, "clear_g");
+        clear_b = sync_get_track(rocket, "clear_b");
 
+        // Register callback functions to use with rocket
+        rocket_callbacks =
+        {
+            // Defined in direction.cpp
+            pause,
+            set_row,
+            is_playing
+        };
+    }
+#endif
+
+    printf("Load audio file\n");
     alcMakeContextCurrent(context);
 
     alGenBuffers(1, &buffer);
@@ -148,18 +259,26 @@ int initComputer(int argc, char** argv) {
     alSourcei(source, AL_BUFFER, buffer);
     alSourcePlay(source);
 
+    printf("Init glut\n");
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(640, 480);
     glutCreateWindow("My Mac/PC program window");
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+
+    printf("Register display and keyboard functions for glut\n");
     glutDisplayFunc(renderLoop);
     glutKeyboardFunc(keyboard); // Register the keyboard callback
 
     // Setup the timer callback
     glutTimerFunc(1000/60, timerFunc, 0);
 
+    // Setup update functions
+    glutIdleFunc(sceneUpdate);
+
+    printf("Start glut main loop\n");
     glutMainLoop();
+
 
     return 0;
 }
@@ -171,6 +290,7 @@ int main(int argc, char** argv)
     init();
     ogx_initialize();
 #else
+    printf("Main start\n");
     initComputer(argc,argv);
 #endif
     glClearColor(0.0f, 0.0f, 0.0f, 0.0f);

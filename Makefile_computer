@@ -22,7 +22,7 @@ else
 	endif
 endif
 
-CXX_FLAGS = -Werror=unused-function -Wall -Wextra
+CXX_FLAGS = -Werror=unused-function -Wall -Wextra -Wpedantic
 EXE_SUFFIX = ""
 
 ifeq ($(OS_TYPE),windows)

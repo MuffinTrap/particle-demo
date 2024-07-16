@@ -1,8 +1,10 @@
-#define GL_SILENCE_DEPRECATION 1
+#include "direction.hpp"
+
 #include <stdbool.h> 
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+
 #ifdef GEKKO
     //TODO: 
 #else
@@ -10,6 +12,7 @@
     #include <AL/al.h>
     #include <AL/alc.h>
 #endif
+
 static const bool music_enabled = true;
 /***AUDIO PUBLIC***/
 
@@ -19,6 +22,11 @@ static int time_frames = 0;
 double bpm; /* beats per minute */
 int rpb; /* rows per beat */
 double row_rate;
+
+// These are the rocket sync callback functions
+
+
+
 void setupDirection() {
 	bpm = 162.0; /* beats per minute */
 	rpb = 8; /* rows per beat */

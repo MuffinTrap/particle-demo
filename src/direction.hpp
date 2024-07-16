@@ -1,6 +1,9 @@
 #ifndef DIRECTION_H
 #define DIRECTION_H
-    #include <stdbool.h> 
+
+#include <stdbool.h>
+
+extern "C" {
 
 #ifndef GEKKO
     #include <sndfile.h>
@@ -16,16 +19,18 @@
     void audio_poll(void);
     extern wav64_t music_wav;
 #endif
+
     void setupDirection();
     void updateAudio();
     double getTime();
     bool isMusicEnabled();
     void frameCounterIncrement();
     double get_row();
-
-    double get_row();
-    void pause(int flag);
     void set_row( int row);
 
+    void pause(int flag);
     int is_playing();
+
+} // extern "C"
+
 #endif

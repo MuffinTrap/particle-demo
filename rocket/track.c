@@ -57,7 +57,7 @@ double sync_get_val(struct sync_track t, double row) {
     }
 }
 #else
-double sync_get_val(struct sync_track *t, double row) {
+double sync_get_val(const struct sync_track *t, double row) {
     int idx, irow;
 
     /* If we have no keys at all, return a constant 0 */
