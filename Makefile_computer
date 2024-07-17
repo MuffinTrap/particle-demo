@@ -36,8 +36,8 @@ ifeq ($(OS_TYPE),macos)
 	# macOS specific settings
 	CXX = clang++
 	EXE_SUFFIX = ".out"
-	CXX_FLAGS += -I/opt/homebrew/Cellar/libsndfile/1.2.2/include -I/opt/homebrew/Cellar/openal-soft/1.23.1/include
-	LD_FLAGS = -L/opt/homebrew/Cellar/libsndfile/1.2.2/lib -L/opt/homebrew/Cellar/openal-soft/1.23.1/lib -lpng -lsndfile -lopenal -framework OpenGL -framework GLUT -Wno-unused-function -Wl,-flat_namespace
+	CXX_FLAGS += -I/opt/homebrew/Cellar/libsndfile/1.2.2/include -I/opt/homebrew/Cellar/openal-soft/1.23.1/include -I/opt/homebrew/Cellar/glm/1.0.1/include -I/opt/homebrew/Cellar/libpng/1.6.43/include -std=c++11
+	LD_FLAGS = -L/opt/homebrew/Cellar/libsndfile/1.2.2/lib -L/opt/homebrew/Cellar/openal-soft/1.23.1/lib -lpng -lsndfile -lopenal -framework OpenGL -framework GLUT -Wno-unused-function -Wl -L/opt/homebrew/opt/glm/lib -L/opt/homebrew/Cellar/libpng/1.6.43/lib
 endif
 
 ifeq ($(OS_TYPE),linux)
