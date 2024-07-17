@@ -50,14 +50,10 @@ bool Demo::ConnectRocket()
         printf("Rocket connected\n");
         rocket_in_use = true;
 
-        // Register callback functions to use with rocket
-        rocket_callbacks =
-        {
-            // Defined in direction.cpp
-            pause,
-            set_row,
-            is_playing
-        };
+        // Register callback functions defined in direction.cpp to use with rocket
+        rocket_callbacks.pause = pause;
+        rocket_callbacks.is_playing = is_playing;
+        rocket_callbacks.set_row = set_row;
     }
 
     // Get the pointers to the tracks in the editor

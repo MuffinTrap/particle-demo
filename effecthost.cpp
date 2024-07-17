@@ -1,4 +1,5 @@
 #include "effecthost.h"
+#include <stdio.h>
 
 EffectHost::EffectHost()
 {

@@ -19,7 +19,6 @@ public:
 	void RunMainLoop();
 	void ReadControllerInput(WiiController &controllerInOut);
 
-	bool rocket_in_use = false;
 	int screenWidth;
 	int screenHeight;
 };

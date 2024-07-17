@@ -12,7 +12,7 @@ void AssertFunctionPrintf(bool test, const char* filename, int lineNumber, const
 		va_list args;
 
 		va_start(args, message);
-		vsprintf(buff, message, args);
+		vsnprintf(buff, 256, message, args);
 		va_end(args);
 
 		printf("Assert failed! %s:%d:%s\n", filename, lineNumber, buff);

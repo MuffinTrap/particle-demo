@@ -8,23 +8,24 @@ class FontGL;
 struct Name
 {
 	glm::vec3 pos;
-	bool found = false;
+	bool found;
 	std::string text;
 };
 
 class TunerFx
 {
 public:
+	TunerFx();
 	void Init(int screenWidth, int screenHeight);
 	void Update(float deltaTime);
 	void Draw(FontGL* font);
 
 
 	// Configuration values
-	short rows = 6;
-	float step = 0.05f;
-	float textToRowScale = 0.25f;
-	float lineSpeed = 0.5f;
+	short rows;
+	float step;
+	float textToRowScale;
+	float lineSpeed;
 
 	// Update values
 	float linePos = 0.0f;

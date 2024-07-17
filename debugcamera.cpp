@@ -18,10 +18,15 @@ void DebugCamera::Init ( int scrW, int scrH )
 {
     screenWidth = scrW;
     screenHeight = scrH;
+	eye = glm::vec3(0.0f, 0.0f, 1.0f);
+	dir = glm::vec3(0.0f, 0.0f, -1.0f);
+	lookTarget = glm::vec3(0.0f, 0.0f, 0.0f);
+	cameraSpeed = 2.4f;
+	turnSpeedRadians = 0.8f;
 }
 
 
-glm::vec3 DebugCamera::NormalizedCursor(WiiController &controller)
+glm::vec2 DebugCamera::NormalizedCursor(WiiController &controller)
 {
     glm::vec2 cp = controller.GetCursorPosition();
     cp.x /= screenWidth;
@@ -30,12 +35,13 @@ glm::vec3 DebugCamera::NormalizedCursor(WiiController &controller)
     cp.y /= screenHeight;
     cp.y *= 2.0f;
     cp.y -= 1.0f;
-    return {cp.x, cp.y ,0.0f};
+    return cp;
 }
 
 void DebugCamera::Reset()
 {
-	eye = {0.0f, 0.0f, 1.0f};
+	eye = glm::vec3(0.0f, 0.0f, 1.0f);
+	dir = glm::vec3(0.0f, 0.0f, -1.0f);
 }
 
 void DebugCamera::Update(float deltaTime, WiiController& controller)
@@ -87,7 +93,7 @@ void DebugCamera::Update(float deltaTime, WiiController& controller)
 void DebugCamera::ApplyMatrix()
 {
 	// Set the modelview matrix
-    glm::vec3 cp = normalizedCursor;
+    glm::vec2 cp = normalizedCursor;
     lookTarget = eye + dir;
     glm::vec3 right;
     glm::vec3 up = WorldUp;

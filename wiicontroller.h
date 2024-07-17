@@ -19,12 +19,13 @@ enum WiiButtons
 
 	// Nunchuck
 	ButtonZ	=		(0x0001 << 16),
-	ButtonC	=		(0x0002 << 16),
+	ButtonC	=		(0x0002 << 16)
 };
 
 class WiiController
 {
 public:
+	WiiController();
 	void SetChannelNumber(int channel);
 	void ZeroAllInputs();
 	// Button values are same as in <wiiuse/wpad.h>
@@ -48,5 +49,5 @@ public:
 	float cursorY;
 	float roll;
 
-	int channel = 0;
+	int channel;
 };

@@ -1,5 +1,6 @@
 #include "FontGL.h"
 #include <string.h>
+#include <stdarg.h>
 #include "crossOpenGL.h"
 #include "crossCache.h"
 #include "crossTypedefs.h"

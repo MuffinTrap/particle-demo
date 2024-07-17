@@ -6,11 +6,11 @@
 
 struct TextureGL
 {
-	GLsizei width = 0;
-	GLsizei height = 0;
-	GLenum format = 0;
-	GLint bytesPerPixel = 0;
-	GLubyte *texels = nullptr;
+	GLsizei width;
+	GLsizei height;
+	GLenum format;
+	GLint bytesPerPixel;
+	GLubyte *texels;
 };
 
 static bool GetPNGtextureInfo(int color_type, TextureGL* texInfo)

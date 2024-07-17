@@ -15,6 +15,9 @@ void AssertFunctionPrint(bool test, const char* filename, int lineNumber, const 
 
 }
 
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Wvariadic-macros"
+
 #define gdl_assert_printf(test, message, ...) \
 AssertFunctionPrintf(test, __FILE__, __LINE__, message, __VA_ARGS__)
 
@@ -22,5 +25,7 @@ AssertFunctionPrintf(test, __FILE__, __LINE__, message, __VA_ARGS__)
 AssertFunctionPrint(test, __FILE__, __LINE__, message)
 
 #define gdl_assert_test(test) assert(test)
+
+#pragma clang diagnostic pop
 
 #endif

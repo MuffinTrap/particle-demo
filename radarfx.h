@@ -26,15 +26,15 @@ public:
 	void DrawGrid(float left, float right, float top, float bottom);
 	void Quit();
 
-	glm::vec3* dotsArray = nullptr;
-	u32 dotAmount = 0;
-	u32 gridSize = 16;
+	glm::vec3* dotsArray;
+	u32 dotAmount;
+	u32 gridSize;
 	float cellSize;
 
 	// How many points and lines to draw?
-	float elapsed = 0.0f;
-	u32 drawAmount = 0;
-	unsigned seed = 100;
+	float elapsed;
+	u32 drawAmount;
+	unsigned seed;
 
 	std::vector<NumberEntry> numberEntries;
 };

@@ -15,16 +15,16 @@ void PaletteClearColor3f ( ColorName name )
 {
 	switch(name)
 	{
-		case ColorName::BLACK:
+		case BLACK:
 			glClearColor(Black.r, Black.g, Black.b, 0.0f);
 			break;
-		case ColorName::GREY:
+		case GREY:
 			glClearColor(Grey.r, Grey.g, Grey.b, 0.0f);
 			break;
-		case ColorName::WHITE:
+		case WHITE:
 			glClearColor(White.r, White.g, White.b, 0.0f);
 			break;
-		case ColorName::ORANGE:
+		case ORANGE:
 			glClearColor(Orange.r, Orange.g, Orange.b, 0.0f);
 			break;
 	};
@@ -34,16 +34,16 @@ void PaletteColor3f ( ColorName name )
 {
 	switch(name)
 	{
-		case ColorName::BLACK:
+		case BLACK:
 			glColor3f(Black.r, Black.g, Black.b);
 			break;
-		case ColorName::GREY:
+		case GREY:
 			glColor3f(Grey.r, Grey.g, Grey.b);
 			break;
-		case ColorName::WHITE:
+		case WHITE:
 			glColor3f(White.r, White.g, White.b);
 			break;
-		case ColorName::ORANGE:
+		case ORANGE:
 			glColor3f(Orange.r, Orange.g, Orange.b);
 			break;
 
@@ -53,16 +53,16 @@ void PaletteColor4f ( ColorName name, float alpha)
 {
 	switch(name)
 	{
-		case ColorName::BLACK:
+		case BLACK:
 			glColor4f(Black.r, Black.g, Black.b, alpha);
 			break;
-		case ColorName::GREY:
+		case GREY:
 			glColor4f(Grey.r, Grey.g, Grey.b, alpha);
 			break;
-		case ColorName::WHITE:
+		case WHITE:
 			glColor4f(White.r, White.g, White.b, alpha);
 			break;
-		case ColorName::ORANGE:
+		case ORANGE:
 			glColor4f(Orange.r, Orange.g, Orange.b, alpha);
 			break;
 	};

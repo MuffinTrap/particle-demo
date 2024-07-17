@@ -1,5 +1,12 @@
 #include "wiicontroller.h"
 
+WiiController::WiiController()
+{
+	channel = 0;
+	ZeroAllInputs();
+}
+
+
 void WiiController::SetChannelNumber ( int channel )
 {
 	this->channel = channel;

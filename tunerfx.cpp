@@ -3,6 +3,14 @@
 #include "FontGL.h"
 #include "palette.h"
 
+TunerFx::TunerFx()
+{
+	rows = 6;
+	step = 0.05f;
+	textToRowScale = 0.25f;
+	lineSpeed = 0.5f;
+}
+
 
 void TunerFx::Init(int screenWidth, int screenHeight)
 {
@@ -131,10 +139,10 @@ void TunerFx::Draw ( FontGL* font )
 
 glm::vec3 TunerFx::GetNamePos(float x, short row)
 {
-	return {
+	return glm::vec3(
 		left + x * width,
 		1.0f - ((float)row +0.5f) * 2.0f/(float)rows,
-		0.0f};
+		0.0f);
 }
 Name TunerFx::CreateName(float x, short row, const char* text)
 {

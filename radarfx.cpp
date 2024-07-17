@@ -15,6 +15,10 @@
 RadarFX::RadarFX()
 {
 	gridSize = 16;
+	dotsArray = nullptr;
+	drawAmount = 0;
+	seed =100;
+	elapsed = 0.0f;
 }
 
 void RadarFX::Init ( u32 dotAmount )
@@ -24,7 +28,7 @@ void RadarFX::Init ( u32 dotAmount )
 	dotsArray = (glm::vec3*)malloc(dotArraySize);
 	for(u32 i = 0; i < dotAmount; i++)
 	{
-		dotsArray[i] = glm::vec3{GetRandomFloat(0.2f, 0.8f), GetRandomFloat(0.2f, 0.8f), 0.0f};
+		dotsArray[i] = glm::vec3(GetRandomFloat(0.2f, 0.8f), GetRandomFloat(0.2f, 0.8f), 0.0f);
 	}
 	CacheFlushRange(dotsArray, dotArraySize);
 
@@ -265,7 +269,7 @@ void RadarFX::Draw(FontGL* font)
 				if (numberEntries.size() <= di)
 				{
 					NumberEntry e;
-					e.lineEnd = {left-lineLength, ly, z};
+					e.lineEnd = glm::vec3(left-lineLength, ly, z);
 					sprintf(numberbuffer, "%.4f %.4f %.4f", e.lineEnd.x, e.lineEnd.y, e.lineEnd.z);
 					e.text = numberbuffer;
 					e.alignmentX = RJustify;
@@ -297,8 +301,8 @@ void RadarFX::Draw(FontGL* font)
 				if (numberEntries.size() <= di)
 				{
 					NumberEntry e;
-					e.lineEnd = {right + lineLength, ry, z};
-					sprintf(numberbuffer, "%.4f %.4f %.4f", e.lineEnd.x, e.lineEnd.y, e.lineEnd.z);
+					e.lineEnd = glm::vec3(right + lineLength, ry, z);
+					snprintf(numberbuffer, 64, "%.4f %.4f %.4f", e.lineEnd.x, e.lineEnd.y, e.lineEnd.z);
 					e.text = numberbuffer;
 					e.alignmentX = LJustify;
 					e.index = di;

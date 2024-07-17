@@ -28,10 +28,10 @@ void Platform::Init ( int argc, char ** argv, ScreenAspect aspectRatio, bool use
     gdl::InitAspectMode mode = gdl::Aspect4x3;
     switch(aspectRatio)
     {
-        case ScreenAspect::Screen4x3:
+        case Screen4x3:
             mode = gdl::Aspect4x3;
             break;
-        case ScreenAspect::Screen16x9:
+        case Screen16x9:
             mode = gdl::Aspect16x9;
             break;
     };
@@ -269,11 +269,11 @@ void Platform::Init ( int argc, char ** argv, ScreenAspect aspectRatio, bool use
 {
     switch(aspectRatio)
     {
-        case ScreenAspect::Screen4x3:
+        case Screen4x3:
             screenWidth = 640;
             screenHeight = 480;
             break;
-        case ScreenAspect::Screen16x9:
+        case Screen16x9:
             screenWidth = 854;
             screenHeight = 480;
             break;

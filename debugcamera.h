@@ -8,17 +8,17 @@ public:
 	void Init(int scrW, int scrH);
 	void Draw3DAxii();
 	void Update(float deltaTime, WiiController &controller);
-	glm::vec3 NormalizedCursor(WiiController &controller);
+	glm::vec2 NormalizedCursor(WiiController &controller);
 	void ApplyMatrix();
 	void Reset();
-	glm::vec3 eye = {0.0f, 0.0f, 1.0f};
-	glm::vec3 dir = {0.0f, 0.0f, -1.0f};
-	glm::vec3 lookTarget = {0.0f, 0.0f, 0.0f};
-	float cameraSpeed = 2.4f;
-	float turnSpeedRadians = 0.8f;
+	glm::vec3 eye;
+	glm::vec3 dir;
+	glm::vec3 lookTarget;
+	float cameraSpeed;
+	float turnSpeedRadians;
 
-	glm::vec3 normalizedCursor;
+	glm::vec2 normalizedCursor;
 
-	int screenWidth = 1;
-	int screenHeight = 1;
+	int screenWidth;
+	int screenHeight;
 };

@@ -36,7 +36,7 @@ INCLUDES	:=	include
 
 # The Wii version is always reading generated sync tracks: -DSYNC_PLAYER
 CFLAGS	= -O3 -Werror -Wall -Wextra -DPLATFORM_WII $(MACHDEP) $(INCLUDE) -DSYNC_PLAYER
-CXXFLAGS	= -Wwrite-strings $(CFLAGS)
+CXXFLAGS	= -Wwrite-strings $(CFLAGS) -std=c++11
 
 LDFLAGS	=	$(MACHDEP) -Wl,-Map,$(notdir $@).map
 

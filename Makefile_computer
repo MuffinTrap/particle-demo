@@ -22,7 +22,7 @@ else
 	endif
 endif
 
-CXX_FLAGS = -Werror=unused-function -Wall -Wextra -Wpedantic
+CXX_FLAGS = -Werror=unused-function -Wall -Wextra -Wpedantic -std=c++11
 EXE_SUFFIX = ""
 
 ifeq ($(OS_TYPE),windows)
@@ -37,14 +37,14 @@ ifeq ($(OS_TYPE),macos)
 	CXX = clang++
 	EXE_SUFFIX = ".out"
 	CXX_FLAGS += -I/opt/homebrew/Cellar/libsndfile/1.2.2/include -I/opt/homebrew/Cellar/openal-soft/1.23.1/include
-	LD_FLAGS = -L/opt/homebrew/Cellar/libsndfile/1.2.2/lib -L/opt/homebrew/Cellar/openal-soft/1.23.1/lib -lpng -lsndfile -lopenal -framework OpenGL -framework GLUT -Wno-unused-function -Wl,-flat_namespace -Wl
+	LD_FLAGS = -L/opt/homebrew/Cellar/libsndfile/1.2.2/lib -L/opt/homebrew/Cellar/openal-soft/1.23.1/lib -lpng -lsndfile -lopenal -framework OpenGL -framework GLUT -Wno-unused-function -Wl,-flat_namespace
 endif
 
 ifeq ($(OS_TYPE),linux)
 	# Linux specific settings
 	CXX = clang++
 	EXE_SUFFIX = ".elf"
-	LD_FLAGS = -lpng -lsndfile -lopenal -lGL -lGLU -lglut -Wno-unused-function -Wl,-z,muldefs
+	LD_FLAGS = -lpng -lsndfile -lopenal -lGL -lGLU -lglut -Wno-unused-function -z muldefs
 	GLUT_INCLUDE = -I/usr/include/GL/
 	CXX_FLAGS += $(GLUT_INCLUDE)
 endif
