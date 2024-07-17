@@ -299,7 +299,7 @@ void sync_destroy_device(struct sync_device *d)
 #endif
 
 	for (i = 0; i < (int)d->num_tracks; ++i) {
-		free(d->tracks[i]->name);
+		// free(d->tracks[i]->name); no need to free, it is const char
 		free(d->tracks[i]->keys);
 		free(d->tracks[i]);
 	}

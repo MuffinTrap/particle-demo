@@ -24,10 +24,9 @@ double key_ramp(const struct track_key k[2], double row) {
     return k[0].value + (k[1].value - k[0].value) * t;
 }
 
-// muffintrap: I dont think it needs to be different for GEKKO
-//#ifdef GEKKO
-#if 0
-double sync_get_val(struct sync_track t, double row) {
+#ifdef GEKKO
+// For Wii version: read directly from header
+double sync_get_val(const struct sync_track &t, double row) {
     int idx, irow;
 
     /* If we have no keys at all, return a constant 0 */
@@ -64,7 +63,9 @@ double sync_get_val(const struct sync_track *t, double row) {
 
     /* If we have no keys at all, return a constant 0 */
     if (!t->num_keys)
+    {
         return 0.0f;
+    }
 
     irow = (int)floor(row);
     idx = key_idx_floor(t, irow);
@@ -86,7 +87,7 @@ double sync_get_val(const struct sync_track *t, double row) {
     case KEY_RAMP:
         return key_ramp(t->keys + idx, row);
     default:
-        assert(0);
+        assert(0 && "Invalid key type");
         return 0.0f;
     }
 }
@@ -95,8 +96,18 @@ double sync_get_val(const struct sync_track *t, double row) {
 void start_save_sync(const char *filename) {
     FILE *file = fopen(filename, "w");
     fprintf(file, "// sync data\n");
-    fprintf(file, "#include \"rocket/track.h\"\n");
+    fprintf(file, "#include \"../rocket/track.h\"\n");
     fclose(file);
+}
+
+const char* key_type_to_string(enum key_type tp) {
+    switch(tp) {
+        case KEY_STEP: return "KEY_STEP"; break;
+        case KEY_LINEAR: return "KEY_LINEAR"; break;
+        case KEY_SMOOTH: return "KEY_RAMP"; break;
+        case KEY_RAMP: return "KEY_RAMP"; break;
+        default: return ""; break;
+    };
 }
 
 void save_sync(const struct sync_track *t, const char *filename) {
@@ -112,7 +123,7 @@ void save_sync(const struct sync_track *t, const char *filename) {
         float value = t->keys[i].value;
         enum key_type type = t->keys[i].type;
 
-        fprintf(file, "{ %d, %f, %d}, ", row, value, type);
+        fprintf(file, "{ %d, %f, %s}, ", row, value, key_type_to_string(type));
     }
     fprintf(file, "};\n");
 

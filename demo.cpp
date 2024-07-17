@@ -9,11 +9,24 @@
 
 // Rocket sync variables
 struct sync_device *rocket;
+
 // Struct for rocket callbacsk
+#ifndef SYNC_PLAYER
+// This is for the win-mac-linux version
+// Listen to the editor and store tracks through pointers
 static sync_cb rocket_callbacks;
 const struct sync_track *clear_r;
 const struct sync_track *clear_g;
 const struct sync_track *clear_b;
+
+#else
+
+// This is for the wii version.
+// Read track data from a header
+// This header contains the sync_tracks
+#include "src/sync_data.h"
+#endif
+
 
 bool Demo::ConnectRocket()
 {
@@ -37,10 +50,6 @@ bool Demo::ConnectRocket()
         printf("Rocket connected\n");
         rocket_in_use = true;
 
-        clear_r = sync_get_track(rocket, "clear_r");
-        clear_g = sync_get_track(rocket, "clear_g");
-        clear_b = sync_get_track(rocket, "clear_b");
-
         // Register callback functions to use with rocket
         rocket_callbacks =
         {
@@ -50,7 +59,16 @@ bool Demo::ConnectRocket()
             is_playing
         };
     }
+
+    // Get the pointers to the tracks in the editor
+    clear_r = sync_get_track(rocket, "clear_r");
+    clear_g = sync_get_track(rocket, "clear_g");
+    clear_b = sync_get_track(rocket, "clear_b");
 #endif
+
+    // test reading track
+    float first_red = sync_get_val(clear_r, 0.0);
+    printf("Red on first row is %.2f\n", first_red);
 
 	return true;
 }
@@ -73,6 +91,7 @@ void Demo::Init(int scrW, int scrH, bool useRocket)
     glEnableClientState(GL_VERTEX_ARRAY);
     glEnableClientState(GL_INDEX_ARRAY);
 
+    rocket_in_use = useRocket;
 	if (useRocket)
 	{
 		ConnectRocket();
@@ -166,16 +185,16 @@ void Demo::Quit()
 	{
 #ifndef SYNC_PLAYER
 
-// #define SAVE_TO_HEADER
+#define SAVE_TO_HEADER
 #ifdef SAVE_TO_HEADER
-            // This tries to write to a header file, but on Linux it segfaults
             start_save_sync("src/sync_data.h");
             printf("save track clear_r\n");
             save_sync(clear_r, "src/sync_data.h");
             save_sync(clear_g, "src/sync_data.h");
             save_sync(clear_b, "src/sync_data.h");
 #else
-            // Save as binary file
+            // Save as binary file:
+            // The Wii exe fails to read these, maybe endianness error?
             sync_save_tracks(rocket);
 #endif
 

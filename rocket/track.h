@@ -24,7 +24,7 @@ struct track_key {
 };
 
 struct sync_track {
-	char *name;
+	const char *name;
 	struct track_key *keys;
 	int num_keys;
 };
