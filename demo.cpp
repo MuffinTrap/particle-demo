@@ -67,7 +67,7 @@ void Demo::Init(int scrW, int scrH, bool useRocket)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glClearColor(0.0f, 0.0f, 0.0f, 0.0f);
+    glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
     glShadeModel(GL_FLAT);
 
     // Use arrays and indices to draw particles
@@ -96,7 +96,7 @@ void Demo::Update ( float elapsed, float deltaTime )
     }
 #endif
 
-	angle = elapsed * deltaTime * 90.0f;
+	angle = elapsed * deltaTime * 360.0f;
 
 }
 
@@ -123,7 +123,9 @@ void Demo::Draw()
     // Set the modelview matrix
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(10.0f, 0.0, -10.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0);
+    gluLookAt(0.0f, 0.0, 10.0, // Eye
+              0.0, 0.0, 0.0,  // Center
+              0.0, 1.0, 0.0); // Up
     // Test square
     glPushMatrix();
     if (rocket_in_use)

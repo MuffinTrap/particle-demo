@@ -19,6 +19,7 @@ static bool ESC_PRESSED = false;
 #include <wiiuse/wpad.h>
 
 static gdl::Sound demoMusic;
+static WiiController controller;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -26,24 +27,26 @@ void Platform::Init ( int argc, char ** argv, bool useRocket )
 {
 	fatInitDefault();
 	gdl::InitSystem(gdl::ModeAuto, gdl::AspectAuto, gdl::HiRes, gdl::InitFlags::OpenGX);
+    ogx_initialize();
 
 	// Init controller
 	WPAD_Init();
 	WPAD_SetDataFormat(WPAD_CHAN_0, WPAD_FMT_BTNS_ACC_IR);
+    controller.SetChannelNumber(0);
 
     gdl::ConsoleMode();
 	demoInstance.Init(gdl::ScreenXres, gdl::ScreenYres, useRocket);
 
-	/*
+
     while(true)
     {
-        gdl::WiiInput::StartFrame();
-        if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_HOME)) {
+        ReadControllerInput(controller);
+        if (controller.ButtonPress(WPAD_BUTTON_HOME)) {
             break;
         }
         VIDEO_WaitVSync();
     }
-    */
+
 }
 #pragma GCC diagnostic pop
 
@@ -63,8 +66,6 @@ void Platform::RunMainLoop()
 	float deltaTime;
 	u64 now = gettime();
 	u64 deltaTimeStart = now;
-    WiiController ctrl0;
-    ctrl0.SetChannelNumber(0);
 	PlayMusic();
 	while (ESC_PRESSED == false)
 	{
@@ -73,12 +74,13 @@ void Platform::RunMainLoop()
 		deltaTime = (float)(now - deltaTimeStart) / (float)(TB_TIMER_CLOCK * 1000); // division is to convert from ticks to seconds
 		deltaTimeStart = now;
 
-        ReadControllerInput(ctrl0);
+        ReadControllerInput(controller);
+        updateAudio();
 
-		if (ctrl0.ButtonPress(WPAD_BUTTON_HOME)){
+		if (controller.ButtonPress(WPAD_BUTTON_HOME)){
 			ESC_PRESSED = true;
 		}
-		demoInstance.Update(0.0f, deltaTime);
+		demoInstance.Update(getTime(), deltaTime);
 		gdl::PrepDisplay();
 
 		demoInstance.Draw();
@@ -225,16 +227,19 @@ void timerFunc(int value) {
 
 void Platform::Init ( int argc, char ** argv, bool useRocket )
 {
+    int wiiHDwidth = 854;
+    int wiiHDheight = 480;
+
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(640, 480);
+    glutInitWindowSize(wiiHDwidth, wiiHDheight);
     glutCreateWindow("My Mac/PC program window");
 
     glutDisplayFunc(renderLoop);
     glutKeyboardFunc(keyboard); // Register the keyboard callback
 	glutIdleFunc(sceneUpdate);
 
-	demoInstance.Init(640, 480, useRocket);
+	demoInstance.Init(wiiHDwidth, wiiHDheight, useRocket);
 }
 
 void Platform::RunMainLoop()

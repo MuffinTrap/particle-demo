@@ -58,6 +58,11 @@ int loadAudio(const char* filename)
     }
 }
 
+void updateAudio()
+{
+    time_secs = musicSound.GetElapsedSeconds();
+}
+
 void playAudio()
 {
     musicSound.Play(1.0f, 100.0f);
