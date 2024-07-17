@@ -1,15 +1,28 @@
 #pragma once
-#include <mgdl-wii.h>
-#include <GL/opengx.h>
 #include "palette.h"
 #include "ImageGL.h"
-class FontGL : public gdl::FFont
+#include "crossVector3.h"
+
+enum FontAlignment
+{
+	Centered,
+	RJustify,
+	LJustify
+};
+
+class FontGL
 {
 public:
 	void LoadFromImage(const char* filename, short charw, short charh, char firstCharacter);
-	void Printf(ColorName color, float scale, gdl::AlignmentModes alignmentX, gdl::AlignmentModes alignmentY, const char* format, ... );
-	void DrawSheet(guVector center);
+	void Printf(ColorName color, float scale, FontAlignment alignmentX, FontAlignment alignmentY, const char* format, ... );
+	void DrawSheet();
 	void Bind(ImageGL& sheet,  short charw, short charh, char firstCharacter);
 private:
+
+	void CreateTextureCoordList(short rows, short charactersPerRow, short texW, short texH);
+	glm::vec2 GetTextureCoordinate(char character, char subIndex);
 	GLuint textureName;
+	short		cw,ch;
+	glm::vec2		*tList;
+	char		firstIndex; // muffintrap: need to remember the first index to calculate offsets into vertex and uv arrays
 };

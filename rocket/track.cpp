@@ -24,7 +24,9 @@ double key_ramp(const struct track_key k[2], double row) {
     return k[0].value + (k[1].value - k[0].value) * t;
 }
 
-#ifdef GEKKO
+// muffintrap: I dont think it needs to be different for GEKKO
+//#ifdef GEKKO
+#if 0
 double sync_get_val(struct sync_track t, double row) {
     int idx, irow;
 

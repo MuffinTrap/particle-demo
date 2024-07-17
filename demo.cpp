@@ -78,7 +78,6 @@ void Demo::Init(int scrW, int scrH, bool useRocket)
 	{
 		ConnectRocket();
 	}
-	setupDirection();
 }
 
 // elapsed : for effects that are in sync with music
@@ -97,7 +96,7 @@ void Demo::Update ( float elapsed, float deltaTime )
     }
 #endif
 
-	angle = elapsed * 90.0f;
+	angle = elapsed * deltaTime * 90.0f;
 
 }
 

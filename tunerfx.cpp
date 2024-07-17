@@ -1,13 +1,12 @@
-#include <GL/opengx.h>
-
+#include "crossOpenGL.h"
 #include "tunerfx.h"
 #include "FontGL.h"
 #include "palette.h"
 
 
-void TunerFx::Init()
+void TunerFx::Init(int screenWidth, int screenHeight)
 {
-	aspect = (float)gdl::ScreenXres/(float)gdl::ScreenYres;
+	aspect = (float)screenWidth/(float)screenHeight;
 	width = aspect * 2.0f;
 	left = -aspect;
 	right = +aspect;
@@ -93,7 +92,7 @@ void TunerFx::Draw ( FontGL* font )
 	// Draw names
 	for (size_t ni = 0; ni < names.size(); ni++)
 	{
-		guVector& p = names[ni].pos;
+		glm::vec3& p = names[ni].pos;
 		if (p.x < left+linePos)
 		{
 			// Draw cross on the position.
@@ -109,7 +108,7 @@ void TunerFx::Draw ( FontGL* font )
 			float crossSize = rowHeight * textToRowScale * 0.25f;
 			glTranslatef(p.x-crossSize, p.y, p.z);
 			// Draw name
-			font->Printf(nameColor, rowHeight * textToRowScale, gdl::RJustify, gdl::Centered, names[ni].text.c_str());
+			font->Printf(nameColor, rowHeight * textToRowScale, RJustify, Centered, names[ni].text.c_str());
 
 			// Draw cross on position
 			glTranslatef(crossSize, -crossSize, 0.0f);
@@ -130,7 +129,7 @@ void TunerFx::Draw ( FontGL* font )
 	}
 }
 
-guVector TunerFx::GetNamePos(float x, short row)
+glm::vec3 TunerFx::GetNamePos(float x, short row)
 {
 	return {
 		left + x * width,

@@ -1,7 +1,4 @@
 #include "effecthost.h"
-#include <wiiuse/wpad.h>
-#include <mgdl-wii.h>
-#include "mgdl-input-wii.h"
 
 EffectHost::EffectHost()
 {
@@ -25,21 +22,13 @@ void EffectHost::Init()
 	printf("Radar init\n");
     radar.Init(64);
 	printf("Tuner init\n");
-	tuner.Init();
+	tuner.Init(640, 480);
 	activeEffect = Radar;
 }
 
 
 void EffectHost::Update ( float deltaTime )
 {
-	if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_1))
-	{
-		activeEffect = Radar;
-	}
-	if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_2))
-	{
-		activeEffect = Tuner;
-	}
 
 	switch(activeEffect)
 	{

@@ -1,6 +1,5 @@
 #include "palette.h"
-#include <GL/opengx.h>
-#include <mgdl-wii.h>
+#include "crossOpenGL.h"
 
 struct Col
 {

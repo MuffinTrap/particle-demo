@@ -2,6 +2,8 @@
 
 #include <math.h>
 
+#if 0
+
 static float sync_row = 0.0f;
 static bool music_playing = false;
 std::string hostAddress = "localhost";
@@ -121,3 +123,5 @@ void DisconnectRocket ( sync_device* device )
 
 
 
+
+#endif

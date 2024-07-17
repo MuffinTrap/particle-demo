@@ -18,7 +18,17 @@
 - [KDevelop](https://kdevelop.org/)
 - [Font conversion tool](https://stmn.itch.io/font2bitmap)
 
+## Libraries needed for Wii
+- mtek-gdl  (see Frameworks above)
+- ppc-glm (from devkitpro pacman)
+
+## Libraries needed for Mac port:
+- glm [OpenGL Maths Library](https://formulae.brew.sh/formula/glm)
+
 ## Libraries needed for Linux port:
+
+### Demo
+- libglm-dev [OpenGL Maths Library](https://github.com/g-truc/glm)
 
 ### Rocket editor
 - libqt5websockets5-dev

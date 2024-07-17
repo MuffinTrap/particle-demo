@@ -16,15 +16,71 @@ double bpm; /* beats per minute */
 int rpb; /* rows per beat */
 double row_rate;
 
+void setupDirection(double beatsPerMin, int rowsPerBeat) {
+	bpm = beatsPerMin;
+	rpb = rowsPerBeat;
+	row_rate = ((double)(bpm) / 60.0) * rpb;
+}
 
+double getTime() {
+	return time_secs;
+}
+
+bool isMusicEnabled() {
+	return music_enabled;
+}
+
+void frameCounterIncrement() {
+	time_frames++;
+}
+
+double get_row()
+{
+	return time_secs * row_rate + 0.016;
+}
+
+
+#ifdef GEKKO
 // //////////////////////////////////////
 //           NINTENDO WII
 
-#ifdef GEKKO
-    //TODO: 
+gdl::Sound musicSound;
+
+int loadAudio(const char* filename)
+{
+    bool loadOk = musicSound.LoadSound(filename);
+    gdl_assert(loadOk, "Failed to load Wii music");
+    if (loadOk) {
+        return 0;
+    }
+    else {
+        return 1;
+    }
+}
+
+void playAudio()
+{
+    musicSound.Play(1.0f, 100.0f);
+}
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
+void set_row(int row)
+{
+    // * NOT IMPLEMENTED ON WII *//
+}
+#pragma GCC diagnostic pop
+
+void pause(int flag)
+{
+    musicSound.Pause(flag == 1 ? true : false);
+}
+
+int is_playing()
+{
+    return (musicSound.GetIsPlaying() ? 1 : 0);
+}
 
 #else
-
 ///////////////////////////////////////////
 // WIN - MAC - LINUX
 
@@ -104,28 +160,6 @@ void updateAudio()
 	time_secs = (double)sampleOffset / sampleRate;
 }
 
-void setupDirection() {
-	bpm = 162.0; /* beats per minute */
-	rpb = 8; /* rows per beat */
-	row_rate = ((double)(bpm) / 60) * rpb;
-}
-
-double getTime() {
-	return time_secs;
-}
-
-bool isMusicEnabled() {
-	return music_enabled;
-}
-
-void frameCounterIncrement() {
-	time_frames++;
-}
-
-double get_row() 
-{
-	return time_secs * row_rate + 0.016;
-}
 
 // These are the rocket sync callback functions
 void pause( int __attribute__((__unused__)) flag)

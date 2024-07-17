@@ -47,7 +47,7 @@ void sync_set_io_cb(struct sync_device *d, struct sync_io_cb *cb);
 
 const struct sync_track *sync_get_track(struct sync_device *, const char *);
 
-#ifdef GEKKO
+#if 0
     double sync_get_val(const struct sync_track t, double row);
 #else
 	double sync_get_val(const struct sync_track *, double);

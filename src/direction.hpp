@@ -3,9 +3,13 @@
 
 #include <stdbool.h>
 
-extern "C" {
-
 #ifdef GEKKO
+#include <mgdl-wii.h>
+#endif
+
+extern "C" {
+#ifdef GEKKO
+    extern gdl::Sound musicSound;
     // TODO
 #else
     #include <sndfile.h>
@@ -20,7 +24,9 @@ extern "C" {
 #endif
 
     // Functions called by platform
-    void setupDirection();
+    void setupDirection(double beatsPerMin, int rowsPerBeat);
+
+    // These are different for each platform
     int loadAudio(const char* filename);
     void playAudio();
     void updateAudio();

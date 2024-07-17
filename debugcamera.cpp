@@ -1,9 +1,6 @@
 #include "debugcamera.h"
-#include "mgdl-input-wii.h"
-#include <wiiuse/wpad.h>
-#include <GL/opengx.h>
-#include <GL/glu.h>
-#include <mgdl-wii.h>
+#include "crossOpenGL.h"
+#include "crossVector3.h"
 
 // Controls:
 /*
@@ -17,17 +14,23 @@
  */
 
 
-
-static gdl::vec2 NormalizedCursor()
+void DebugCamera::Init ( int scrW, int scrH )
 {
-    gdl::vec2 cp = gdl::WiiInput::GetCursorPosition();
-    cp.x /= gdl::ScreenXres;
+    screenWidth = scrW;
+    screenHeight = scrH;
+}
+
+
+glm::vec3 DebugCamera::NormalizedCursor(WiiController &controller)
+{
+    glm::vec2 cp = controller.GetCursorPosition();
+    cp.x /= screenWidth;
     cp.x *= 2.0f;
     cp.x -= 1.0f;
-    cp.y /= gdl::ScreenYres;
+    cp.y /= screenHeight;
     cp.y *= 2.0f;
     cp.y -= 1.0f;
-    return cp;
+    return {cp.x, cp.y ,0.0f};
 }
 
 void DebugCamera::Reset()
@@ -35,17 +38,17 @@ void DebugCamera::Reset()
 	eye = {0.0f, 0.0f, 1.0f};
 }
 
-void DebugCamera::Update(float deltaTime)
+void DebugCamera::Update(float deltaTime, WiiController& controller)
 {
-    gdl::vec2 joystick = gdl::WiiInput::GetNunchukJoystickDirection(0.1f);
-    bool left = gdl::WiiInput::ButtonHeld(WPAD_BUTTON_LEFT);
-    bool right =gdl::WiiInput::ButtonHeld(WPAD_BUTTON_RIGHT);
-    bool up = gdl::WiiInput::ButtonHeld(WPAD_BUTTON_UP);
-    bool down =gdl::WiiInput::ButtonHeld(WPAD_BUTTON_DOWN);
+    glm::vec2 joystick = controller.GetNunchukJoystickDirection(0.1f);
+    bool left = controller.ButtonHeld(ButtonLeft);
+    bool right =controller.ButtonHeld(ButtonRight);
+    bool up = controller.ButtonHeld(ButtonUp);
+    bool down =controller.ButtonHeld(ButtonDown);
 
-    guVector rightVec;
-    guVector upVec = gdl::UP;
-    guVecCross(&dir, &upVec, &rightVec);
+    glm::vec3 rightVec;
+    glm::vec3 upVec = WorldUp;
+    rightVec = glm::cross(dir, upVec);
     eye = eye + (rightVec * joystick.x) * cameraSpeed * deltaTime;
     eye = eye - (dir * joystick.y) * cameraSpeed * deltaTime;
 
@@ -58,6 +61,7 @@ void DebugCamera::Update(float deltaTime)
         eye.y -= cameraSpeed * deltaTime;
     }
 
+	normalizedCursor = NormalizedCursor(controller);
     float turn = 0.0f;
     if (left)
     {
@@ -69,13 +73,12 @@ void DebugCamera::Update(float deltaTime)
     }
     if (left || right)
     {
-        Mtx rot;
-        guVector up = gdl::UP;
-        guMtxRotAxisRad(rot, &up, turn);
-        guVecMultiply(rot, &dir, &dir);
+        glm::mat4 rotationMatrix(1);
+        rotationMatrix = glm::rotate(rotationMatrix, turn, WorldUp);
+        dir = glm::vec3(rotationMatrix * glm::vec4(dir, 1.0f));
     }
 
-	if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_B))
+	if (controller.ButtonPress(ButtonB))
 	{
 		Reset();
 	}
@@ -84,11 +87,11 @@ void DebugCamera::Update(float deltaTime)
 void DebugCamera::ApplyMatrix()
 {
 	// Set the modelview matrix
-	gdl::vec2 cp = NormalizedCursor();
+    glm::vec3 cp = normalizedCursor;
     lookTarget = eye + dir;
-    guVector right;
-    guVector up = gdl::UP;
-    guVecCross(&dir, &up, &right);
+    glm::vec3 right;
+    glm::vec3 up = WorldUp;
+    right = glm::cross(dir, up);
 	gluLookAt(eye.x, eye.y, eye.z,
 				lookTarget.x + (right * cp.x).x,
               lookTarget.y + (up * cp.y).y,

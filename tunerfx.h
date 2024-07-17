@@ -1,13 +1,13 @@
 #pragma once
-#include <mgdl-wii.h>
 #include <string>
 #include <vector>
+#include "crossVector3.h"
 
 class FontGL;
 
 struct Name
 {
-	guVector pos;
+	glm::vec3 pos;
 	bool found = false;
 	std::string text;
 };
@@ -15,7 +15,7 @@ struct Name
 class TunerFx
 {
 public:
-	void Init();
+	void Init(int screenWidth, int screenHeight);
 	void Update(float deltaTime);
 	void Draw(FontGL* font);
 
@@ -31,7 +31,7 @@ public:
 
 	std::vector<Name> names;
 private:
-	guVector GetNamePos(float x, short row);
+	glm::vec3 GetNamePos(float x, short row);
 	Name CreateName(float x, short row, const char* text);
 
 	float aspect;

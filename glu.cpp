@@ -81,7 +81,7 @@ GLint gluBuild2DMipmaps (GLenum target, GLint internalFormat, GLsizei width, GLs
 	if (format == GL_RGB || format == GL_BGR) {
 			bpp = 3;
 	}
-	unsigned char * buf = malloc(width * height * bpp);
+	unsigned char * buf = (unsigned char*)malloc(width * height * bpp);
 	int w = width, h = height;
 
 	while (w > 1 && h > 1) {
@@ -191,11 +191,11 @@ GLint gluScaleImage (GLenum format, GLsizei wIn, GLsizei hIn, __attribute__((unu
 	switch (format) {
 	case GL_RGB:
 	case GL_BGR:
-		scale_internal(3,wIn,hIn,dataIn,wOut,hOut,dataOut);
+		scale_internal(3,wIn,hIn,(const unsigned char*)dataIn,wOut,hOut,(unsigned char*)dataOut);
 		return 0;
 	case GL_RGBA:
 	case GL_BGRA:
-		scale_internal(4,wIn,hIn,dataIn,wOut,hOut,dataOut);
+		scale_internal(4,wIn,hIn,(const unsigned char*)dataIn,wOut,hOut,(unsigned char*)dataOut);
 		return 0;
 	};
 	return -1;

@@ -1,12 +1,11 @@
 #pragma once
 
-#include <GL/opengx.h>
-#include <mgdl-wii.h>
+#include "crossOpenGL.h"
 
 class ImageGL
 {
 public:
-	bool LoadImage(const char* filename, gdl::TextureFilterModes filter);
+	bool LoadImage(const char* filename, GLuint filterMode);
 	GLuint textureName;
 	short width;
 	short height;

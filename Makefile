@@ -25,7 +25,7 @@ include $(DEVKITPPC)/wii_rules
 #---------------------------------------------------------------------------------
 TARGET		:=	$(notdir $(CURDIR))
 BUILD		:=	build
-SOURCES		:=	./
+SOURCES		:=	./ rocket/ src/
 DATA		:=	data
 TEXTURES	:=	
 INCLUDES	:=	include
@@ -78,11 +78,8 @@ TPLFILES	:=	$(SCFFILES:.scf=.tpl)
 #---------------------------------------------------------------------------------
 # use CXX for linking C++ projects, CC for standard C
 #---------------------------------------------------------------------------------
-ifeq ($(strip $(CPPFILES)),)
-	export LD	:=	$(CC)
-else
-	export LD	:=	$(CXX)
-endif
+# No, always use C++
+export LD	:=	$(CXX)
 
 export OFILES	:=	$(addsuffix .o,$(BINFILES)) \
 					$(addsuffix .o,$(TPLFILES)) \

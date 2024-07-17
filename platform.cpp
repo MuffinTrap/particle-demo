@@ -9,60 +9,128 @@
 static Demo demoInstance;
 static bool ESC_PRESSED = false;
 
-
 // //////////////////////////////////
 // NINTENDO WII
 ////////////////////////////////////
 #ifdef GEKKO
 #include <mgdl-wii.h>
-#include <mgdl-wii.h>
 #include <wiiuse/wpad.h>
 #include <ogc/lwp_watchdog.h>
-#include "mgdl-input-wii.h"
+#include <wiiuse/wpad.h>
 
 static gdl::Sound demoMusic;
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 void Platform::Init ( int argc, char ** argv, bool useRocket )
 {
+	fatInitDefault();
+	gdl::InitSystem(gdl::ModeAuto, gdl::AspectAuto, gdl::HiRes, gdl::InitFlags::OpenGX);
 
-    gdl::init();
-    ogx_initialize();
+	// Init controller
+	WPAD_Init();
+	WPAD_SetDataFormat(WPAD_CHAN_0, WPAD_FMT_BTNS_ACC_IR);
+
     gdl::ConsoleMode();
-
 	demoInstance.Init(gdl::ScreenXres, gdl::ScreenYres, useRocket);
-}
 
-void Platform::LoadMusic(const char* filename)
+	/*
+    while(true)
+    {
+        gdl::WiiInput::StartFrame();
+        if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_HOME)) {
+            break;
+        }
+        VIDEO_WaitVSync();
+    }
+    */
+}
+#pragma GCC diagnostic pop
+
+void Platform::LoadMusic(const char* filename, double beatsPerMin, int rowsPerBeat)
 {
-	demoMusic.LoadFile(filename);
+	setupDirection(beatsPerMin, rowsPerBeat);
+	loadAudio(filename);
 }
 
 void Platform::PlayMusic()
 {
-	demoMusic.Play();
+	playAudio();
 }
 
 void Platform::RunMainLoop()
 {
+	float deltaTime;
+	u64 now = gettime();
+	u64 deltaTimeStart = now;
+    WiiController ctrl0;
+    ctrl0.SetChannelNumber(0);
 	PlayMusic();
-	while (true)
+	while (ESC_PRESSED == false)
 	{
-		gdl::WiiInput::StartFrame();
+		// Timing
+		u64 now = gettime();
+		deltaTime = (float)(now - deltaTimeStart) / (float)(TB_TIMER_CLOCK * 1000); // division is to convert from ticks to seconds
+		deltaTimeStart = now;
 
-		if (gdl::WiiInput::ButtonPress(WPAD_BUTTON_HOME)){
-			break;
+        ReadControllerInput(ctrl0);
+
+		if (ctrl0.ButtonPress(WPAD_BUTTON_HOME)){
+			ESC_PRESSED = true;
 		}
-		demoInstance.Update(0.0f, 0.0f);
+		demoInstance.Update(0.0f, deltaTime);
 		gdl::PrepDisplay();
 
 		demoInstance.Draw();
 
+		glFlush();
 		gdl::Display();
 	}
 
 	demoInstance.Quit();
-	gdl::DoProgramExit();
+	gdl::wii::DoProgramExit();
 }
+
+void Platform::ReadControllerInput ( WiiController& controllerInOut )
+{
+  WPAD_ScanPads();  // Scan the Wiimotes
+
+  WPADData *data1 = WPAD_Data(controllerInOut.channel);
+
+  const ir_t &ir = data1->ir;
+  // Multiply x and y to match them to 16:9 screen
+  controllerInOut.cursorX = ir.x * 1.67f - 16.f;
+  controllerInOut.cursorY = ir.y * 1.2f - 16.f;
+
+  controllerInOut.pressedButtons = WPAD_ButtonsDown(0);
+  controllerInOut.releasedButtons = WPAD_ButtonsUp(0);
+  controllerInOut.heldButtons = WPAD_ButtonsHeld(0);
+
+  controllerInOut.nunchukJoystickDirectionX=0.0f;
+  controllerInOut.nunchukJoystickDirectionY=0.0f;
+  const expansion_t &ex = data1->exp;
+  if (ex.type == WPAD_EXP_NUNCHUK)
+  {
+      joystick_t n = ex.nunchuk.js;
+      if (n.mag > controllerInOut.nunchukJoystickDeadzone)
+      {
+          // Angle is reported in degrees
+          // Angle of 0 means up.
+          // 90 right, 180 down, 270 left
+
+          float rad = DegToRad(n.ang);
+          float x = 0;
+          float y = -1.0f;
+          float dirx = cos(rad) * x - sin(rad) * y;
+          float diry = sin(rad) * x + cos(rad) * y;
+          controllerInOut.nunchukJoystickDirectionX = dirx * n.mag;
+          controllerInOut.nunchukJoystickDirectionY = diry * n.mag;
+      }
+  }
+
+  controllerInOut.roll = DegToRad(data1->orient.roll);
+}
+
 
 // ///////////////////////////////////
 #else
@@ -179,14 +247,20 @@ void Platform::RunMainLoop()
 }
 
 
-void Platform::LoadMusic(const char* filename)
+void Platform::LoadMusic(const char* filename, double beatsPerMin, int rowsPerBeat)
 {
+	setupDirection(beatsPerMin, rowsPerBeat);
 	loadAudio(filename);
 }
 
 void Platform::PlayMusic()
 {
     playAudio();
+}
+
+void Platform::ReadControllerInput ( WiiController& controllerInOut )
+{
+	controllerInOut.ZeroAllInputs();
 }
 
 #endif // WIN - MAC - LINUX

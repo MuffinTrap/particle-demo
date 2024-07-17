@@ -1,6 +1,8 @@
 #include "ImageGL.h"
 #include <stdio.h>
 #include <png.h>
+#include <cstdlib>
+#include "crossCache.h"
 
 struct TextureGL
 {
@@ -230,7 +232,7 @@ static TextureGL* ReadPNG(const char* filename)
 #endif
 		row_pointers[i] = (png_bytep)(textureInfoPtr->texels + readStart);
 	}
-	DCFlushRange(row_pointers, rowPointersSize);
+	CacheFlushRange(row_pointers, rowPointersSize);
 
 	// Pointers to rows are set, read the pixels on the rows
 	png_read_image(png_ptr, row_pointers);
@@ -242,17 +244,14 @@ static TextureGL* ReadPNG(const char* filename)
 	fclose(fp);
 
 	// Flush read texels
-	DCFlushRange(textureInfoPtr->texels, imageDataSize);
+	CacheFlushRange(textureInfoPtr->texels, imageDataSize);
 	return textureInfoPtr;
 }
 
-bool ImageGL::LoadImage ( const char* filename, gdl::TextureFilterModes filter)
+bool ImageGL::LoadImage ( const char* filename, GLuint filterMode)
 {
 	// Load using png
-	if (gdl::ConsoleActive)
-	{
-		printf("gdl:: Loading image %s for OpenGX...", filename);
-	}
+	printf("gdl:: Loading image %s for OpenGX...", filename);
 
 	TextureGL* textureDataPtr = ReadPNG(filename);
 	if (textureDataPtr == nullptr || textureDataPtr->texels == nullptr)
@@ -263,15 +262,10 @@ bool ImageGL::LoadImage ( const char* filename, gdl::TextureFilterModes filter)
 	height = textureDataPtr->height;
 
 	GLint alignment;
-	GLint glFilter = GL_LINEAR;
-	if (filter == gdl::TextureFilterModes::Nearest)
-	{
-		glFilter = GL_NEAREST;
-	}
 	glGenTextures(1, &textureName);
 	glBindTexture(GL_TEXTURE_2D, textureName);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, glFilter);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, glFilter);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, filterMode);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, filterMode);
 
 	// Load to OpenGL
 

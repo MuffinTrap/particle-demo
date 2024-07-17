@@ -1,9 +1,15 @@
 #include "radarfx.h"
-#include <GL/opengx.h>
-#include <stdlib.h>
-#include "FontGL.h"
+
 #include <random>
 #include <stdio.h>
+#include <stdlib.h>
+#include "crossOpenGL.h"
+#include "crossCache.h"
+#include "crossRandom.h"
+
+
+
+#include "FontGL.h"
 #include "palette.h"
 
 RadarFX::RadarFX()
@@ -14,13 +20,13 @@ RadarFX::RadarFX()
 void RadarFX::Init ( u32 dotAmount )
 {
 	this->dotAmount = dotAmount;
-	size_t dotArraySize = dotAmount* sizeof(guVector);
-	dotsArray = (guVector*)malloc(dotArraySize);
+	size_t dotArraySize = dotAmount * sizeof(glm::vec3);
+	dotsArray = (glm::vec3*)malloc(dotArraySize);
 	for(u32 i = 0; i < dotAmount; i++)
 	{
-		dotsArray[i] = guVector{gdl::GetRandomFloat(0.2f, 0.8f), gdl::GetRandomFloat(0.2f, 0.8f), 0.0f};
+		dotsArray[i] = glm::vec3{GetRandomFloat(0.2f, 0.8f), GetRandomFloat(0.2f, 0.8f), 0.0f};
 	}
-	DCFlushRange(dotsArray, dotArraySize);
+	CacheFlushRange(dotsArray, dotArraySize);
 
 	// TODO Sort the dots so that it start from the middle of y
 }
@@ -45,7 +51,7 @@ void RadarFX::Update ( float deltaTime )
 		if (drawAmount == dotAmount)
 		{
 			drawAmount = 0;
-			seed = gdl::GetRandomInt(0, 256);
+			seed = GetRandomInt(0, 256);
 		}
 	}
 }
@@ -218,7 +224,7 @@ void RadarFX::Draw(FontGL* font)
 	glBegin(GL_LINES);
 	for(u32 di = 0; di < drawAmount; di++)
 	{
-		if (gdl::GetRandomInt(0, 4) == 0)
+		if (GetRandomInt(0, 4) == 0)
 		{
 			if (di == drawAmount-1)
 			{
@@ -262,7 +268,7 @@ void RadarFX::Draw(FontGL* font)
 					e.lineEnd = {left-lineLength, ly, z};
 					sprintf(numberbuffer, "%.4f %.4f %.4f", e.lineEnd.x, e.lineEnd.y, e.lineEnd.z);
 					e.text = numberbuffer;
-					e.alignmentX = gdl::RJustify;
+					e.alignmentX = RJustify;
 					e.index = di;
 					numberEntries.push_back(e);
 				}
@@ -294,7 +300,7 @@ void RadarFX::Draw(FontGL* font)
 					e.lineEnd = {right + lineLength, ry, z};
 					sprintf(numberbuffer, "%.4f %.4f %.4f", e.lineEnd.x, e.lineEnd.y, e.lineEnd.z);
 					e.text = numberbuffer;
-					e.alignmentX = gdl::LJustify;
+					e.alignmentX = LJustify;
 					e.index = di;
 					numberEntries.push_back(e);
 				}
@@ -315,7 +321,7 @@ void RadarFX::Draw(FontGL* font)
 	bool plus = true;
 	for(u32 di = 0; di < drawAmount; di++)
 	{
-		if (gdl::GetRandomInt(0,4)==0)
+		if (GetRandomInt(0,4)==0)
 		{
 			float px = left + dotsArray[di].x * wh;
 			float py = top - dotsArray[di].y * wh;
@@ -336,7 +342,6 @@ void RadarFX::Draw(FontGL* font)
 	glEnd();
 
 	// Draw texts
-	// TODO Three words for each line
 	for (u32 di = 0; di < drawAmount; di++)
 	{
 		if (di >= numberEntries.size())
@@ -348,7 +353,7 @@ void RadarFX::Draw(FontGL* font)
 		{
 			glPushMatrix();
 			glTranslatef(e.lineEnd.x, e.lineEnd.y, e.lineEnd.z);
-			font->Printf(WHITE, textHeight, e.alignmentX, gdl::Centered, e.text.c_str());
+			font->Printf(WHITE, textHeight, e.alignmentX, Centered, e.text.c_str());
 			glPopMatrix();
 		}
 	}

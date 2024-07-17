@@ -1,15 +1,17 @@
 #pragma once
-#include <mgdl-wii.h>
 #include <vector>
 #include <string>
+#include <glm/vec3.hpp>
+#include "crossTypedefs.h"
 
-class FontGL;
+#include "FontGL.h"
+
 
 struct NumberEntry
 {
-	gdl::AlignmentModes alignmentX;
-	u32 index;
-	guVector lineEnd;
+	FontAlignment alignmentX;
+	uint32_t index;
+	glm::vec3 lineEnd;
 	std::string text;
 };
 
@@ -24,7 +26,7 @@ public:
 	void DrawGrid(float left, float right, float top, float bottom);
 	void Quit();
 
-	guVector* dotsArray = nullptr;
+	glm::vec3* dotsArray = nullptr;
 	u32 dotAmount = 0;
 	u32 gridSize = 16;
 	float cellSize;
