@@ -23,10 +23,20 @@ static WiiController controller;
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-void Platform::Init ( int argc, char ** argv, bool useRocket )
+void Platform::Init ( int argc, char ** argv, ScreenAspect aspectRatio, bool useRocket )
 {
+    gdl::InitAspectMode mode = gdl::Aspect4x3;
+    switch(aspectRatio)
+    {
+        case ScreenAspect::Screen4x3:
+            mode = gdl::Aspect4x3;
+            break;
+        case ScreenAspect::Screen16x9:
+            mode = gdl::Aspect16x9;
+            break;
+    };
 	fatInitDefault();
-	gdl::InitSystem(gdl::ModeAuto, gdl::AspectAuto, gdl::HiRes, gdl::InitFlags::OpenGX);
+	gdl::InitSystem(gdl::ModeAuto, mode, gdl::HiRes, gdl::InitFlags::OpenGX);
     ogx_initialize();
 
 	// Init controller
@@ -222,24 +232,66 @@ void timerFunc(int value) {
     sceneUpdate();
     glutTimerFunc(1000/60, timerFunc, 0); // Re-register the timer callback
 }
+
+static int scrw = 0;
+static int scrh= 0;
+void onWindowSizeChange(int newWidth, int newHeight)
+{
+    // Keep aspect ratio
+    float width = (float)newWidth/(float)scrw;
+    float height = (float)newHeight/(float)scrh;
+    float scale = width < height ? width : height;
+
+    float scaledWidth = scale*(float)scrw;
+    float scaledHeight = scale*(float)scrh;
+
+    int left = 0;
+    int top = 0;
+
+    if (scaledWidth < newWidth)
+    {
+        // Black bars on sides
+        left = (newWidth - scaledWidth)/2;
+    }
+    if (scaledHeight < newHeight)
+    {
+        // Black bars on top and bottom
+        top = (newHeight - scaledHeight)/2;
+    }
+    glViewport(left, top, (int)scaledWidth, (int)scaledHeight);
+    // Don't do anything?
+
+}
 #pragma clang diagnostic pop
 #pragma GCC diagnostic pop
 
-void Platform::Init ( int argc, char ** argv, bool useRocket )
+void Platform::Init ( int argc, char ** argv, ScreenAspect aspectRatio, bool useRocket )
 {
-    int wiiHDwidth = 854;
-    int wiiHDheight = 480;
+    switch(aspectRatio)
+    {
+        case ScreenAspect::Screen4x3:
+            screenWidth = 640;
+            screenHeight = 480;
+            break;
+        case ScreenAspect::Screen16x9:
+            screenWidth = 854;
+            screenHeight = 480;
+            break;
+    };
+    scrw = screenWidth;
+    scrh = screenHeight;
 
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
-    glutInitWindowSize(wiiHDwidth, wiiHDheight);
+    glutInitWindowSize(screenWidth, screenHeight);
     glutCreateWindow("My Mac/PC program window");
 
     glutDisplayFunc(renderLoop);
     glutKeyboardFunc(keyboard); // Register the keyboard callback
 	glutIdleFunc(sceneUpdate);
+    glutReshapeFunc(onWindowSizeChange);
 
-	demoInstance.Init(wiiHDwidth, wiiHDheight, useRocket);
+	demoInstance.Init(screenWidth, screenHeight, useRocket);
 }
 
 void Platform::RunMainLoop()

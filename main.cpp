@@ -4,7 +4,7 @@ int main(int argc, char** argv)
 {
     bool useRocket = true;
     Platform demoPlatform;
-    demoPlatform.Init(argc, argv, useRocket);
+    demoPlatform.Init(argc, argv, Screen4x3, useRocket);
 
     //
 

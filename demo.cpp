@@ -63,11 +63,10 @@ void Demo::Init(int scrW, int scrH, bool useRocket)
 	aspect = (float)screenWidth/(float)screenHeight;
 
     glViewport(0, 0, screenWidth, screenHeight);
-    glOrtho(-40.0f * aspect, 40.0f * aspect, -40.0f, 40.0f, -0.1f, 1000.0f);
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glClearColor(0.0f, 0.0f, 1.0f, 0.0f);
+    glClearColor(0.1f, 0.1f, 0.7f, 0.0f);
     glShadeModel(GL_FLAT);
 
     // Use arrays and indices to draw particles
@@ -144,6 +143,19 @@ void Demo::Draw()
     glRotatef(angle, 0.0f, 0.0f, 1.0f);
 
     glRectf(-2.0f, -2.0f, 2.0f, 2.0f);
+    glPopMatrix();
+
+    glPushMatrix();
+    glBegin(GL_LINES);
+    glColor3f(1.0f, 0.6f, 0.6f);
+    glVertex3f(-1.0f, 0.0f, 0.0f);
+    glVertex3f(1.0f, 0.0f, 0.0f);
+    glVertex3f(0.0f, 1.0f, 0.0f);
+    glVertex3f(0.0f, -1.0f, 0.0f);
+
+    glEnd();
+
+
     glPopMatrix();
 }
 
