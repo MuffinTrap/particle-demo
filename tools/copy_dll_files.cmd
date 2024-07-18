@@ -28,7 +28,7 @@ xcopy %src%\libvorbisenc-2.dll %dest% /y
 
 :: Copy exe
 xcopy %repo%\gldemo.exe %dest% /y 
-:: Copy all sd_card files
-xcopy %repo%\sd_card\ %dest% /s /e /y 
+:: Copy all images
+xcopy %repo%\*png %dest% /s /e /y
 :: Copy music
 xcopy %repo%\*.wav %dest% /y 
