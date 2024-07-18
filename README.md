@@ -18,6 +18,42 @@
 - [KDevelop](https://kdevelop.org/)
 - [Font conversion tool](https://stmn.itch.io/font2bitmap)
 
+
+## Windows instructions
+
+### Development environment and libraries
+1. Install [MSYS2](https://www.msys2.org/) (This is a different version from the one that comes with DevkitPro) [Detailed instructions for install](https://www.freecodecamp.org/news/how-to-install-c-and-cpp-compiler-on-windows/)
+2. Launch the UCRT64 variant and update the packages as explained in the Detailed instructions above.
+3. Install the compiler 
+<code>pacman -S mingw-w64-ucrt-x86_64-gcc</code>
+4. Install the required libraries:
+<code>pacman -S mingw-w64-ucrt-x86_64-openal mingw-w64-ucrt-x86_64-freeglut mingw-w64-ucrt-x86_64-libpng mingw-w64-ucrt-x86_64-libsndfile mingw-w64-ucrt-x86_64-glm make</code>
+
+### Compiling the demo and getting the .dll files
+1. Navigate to the github repository.
+2. Run command <code>make -f Makefile_computer</code>
+3. Create a new folder __outside__ the repository and name it something like win_build.
+4. Copy the **tools/copy_dll_files.cmd** to win_build
+5. Edit the CMD file to have the repository path
+6. Run the CMD file to copy all the dlls.
+
+#### These are the dll files that the demo needs to run.
+- libgcc_s_seh-1.dll
+- libfreeglut.dll
+- libopenal-1.dll
+- libpng16-16.dll
+- libsndfile-1.dll
+- libstdc++-6.dll
+- libwinpthread-1.dll
+- zlib1.dll
+- libFLAC.dll
+- libmpg123-0.dll
+- libmp3lame-0.dll
+- libogg-0.dll
+- libvorbis-0.dll
+- libopus-0.dll
+- libvorbisenc-2.dll
+
 ## Libraries needed for Wii
 - mtek-gdl  (see Frameworks above)
 - ppc-glm (from devkitpro pacman)

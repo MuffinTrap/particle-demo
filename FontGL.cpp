@@ -5,6 +5,7 @@
 #include "crossCache.h"
 #include "crossTypedefs.h"
 #include "crossAssert.h"
+#include "crossAlloc.h"
 
 void FontGL::LoadFromImage(const char* filename, short charw, short charh, char firstCharacter )
 {
@@ -152,7 +153,7 @@ void FontGL::CreateTextureCoordList(short rows, short charactersPerRow, short te
 	size_t tListSize = (sizeof(glm::vec2)*4)*(characterAmount);
 	if (tList == NULL)
 	{
-		tList = (glm::vec2*)aligned_alloc(32, tListSize);
+		tList = (glm::vec2*)AllocateAlignedMemory(tListSize);
 		gdl_assert_print(tList != nullptr, "Out of memory when allocation font txcord list");
 	}
 

@@ -3,6 +3,7 @@
 #include <png.h>
 #include <cstdlib>
 #include "crossCache.h"
+#include "crossAlloc.h"
 
 struct TextureGL
 {
@@ -202,7 +203,7 @@ static TextureGL* ReadPNG(const char* filename)
 
 	// Allocate!
 	size_t imageDataSize = sizeof(GLubyte) * w * h * textureInfoPtr->bytesPerPixel;
-	textureInfoPtr->texels = (GLubyte*)aligned_alloc(32,  imageDataSize);
+	textureInfoPtr->texels = (GLubyte*)AllocateAlignedMemory(imageDataSize);
 
 	if (textureInfoPtr->texels == nullptr)
 	{
@@ -215,7 +216,7 @@ static TextureGL* ReadPNG(const char* filename)
 
 	// Set up array for rows to read
 	size_t rowPointersSize = sizeof(png_bytep) * h;
-	row_pointers = (png_bytep*)aligned_alloc(32, rowPointersSize);
+	row_pointers = (png_bytep*)AllocateAlignedMemory(rowPointersSize);
 
 	// Read all rows
 	size_t rowSize = w * textureInfoPtr->bytesPerPixel;

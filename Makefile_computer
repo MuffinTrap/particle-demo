@@ -23,6 +23,8 @@ else
 endif
 
 CXX_FLAGS = -Werror=unused-function -Wall -Wextra -Wpedantic -std=c++11
+# Optimize!
+CXX_FLAGS += -Ofast
 EXE_SUFFIX = ""
 
 ifeq ($(OS_TYPE),windows)

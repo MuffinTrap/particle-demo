@@ -288,7 +288,6 @@ void Platform::Init ( int argc, char ** argv, ScreenAspect aspectRatio, bool use
 
     glutDisplayFunc(renderLoop);
     glutKeyboardFunc(keyboard); // Register the keyboard callback
-	glutIdleFunc(sceneUpdate);
     glutReshapeFunc(onWindowSizeChange);
 
 	demoInstance.Init(screenWidth, screenHeight, useRocket);
