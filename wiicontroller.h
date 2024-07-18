@@ -36,9 +36,13 @@ public:
 	glm::vec2 GetCursorPosition();
 	glm::vec2 GetNunchukJoystickDirection(float deadzone);
 
+	void SetButtonDown(int buttonEnum);
+	void SetButtonUp(int buttonEnum);
+
 	// In rad -PI...PI
 	float GetRoll();
 
+	// State
 	u32 pressedButtons;
 	u32 releasedButtons;
 	u32 heldButtons;
@@ -49,5 +53,6 @@ public:
 	float cursorY;
 	float roll;
 
+	// Which controller number this is: 0-3
 	int channel;
 };

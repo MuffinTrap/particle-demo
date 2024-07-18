@@ -9,49 +9,52 @@ EffectHost::EffectHost()
 EffectHost::~EffectHost()
 {
 	radar.Quit();
+	plotter.Quit();
 }
 
 void EffectHost::Init()
 {
 	printf("effecthost::Init()\n");
-	// NOTE: Andvari is 30x30
-	//font.LoadFromBuffer(NES30x30_png, NES30x30_png_size, 30, 30, ' ' );
 	font.LoadFromImage("andvari30x30.png", 30, 30, ' ');
-	//font.LoadFromImage("font8x16.png", 8, 16, ' ');
-	// font.LoadFromBuffer(font8x16_png, font8x16_png_size, 8, 16, ' ');
-	//font.LoadFromBuffer(font_test_png, font_test_png_size, 8, 16, ' ');
-	printf("Radar init\n");
     radar.Init(64);
-	printf("Tuner init\n");
 	tuner.Init(640, 480);
-	activeEffect = Radar;
+	plotter.Init(32);
+	activeEffect = 0.0f;
 }
 
 
 void EffectHost::Update ( float deltaTime )
 {
+	static float phase = 0.0f;
 
-	switch(activeEffect)
+	if (activeEffect <= 1.0f)
 	{
-		case Radar:
-			radar.Update(deltaTime);
-			break;
-		case Tuner:
-			tuner.Update(deltaTime);
-			break;
-	};
+		radar.Update(deltaTime);
+	}
+	else if (activeEffect <= 2.0f)
+	{
+		tuner.Update(deltaTime);
+	}
+	else
+	{
+		phase += deltaTime;
+		plotter.SetPhase(phase);
+	}
 }
 
 void EffectHost::Draw()
 {
-	switch(activeEffect)
+	if (activeEffect <= 1.0f)
 	{
-		case Radar:
-			radar.Draw(&font);
-			break;
-		case Tuner:
-			tuner.Draw(&font);
-			break;
-	};
+		radar.Draw(&font);
+	}
+	else if (activeEffect <= 2.0f)
+	{
+		tuner.Draw(&font);
+	}
+	else
+	{
+		plotter.Draw();
+	}
 }
 

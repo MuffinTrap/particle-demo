@@ -3,7 +3,7 @@
 #ifdef GEKKO
 #include <mgdl-wii.h>
 
-void CacheFlushRange ( void* rangeStart, int size )
+void CacheFlushRange ( void* rangeStart, size_t size )
 {
 	DCFlushRange(rangeStart, size);
 }

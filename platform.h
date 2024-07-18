@@ -17,7 +17,6 @@ public:
 	void LoadMusic(const char* filename, double beatsPerMin, int rowsPerBeat);
 	void PlayMusic();
 	void RunMainLoop();
-	void ReadControllerInput(WiiController &controllerInOut);
 
 	int screenWidth;
 	int screenHeight;

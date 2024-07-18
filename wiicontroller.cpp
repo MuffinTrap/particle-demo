@@ -51,3 +51,14 @@ void WiiController::ZeroAllInputs()
 	cursorY = 0.0f;
 	roll = 0.0f;
 }
+
+void WiiController::SetButtonDown ( int buttonEnum )
+{
+	pressedButtons += buttonEnum;
+	heldButtons += buttonEnum;
+}
+void WiiController::SetButtonUp ( int buttonEnum )
+{
+	heldButtons -= buttonEnum;
+}
+

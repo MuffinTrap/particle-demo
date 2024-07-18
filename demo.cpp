@@ -2,6 +2,8 @@
 #include "crossOpenGL.h"
 #include <math.h>
 
+#include "palette.h"
+
 // Rocket sync includes
 #include "src/direction.hpp"
 #include "rocket/sync.h"
@@ -12,19 +14,19 @@ struct sync_device *rocket;
 
 // Struct for rocket callbacsk
 #ifndef SYNC_PLAYER
-// This is for the win-mac-linux version
-// Listen to the editor and store tracks through pointers
-static sync_cb rocket_callbacks;
-const struct sync_track *clear_r;
-const struct sync_track *clear_g;
-const struct sync_track *clear_b;
+    // This is for the win-mac-linux version
+    // Listen to the editor and store tracks through pointers
+    static sync_cb rocket_callbacks;
+    const struct sync_track *clear_r;
+    const struct sync_track *clear_g;
+    const struct sync_track *clear_b;
 
 #else
 
-// This is for the wii version.
-// Read track data from a header
-// This header contains the sync_tracks
-#include "src/sync_data.h"
+    // This is for the wii version.
+    // Read track data from a header
+    // This header contains the sync_tracks
+    #include "src/sync_data.h"
 #endif
 
 
@@ -62,10 +64,6 @@ bool Demo::ConnectRocket()
     clear_b = sync_get_track(rocket, "clear_b");
 #endif
 
-    // test reading track
-    float first_red = sync_get_val(clear_r, 0.0);
-    printf("Red on first row is %.2f\n", first_red);
-
 	return true;
 }
 
@@ -80,7 +78,7 @@ void Demo::Init(int scrW, int scrH, bool useRocket)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glClearColor(0.1f, 0.1f, 0.7f, 0.0f);
+    PaletteClearColor3f(BLACK);
     glShadeModel(GL_FLAT);
 
     // Use arrays and indices to draw particles
@@ -92,14 +90,22 @@ void Demo::Init(int scrW, int scrH, bool useRocket)
 	{
 		ConnectRocket();
 	}
+
+	camera.Init(screenWidth, screenHeight);
+	host.Init();
+}
+
+void Demo::UpdateController(WiiController& controllerState)
+{
+    controller = controllerState;
 }
 
 // elapsed : for effects that are in sync with music
 // deltaTime : for effects that run constantly and are not in sync with music
 void Demo::Update ( float elapsed, float deltaTime )
 {
-// Read track values from rocket
-#ifndef SYNC_PLAYER
+    // Read track values from rocket
+    #ifndef SYNC_PLAYER
     if (rocket_in_use)
     {
         if (sync_update(rocket, (int)floor(get_row()), &rocket_callbacks))
@@ -108,20 +114,19 @@ void Demo::Update ( float elapsed, float deltaTime )
             sync_tcp_connect(rocket, "localhost", SYNC_DEFAULT_PORT);
         }
     }
-#endif
+    #endif
 
 	angle = elapsed * deltaTime * 360.0f;
-
-}
-
-void glRectf(float x1, float y1, float x2, float y2)
-{
-    glBegin(GL_QUADS);
-        glVertex3f(x1, y1, -1.0f);
-        glVertex3f(x2, y1, -1.0f);
-        glVertex3f(x2, y2, -1.0f);
-        glVertex3f(x1, y2, -1.0f);
-    glEnd();
+    if (controller.ButtonPress(Button1))
+    {
+        host.activeEffect -= 1.0f;
+    }
+    if (controller.ButtonPress(Button2))
+    {
+        host.activeEffect += 1.0f;
+    }
+    host.Update(deltaTime * 4.0f);
+    camera.Update(deltaTime, controller);
 }
 
 // Draw effects using OpenGL functions
@@ -132,45 +137,18 @@ void Demo::Draw()
     // Set the projection matrix
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    gluPerspective(45.0, aspect, 0.1, 100.0);
+    gluPerspective(75.0, aspect, 0.1, 100.0);
 
     // Set the modelview matrix
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(0.0f, 0.0, 10.0, // Eye
-              0.0, 0.0, 0.0,  // Center
+    gluLookAt(camera.eye.x, camera.eye.y, camera.eye.z,
+              0.0, camera.lookTarget.y, 0.0,  // Center
               0.0, 1.0, 0.0); // Up
-    // Test square
-    glPushMatrix();
-    if (rocket_in_use)
-    {
-        glColor3f(
-            (float)(sync_get_val(clear_r, get_row())),
-            (float)(sync_get_val(clear_g, get_row())),
-            (float)(sync_get_val(clear_b, get_row()))
-        );
-    }
-    else
-    {
-        glColor3f(1.0f, 1.0f, 0.0f);
-    }
-
-    glRotatef(angle, 0.0f, 0.0f, 1.0f);
-
-    glRectf(-2.0f, -2.0f, 2.0f, 2.0f);
-    glPopMatrix();
 
     glPushMatrix();
-    glBegin(GL_LINES);
-    glColor3f(1.0f, 0.6f, 0.6f);
-    glVertex3f(-1.0f, 0.0f, 0.0f);
-    glVertex3f(1.0f, 0.0f, 0.0f);
-    glVertex3f(0.0f, 1.0f, 0.0f);
-    glVertex3f(0.0f, -1.0f, 0.0f);
-
-    glEnd();
-
-
+        glTranslatef(0.0f, 0.0f, -1.0f);
+        host.Draw();
     glPopMatrix();
 }
 

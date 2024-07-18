@@ -9,6 +9,7 @@ TunerFx::TunerFx()
 	step = 0.05f;
 	textToRowScale = 0.25f;
 	lineSpeed = 0.5f;
+	linePos = 0.0f;
 }
 
 

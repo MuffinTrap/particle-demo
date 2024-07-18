@@ -52,11 +52,21 @@ void DebugCamera::Update(float deltaTime, WiiController& controller)
     bool up = controller.ButtonHeld(ButtonUp);
     bool down =controller.ButtonHeld(ButtonDown);
 
+    static glm::vec3 forward = glm::vec3(0.0f, 0.0f, -1.0f);
     glm::vec3 rightVec;
     glm::vec3 upVec = WorldUp;
-    rightVec = glm::cross(dir, upVec);
+    rightVec = glm::cross(forward, upVec);
     eye = eye + (rightVec * joystick.x) * cameraSpeed * deltaTime;
-    eye = eye - (dir * joystick.y) * cameraSpeed * deltaTime;
+    eye = eye - (forward * joystick.y) * cameraSpeed * deltaTime;
+
+    if (controller.ButtonHeld(ButtonMinus))
+    {
+        lookTarget.y -= cameraSpeed *deltaTime;
+    }
+    if (controller.ButtonHeld(ButtonPlus))
+    {
+        lookTarget.y += cameraSpeed *deltaTime;
+    }
 
     if (up)
     {

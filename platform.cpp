@@ -7,7 +7,6 @@
 #include "src/direction.hpp"
 
 static Demo demoInstance;
-static bool ESC_PRESSED = false;
 
 // //////////////////////////////////
 // NINTENDO WII
@@ -20,6 +19,46 @@ static bool ESC_PRESSED = false;
 
 static gdl::Sound demoMusic;
 static WiiController controller;
+
+static void ReadControllerInput ( WiiController& controllerInOut )
+{
+  WPAD_ScanPads();  // Scan the Wiimotes
+
+  WPADData *data1 = WPAD_Data(controllerInOut.channel);
+
+  const ir_t &ir = data1->ir;
+  // Multiply x and y to match them to 16:9 screen
+  controllerInOut.cursorX = ir.x * 1.67f - 16.f;
+  controllerInOut.cursorY = ir.y * 1.2f - 16.f;
+
+  controllerInOut.pressedButtons = WPAD_ButtonsDown(0);
+  controllerInOut.releasedButtons = WPAD_ButtonsUp(0);
+  controllerInOut.heldButtons = WPAD_ButtonsHeld(0);
+
+  controllerInOut.nunchukJoystickDirectionX=0.0f;
+  controllerInOut.nunchukJoystickDirectionY=0.0f;
+  const expansion_t &ex = data1->exp;
+  if (ex.type == WPAD_EXP_NUNCHUK)
+  {
+      joystick_t n = ex.nunchuk.js;
+      if (n.mag > controllerInOut.nunchukJoystickDeadzone)
+      {
+          // Angle is reported in degrees
+          // Angle of 0 means up.
+          // 90 right, 180 down, 270 left
+
+          float rad = DegToRad(n.ang);
+          float x = 0;
+          float y = -1.0f;
+          float dirx = cos(rad) * x - sin(rad) * y;
+          float diry = sin(rad) * x + cos(rad) * y;
+          controllerInOut.nunchukJoystickDirectionX = dirx * n.mag;
+          controllerInOut.nunchukJoystickDirectionY = diry * n.mag;
+      }
+  }
+
+  controllerInOut.roll = DegToRad(data1->orient.roll);
+}
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
@@ -77,7 +116,7 @@ void Platform::RunMainLoop()
 	u64 now = gettime();
 	u64 deltaTimeStart = now;
 	PlayMusic();
-	while (ESC_PRESSED == false)
+	while (true)
 	{
 		// Timing
 		u64 now = gettime();
@@ -88,8 +127,9 @@ void Platform::RunMainLoop()
         updateAudio();
 
 		if (controller.ButtonPress(WPAD_BUTTON_HOME)){
-			ESC_PRESSED = true;
+			break;
 		}
+        demoInstance.UpdateController(controller);
 		demoInstance.Update(getTime(), deltaTime);
 		gdl::PrepDisplay();
 
@@ -103,45 +143,6 @@ void Platform::RunMainLoop()
 	gdl::wii::DoProgramExit();
 }
 
-void Platform::ReadControllerInput ( WiiController& controllerInOut )
-{
-  WPAD_ScanPads();  // Scan the Wiimotes
-
-  WPADData *data1 = WPAD_Data(controllerInOut.channel);
-
-  const ir_t &ir = data1->ir;
-  // Multiply x and y to match them to 16:9 screen
-  controllerInOut.cursorX = ir.x * 1.67f - 16.f;
-  controllerInOut.cursorY = ir.y * 1.2f - 16.f;
-
-  controllerInOut.pressedButtons = WPAD_ButtonsDown(0);
-  controllerInOut.releasedButtons = WPAD_ButtonsUp(0);
-  controllerInOut.heldButtons = WPAD_ButtonsHeld(0);
-
-  controllerInOut.nunchukJoystickDirectionX=0.0f;
-  controllerInOut.nunchukJoystickDirectionY=0.0f;
-  const expansion_t &ex = data1->exp;
-  if (ex.type == WPAD_EXP_NUNCHUK)
-  {
-      joystick_t n = ex.nunchuk.js;
-      if (n.mag > controllerInOut.nunchukJoystickDeadzone)
-      {
-          // Angle is reported in degrees
-          // Angle of 0 means up.
-          // 90 right, 180 down, 270 left
-
-          float rad = DegToRad(n.ang);
-          float x = 0;
-          float y = -1.0f;
-          float dirx = cos(rad) * x - sin(rad) * y;
-          float diry = sin(rad) * x + cos(rad) * y;
-          controllerInOut.nunchukJoystickDirectionX = dirx * n.mag;
-          controllerInOut.nunchukJoystickDirectionY = diry * n.mag;
-      }
-  }
-
-  controllerInOut.roll = DegToRad(data1->orient.roll);
-}
 
 
 // ///////////////////////////////////
@@ -157,38 +158,35 @@ void Platform::ReadControllerInput ( WiiController& controllerInOut )
 #include <sndfile.h>
 #include <AL/al.h>
 
+#include "glutInput.h"
+
 static void quit()
 {
 	printf("Free resources\n");
 	// Time to go
 	// Game over time
 		// Clean up resources and exit the program
-	alSourceStop(source);
-	alcMakeContextCurrent(NULL);
-	alcDestroyContext(context);
-	alcCloseDevice(device);
-	sf_close(sndfile);
 
-	alDeleteSources(1, &source);
-	alDeleteBuffers(1, &buffer);
-	free(data);
-
+    unloadAudio();
 	demoInstance.Quit();
 
-	// Dont draw anymore
 	exit(0);
-
 }
 
 void sceneUpdate() {
 
-    if (ESC_PRESSED)
+    WiiController* glutInput = GetGlutController();
+    if (glutInput->ButtonPress(ButtonHome))
     {
 		quit();
     }
 
     updateAudio();
+    demoInstance.UpdateController(*glutInput);
 	demoInstance.Update((float)getTime(), 0.016f);
+
+    // Clear pressed buttons
+    glutInput->pressedButtons = 0;
 
     // Update frame counter in direction.cpp
     frameCounterIncrement();
@@ -209,29 +207,20 @@ void renderLoop() {
     glutSwapBuffers();
 }
 
-#pragma GCC diagnostic push
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wunused-parameter"
-#pragma GCC diagnostic ignored "-Wunused-parameter"
 
-static void keyboard(unsigned char key, int x, int y) {
-        if (key == 27) { // ASCII code for 'Escape'
-            printf("exit pressed: save tracks\n");
-            printf("Start save sync\n");
-
-            // This is noticed in the next sceneUpdate
-            printf("Game running: false\n");
-            ESC_PRESSED = true;
-        }
-    }
 // ///////////////////////
 // GLUT timer function
 // calls the given function when 16 milliseconds have passed
 
+#pragma clang diagnostic push
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-parameter"
 void timerFunc(int value) {
     sceneUpdate();
     glutTimerFunc(1000/60, timerFunc, 0); // Re-register the timer callback
 }
+#pragma GCC diagnostic pop
+#pragma clang diagnostic pop
 
 static int scrw = 0;
 static int scrh= 0;
@@ -259,11 +248,7 @@ void onWindowSizeChange(int newWidth, int newHeight)
         top = (newHeight - scaledHeight)/2;
     }
     glViewport(left, top, (int)scaledWidth, (int)scaledHeight);
-    // Don't do anything?
-
 }
-#pragma clang diagnostic pop
-#pragma GCC diagnostic pop
 
 void Platform::Init ( int argc, char ** argv, ScreenAspect aspectRatio, bool useRocket )
 {
@@ -278,6 +263,8 @@ void Platform::Init ( int argc, char ** argv, ScreenAspect aspectRatio, bool use
             screenHeight = 480;
             break;
     };
+
+    // Store these for the reshape callback
     scrw = screenWidth;
     scrh = screenHeight;
 
@@ -287,7 +274,19 @@ void Platform::Init ( int argc, char ** argv, ScreenAspect aspectRatio, bool use
     glutCreateWindow("My Mac/PC program window");
 
     glutDisplayFunc(renderLoop);
-    glutKeyboardFunc(keyboard); // Register the keyboard callback
+
+    // Input callbacks and init
+    glutKeyboardFunc(keyboardDown); // Register the keyboard callback
+    glutKeyboardUpFunc(keyboardUp); // Register the keyboard release
+
+    glutSpecialFunc(specialKeyDown); // Register the keyboard callback
+    glutSpecialUpFunc(specialKeyUp); // Register the keyboard release
+
+    glutMouseFunc(mouseKey);        // Register mouse buttons and movement
+    glutMotionFunc(mouseMove);
+    glutPassiveMotionFunc(mouseMove);
+    GetGlutController()->ZeroAllInputs();
+
     glutReshapeFunc(onWindowSizeChange);
 
 	demoInstance.Init(screenWidth, screenHeight, useRocket);
@@ -302,7 +301,6 @@ void Platform::RunMainLoop()
     glutMainLoop();
 }
 
-
 void Platform::LoadMusic(const char* filename, double beatsPerMin, int rowsPerBeat)
 {
 	setupDirection(beatsPerMin, rowsPerBeat);
@@ -312,11 +310,6 @@ void Platform::LoadMusic(const char* filename, double beatsPerMin, int rowsPerBe
 void Platform::PlayMusic()
 {
     playAudio();
-}
-
-void Platform::ReadControllerInput ( WiiController& controllerInOut )
-{
-	controllerInOut.ZeroAllInputs();
 }
 
 #endif // WIN - MAC - LINUX

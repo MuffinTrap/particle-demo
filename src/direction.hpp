@@ -30,6 +30,7 @@ extern "C" {
     int loadAudio(const char* filename);
     void playAudio();
     void updateAudio();
+    void unloadAudio();
 
     // Functions called by demo
 

@@ -67,6 +67,12 @@ void playAudio()
 {
     musicSound.Play(1.0f, 100.0f);
 }
+
+void unloadAudio()
+{
+    musicSound.Delete();
+}
+
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 void set_row(int row)
@@ -163,6 +169,19 @@ void updateAudio()
 	sf_command(sndfile, SFC_GET_LOG_INFO, &sfinfo, sizeof(sfinfo));
 	double sampleRate = 44100.0;
 	time_secs = (double)sampleOffset / sampleRate;
+}
+
+void unloadAudio()
+{
+	alSourceStop(source);
+	alcMakeContextCurrent(NULL);
+	alcDestroyContext(context);
+	alcCloseDevice(device);
+	sf_close(sndfile);
+
+	alDeleteSources(1, &source);
+	alDeleteBuffers(1, &buffer);
+	free(data);
 }
 
 

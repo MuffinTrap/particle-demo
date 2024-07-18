@@ -2,17 +2,13 @@
 #include "radarfx.h"
 #include "tunerfx.h"
 #include "FontGL.h"
+#include "plotterfx.h"
 
 namespace gdl
 {
 	class Image;
 };
 
-enum EffectName
-{
-	Radar,
-	Tuner
-};
 
 class EffectHost
 {
@@ -23,9 +19,10 @@ public:
 	void Update(float deltaTime);
 	void Draw();
 
-	EffectName activeEffect;
+	float activeEffect;
 	RadarFX radar;
 	TunerFx tuner;
+	PlotterFX plotter;
 
 	FontGL font;
 };

@@ -1,5 +1,9 @@
 #pragma once
 
+#include "effecthost.h"
+#include "debugcamera.h"
+#include "wiicontroller.h"
+
 // This is the cross platform demo class.
 // It should not need to know what platform is in use.
 
@@ -11,6 +15,7 @@ public:
 	bool ConnectRocket();
 	void Draw();
 	void Quit();
+	void UpdateController(WiiController& controllerState);
 
 	int screenWidth;
 	int screenHeight;
@@ -19,4 +24,8 @@ public:
 
 	// Demo things
 	float angle;
+
+	EffectHost host;
+	DebugCamera camera;
+	WiiController controller;
 };
