@@ -29,6 +29,6 @@ xcopy %src%\libvorbisenc-2.dll %dest% /y
 :: Copy exe
 xcopy %repo%\gldemo.exe %dest% /y 
 :: Copy all images
-xcopy %repo%\*png %dest% /s /e /y
+xcopy %repo%\*.png %dest% /s /e /y
 :: Copy music
 xcopy %repo%\*.wav %dest% /y 
