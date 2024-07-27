@@ -2,6 +2,7 @@
 #include <string>
 #include <vector>
 #include "crossVector3.h"
+#include "rocket/sync.h"
 
 class FontGL;
 
@@ -16,19 +17,25 @@ class TunerFx
 {
 public:
 	TunerFx();
-	void Init(int screenWidth, int screenHeight);
-	void Update(float deltaTime);
+	void Init(float aspectRatio, sync_device* rocket);
+	void Update();
 	void Draw(FontGL* font);
+	void Quit();
 
+
+	// Rocket configuration values:
+	float linePos = 0.0f;
+
+	// how many names are visible
+	float visibleNames = 0.0f;
+	// On what row the next name is created
+	short activeNameRow = 0;
 
 	// Configuration values
 	short rows;
 	float step;
 	float textToRowScale;
-	float lineSpeed;
 
-	// Update values
-	float linePos = 0.0f;
 
 	std::vector<Name> names;
 private:
@@ -38,4 +45,5 @@ private:
 	float aspect;
 	float width;
 	float left, right, top, bottom;
+
 };

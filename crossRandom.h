@@ -11,6 +11,10 @@ float GetRandomFloat(float min, float max)
 int GetRandomInt(int min, int max)
 {
     int range = max - min;
+	if (range == 0)
+	{
+		return min;
+	}
 	return min + rand()%range;
 }
 

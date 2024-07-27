@@ -11,7 +11,7 @@ class Demo
 {
 public:
 	void Init(int scrW, int scrH, bool useRocket);
-	void Update(float elapsed, float deltaTime);
+	void Update();
 	bool ConnectRocket();
 	void Draw();
 	void Quit();

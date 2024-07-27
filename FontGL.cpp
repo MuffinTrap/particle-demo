@@ -22,6 +22,7 @@ void FontGL::LoadFromImage(const char* filename, short charw, short charh, char 
 void FontGL::Bind ( ImageGL &fontImage, short charw, short charh, char firstCharacter )
 {
 
+	printf("Binding font\n");
 	short charactersPerRow = fontImage.width/ charw;
 	short rows = fontImage.height / charh;
 	// Calculate the vertex and texture coordinates (vertices are not used)
@@ -29,6 +30,7 @@ void FontGL::Bind ( ImageGL &fontImage, short charw, short charh, char firstChar
 	this->cw = charw;
 	this->ch = charh;
 	CreateTextureCoordList(rows, charactersPerRow, fontImage.width, fontImage.height);
+	printf("Bind done\n");
 }
 
 void FontGL::Printf(ColorName color, float scale, FontAlignment alignmentX, FontAlignment alignmentY, const char* format, ... )

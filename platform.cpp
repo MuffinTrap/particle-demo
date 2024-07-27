@@ -110,9 +110,9 @@ void Platform::PlayMusic()
 	playAudio();
 }
 
+static float deltaTimeS;
 void Platform::RunMainLoop()
 {
-	float deltaTime;
 	u64 now = gettime();
 	u64 deltaTimeStart = now;
 	PlayMusic();
@@ -120,7 +120,7 @@ void Platform::RunMainLoop()
 	{
 		// Timing
 		u64 now = gettime();
-		deltaTime = (float)(now - deltaTimeStart) / (float)(TB_TIMER_CLOCK * 1000); // division is to convert from ticks to seconds
+		deltaTimeS = (float)(now - deltaTimeStart) / (float)(TB_TIMER_CLOCK * 1000); // division is to convert from ticks to seconds
 		deltaTimeStart = now;
 
         ReadControllerInput(controller);
@@ -130,7 +130,7 @@ void Platform::RunMainLoop()
 			break;
 		}
         demoInstance.UpdateController(controller);
-		demoInstance.Update(getTime(), deltaTime);
+		demoInstance.Update();
 		gdl::PrepDisplay();
 
 		demoInstance.Draw();
@@ -141,6 +141,15 @@ void Platform::RunMainLoop()
 
 	demoInstance.Quit();
 	gdl::wii::DoProgramExit();
+}
+
+float Platform::GetDeltaTime()
+{
+    return deltaTimeS;
+}
+float Platform::GetElapsedSeconds()
+{
+    return (float)getTime();
 }
 
 
@@ -159,6 +168,9 @@ void Platform::RunMainLoop()
 #include <AL/al.h>
 
 #include "glutInput.h"
+
+static const float deltaTimeS = 0.016f;
+static const int deltaTimeMS = 16;
 
 static void quit()
 {
@@ -183,7 +195,7 @@ void sceneUpdate() {
 
     updateAudio();
     demoInstance.UpdateController(*glutInput);
-	demoInstance.Update((float)getTime(), 0.016f);
+	demoInstance.Update();
 
     // Clear pressed buttons
     glutInput->pressedButtons = 0;
@@ -217,7 +229,7 @@ void renderLoop() {
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 void timerFunc(int value) {
     sceneUpdate();
-    glutTimerFunc(1000/60, timerFunc, 0); // Re-register the timer callback
+    glutTimerFunc(deltaTimeMS, timerFunc, 0); // Re-register the timer callback
 }
 #pragma GCC diagnostic pop
 #pragma clang diagnostic pop
@@ -296,7 +308,7 @@ void Platform::RunMainLoop()
 {
 	PlayMusic();
     // Setup the timer callback
-    glutTimerFunc(1000/60, timerFunc, 0);
+    glutTimerFunc(deltaTimeMS, timerFunc, 0);
     printf("Start glut main loop\n");
     glutMainLoop();
 }
@@ -311,6 +323,18 @@ void Platform::PlayMusic()
 {
     playAudio();
 }
+
+float Platform::GetDeltaTime()
+{
+    return deltaTimeS;
+}
+
+float Platform::GetElapsedSeconds()
+{
+    return (float)getTime();
+}
+
+
 
 #endif // WIN - MAC - LINUX
 

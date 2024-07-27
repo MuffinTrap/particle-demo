@@ -1,60 +1,73 @@
 #include "effecthost.h"
+#include "crossUtil.h"
 #include <stdio.h>
+#include <cmath>
+
+#include "src/direction.hpp"
+#ifndef SYNC_PLAYER
+    const struct sync_track *effect_active;  // Which effect is active.
+#else
+#include "src/sync_data.h"
+#endif
 
 EffectHost::EffectHost()
 {
 
 }
 
-EffectHost::~EffectHost()
+void EffectHost::Quit()
 {
 	radar.Quit();
+	tuner.Quit();
 	plotter.Quit();
 }
 
-void EffectHost::Init()
+void EffectHost::Init(sync_device* rocket)
 {
-	printf("effecthost::Init()\n");
 	font.LoadFromImage("andvari30x30.png", 30, 30, ' ');
-    radar.Init(64);
-	tuner.Init(640, 480);
+    radar.Init(64, rocket);
+	tuner.Init(640.0f/480.0f, rocket);
 	plotter.Init(32);
-	activeEffect = 0.0f;
+
+	effect_active = sync_get_track(rocket, "effect_active");
+	activeEffect = clampF(sync_get_val(effect_active, 0), 0.0f, 3.0f);
+
+	printf("host init done\n");
 }
 
 
-void EffectHost::Update ( float deltaTime )
+void EffectHost::Update ()
 {
-	static float phase = 0.0f;
+	activeEffect = sync_get_val(effect_active, get_row());
 
-	if (activeEffect <= 1.0f)
+	int ac = (int)floor(activeEffect);
+
+	switch(ac)
 	{
-		radar.Update(deltaTime);
-	}
-	else if (activeEffect <= 2.0f)
-	{
-		tuner.Update(deltaTime);
-	}
-	else
-	{
-		phase += deltaTime;
-		plotter.SetPhase(phase);
-	}
+		case 1:
+			radar.Update();
+		break;
+		case 2:
+			tuner.Update();
+		break;
+	};
 }
 
 void EffectHost::Draw()
 {
-	if (activeEffect <= 1.0f)
+	int ac = (int)activeEffect;
+
+	switch(ac)
 	{
+		case 1:
 		radar.Draw(&font);
-	}
-	else if (activeEffect <= 2.0f)
-	{
+		break;
+		case 2:
 		tuner.Draw(&font);
-	}
-	else
-	{
+		break;
+		case 3:
 		plotter.Draw();
-	}
+		break;
+	};
 }
 

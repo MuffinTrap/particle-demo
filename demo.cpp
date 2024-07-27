@@ -17,10 +17,6 @@ struct sync_device *rocket;
     // This is for the win-mac-linux version
     // Listen to the editor and store tracks through pointers
     static sync_cb rocket_callbacks;
-    const struct sync_track *clear_r;
-    const struct sync_track *clear_g;
-    const struct sync_track *clear_b;
-
 #else
 
     // This is for the wii version.
@@ -58,10 +54,6 @@ bool Demo::ConnectRocket()
         rocket_callbacks.set_row = set_row;
     }
 
-    // Get the pointers to the tracks in the editor
-    clear_r = sync_get_track(rocket, "clear_r");
-    clear_g = sync_get_track(rocket, "clear_g");
-    clear_b = sync_get_track(rocket, "clear_b");
 #endif
 
 	return true;
@@ -92,7 +84,7 @@ void Demo::Init(int scrW, int scrH, bool useRocket)
 	}
 
 	camera.Init(screenWidth, screenHeight);
-	host.Init();
+	host.Init(rocket);
 }
 
 void Demo::UpdateController(WiiController& controllerState)
@@ -100,9 +92,7 @@ void Demo::UpdateController(WiiController& controllerState)
     controller = controllerState;
 }
 
-// elapsed : for effects that are in sync with music
-// deltaTime : for effects that run constantly and are not in sync with music
-void Demo::Update ( float elapsed, float deltaTime )
+void Demo::Update ()
 {
     // Read track values from rocket
     #ifndef SYNC_PLAYER
@@ -116,7 +106,6 @@ void Demo::Update ( float elapsed, float deltaTime )
     }
     #endif
 
-	angle = elapsed * deltaTime * 360.0f;
     if (controller.ButtonPress(Button1))
     {
         host.activeEffect -= 1.0f;
@@ -125,8 +114,7 @@ void Demo::Update ( float elapsed, float deltaTime )
     {
         host.activeEffect += 1.0f;
     }
-    host.Update(deltaTime * 4.0f);
-    camera.Update(deltaTime, controller);
+    host.Update();
 }
 
 // Draw effects using OpenGL functions
@@ -161,11 +149,10 @@ void Demo::Quit()
 
 #define SAVE_TO_HEADER
 #ifdef SAVE_TO_HEADER
+            printf("Saving tracks to header file\n");
             start_save_sync("src/sync_data.h");
-            printf("save track clear_r\n");
-            save_sync(clear_r, "src/sync_data.h");
-            save_sync(clear_g, "src/sync_data.h");
-            save_sync(clear_b, "src/sync_data.h");
+
+            host.Quit();
 #else
             // Save as binary file:
             // The Wii exe fails to read these, maybe endianness error?

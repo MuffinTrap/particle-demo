@@ -3,6 +3,7 @@
 #include "tunerfx.h"
 #include "FontGL.h"
 #include "plotterfx.h"
+#include "rocket/sync.h"
 
 namespace gdl
 {
@@ -14,10 +15,10 @@ class EffectHost
 {
 public:
 	EffectHost();
-	~EffectHost();
-	void Init();
-	void Update(float deltaTime);
+	void Init(sync_device* rocket);
+	void Update();
 	void Draw();
+	void Quit();
 
 	float activeEffect;
 	RadarFX radar;

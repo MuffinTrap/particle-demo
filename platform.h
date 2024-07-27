@@ -18,6 +18,9 @@ public:
 	void PlayMusic();
 	void RunMainLoop();
 
+	static float GetDeltaTime();
+	static float GetElapsedSeconds();
+
 	int screenWidth;
 	int screenHeight;
 };

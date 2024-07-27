@@ -1,39 +1,75 @@
 #include "crossOpenGL.h"
+#include "crossUtil.h"
 #include "tunerfx.h"
 #include "FontGL.h"
 #include "palette.h"
+
+
+#include "rocket/track.h"
+#include "src/direction.hpp"
+#ifndef SYNC_PLAYER
+    const struct sync_track *tuner_pos;  // Position of orange line, 0-1
+    const struct sync_track *tuner_names;  // How many names are visible. Change of 1.0f causes a new name to appear on the lines current position.
+#else
+#include "src/sync_data.h"
+#endif
 
 TunerFx::TunerFx()
 {
 	rows = 6;
 	step = 0.05f;
 	textToRowScale = 0.25f;
-	lineSpeed = 0.5f;
 	linePos = 0.0f;
 }
 
 
-void TunerFx::Init(int screenWidth, int screenHeight)
+void TunerFx::Init(float aspectRatio, sync_device* rocket)
 {
-	aspect = (float)screenWidth/(float)screenHeight;
+	aspect = aspectRatio;
 	width = aspect * 2.0f;
 	left = -aspect;
 	right = +aspect;
 	top = 1.0f;
 	bottom = -1.0f;
 
+	tuner_pos = sync_get_track(rocket, "tuner_pos");
+	tuner_names = sync_get_track(rocket, "tuner_names");
+
+	visibleNames = 0.0f;
 	names.push_back(CreateName(0.2f, 0, "Beans"));
 	names.push_back(CreateName(0.42f, 2, "Muffins"));
-	names.push_back(CreateName(0.7f, 2, "and you"));
 }
 
-void TunerFx::Update ( float deltaTime )
+void TunerFx::Quit()
 {
-	// Move the orange line
-	linePos += lineSpeed * deltaTime;
-	if (linePos > width)
+	save_sync(tuner_pos, "src/sync_data.h");
+	save_sync(tuner_names, "src/sync_data.h");
+
+}
+
+void TunerFx::Update ()
+{
+	linePos = clampF(sync_get_val(tuner_pos, get_row()), 0.0f, 1.0f);
+	float newVisible = sync_get_val(tuner_names, get_row());
+	float diff =  newVisible - visibleNames;
+	while(diff >= 1.0f)
 	{
-		linePos = 0.0f;
+		diff -= 1.0f;
+		for (size_t i = 0; i < names.size(); i++)
+		{
+			if (names[i].found == false)
+			{
+				// TODO find row that has space on it
+				names[i].pos = GetNamePos(linePos, activeNameRow);
+				names[i].found = true;
+				activeNameRow = (activeNameRow + 1)%rows;
+				break;
+			}
+		}
+	}
+	if (newVisible > visibleNames)
+	{
+		visibleNames = newVisible;
 	}
 }
 
@@ -101,6 +137,10 @@ void TunerFx::Draw ( FontGL* font )
 	// Draw names
 	for (size_t ni = 0; ni < names.size(); ni++)
 	{
+		if (names[ni].found == false)
+		{
+			continue;
+		}
 		glm::vec3& p = names[ni].pos;
 		if (p.x < left+linePos)
 		{
@@ -138,10 +178,10 @@ void TunerFx::Draw ( FontGL* font )
 	}
 }
 
-glm::vec3 TunerFx::GetNamePos(float x, short row)
+glm::vec3 TunerFx::GetNamePos(float linePosition, short row)
 {
 	return glm::vec3(
-		left + x * width,
+		left + linePosition,
 		1.0f - ((float)row +0.5f) * 2.0f/(float)rows,
 		0.0f);
 }

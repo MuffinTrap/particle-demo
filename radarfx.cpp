@@ -3,14 +3,27 @@
 #include <random>
 #include <stdio.h>
 #include <stdlib.h>
+#include <cmath>
+
 #include "crossOpenGL.h"
 #include "crossCache.h"
 #include "crossRandom.h"
-
-
+#include "crossUtil.h"
 
 #include "FontGL.h"
 #include "palette.h"
+
+#include "rocket/track.h"
+
+#include "src/direction.hpp"
+#ifndef SYNC_PLAYER
+    const struct sync_track *radar_dots;  // How many dots to draw
+    const struct sync_track *radar_seed;  // The random seed for dot positions and +/- marks. Change causes dot place randomization
+    const struct sync_track *radar_rarity;  // One in a "radar_rarity" change of drawing + or - mark over dot and printing values
+    const struct sync_track *radar_spread;  // How scattered the dots are from origo: max 1.0. Change causes dot place randomization
+#else
+#include "src/sync_data.h"
+#endif
 
 RadarFX::RadarFX()
 {
@@ -19,24 +32,40 @@ RadarFX::RadarFX()
 	drawAmount = 0;
 	seed =100;
 	elapsed = 0.0f;
+	dotSpread = 0.5f;
+	rarity = 4;
 }
 
-void RadarFX::Init ( u32 dotAmount )
+void RadarFX::Init ( u32 dotAmount, sync_device* rocket )
 {
 	this->dotAmount = dotAmount;
+
 	size_t dotArraySize = dotAmount * sizeof(glm::vec3);
 	dotsArray = (glm::vec3*)malloc(dotArraySize);
+
+	radar_dots = sync_get_track(rocket, "radar_dots");
+	radar_seed = sync_get_track(rocket, "radar_seed");
+	radar_spread = sync_get_track(rocket, "radar_spread");
+	radar_rarity = sync_get_track(rocket, "radar_rarity");
+
+	rarity = static_cast<u32>(floor(sync_get_val(radar_rarity, 0)));
+	dotSpread = clampF(sync_get_val(radar_spread, 0), 0.0f, 1.0f) / 2.0f;
+	seed = static_cast<u32>(sync_get_val(radar_seed, 0));
+	srand(seed);
+
 	for(u32 i = 0; i < dotAmount; i++)
 	{
-		dotsArray[i] = glm::vec3(GetRandomFloat(0.2f, 0.8f), GetRandomFloat(0.2f, 0.8f), 0.0f);
+		dotsArray[i] = glm::vec3(0.5f + GetRandomFloat(-dotSpread, dotSpread), 0.5f + GetRandomFloat(-dotSpread, dotSpread), 0.0f);
 	}
 	CacheFlushRange(dotsArray, dotArraySize);
-
-	// TODO Sort the dots so that it start from the middle of y
 }
 
 void RadarFX::Quit()
 {
+	save_sync(radar_dots, "src/sync_data.h");
+	save_sync(radar_seed, "src/sync_data.h");
+	save_sync(radar_spread, "src/sync_data.h");
+	save_sync(radar_rarity, "src/sync_data.h");
 	if (dotsArray != nullptr)
 	{
 		free(dotsArray);
@@ -45,18 +74,38 @@ void RadarFX::Quit()
 }
 
 
-void RadarFX::Update ( float deltaTime )
+void RadarFX::Update ()
 {
-	elapsed += deltaTime;
-	if (elapsed > 0.15f)
+	double R = get_row();
+	rarity = static_cast<u32>(floor(sync_get_val(radar_rarity, R)));
+
+	float fAmount = floor(sync_get_val(radar_dots, R));
+	u32 uAmount = static_cast<u32>(fAmount);
+	drawAmount = clampU32( uAmount, 0, dotAmount);
+
+	bool newDots = false;
+	u32 newSeed = (u32)floor(sync_get_val(radar_seed, R));
+	if (newSeed != seed)
 	{
-		elapsed = 0.0f;
-		drawAmount++;
-		if (drawAmount == dotAmount)
+		seed = newSeed;
+		srand(seed);
+		newDots = true;
+	}
+
+	float newSpread = (float)sync_get_val(radar_spread, R);
+	if (newSpread != dotSpread)
+	{
+		dotSpread = newSpread;
+		newDots = true;
+	}
+
+	if (newDots)
+	{
+		for(u32 i = 0; i < dotAmount; i++)
 		{
-			drawAmount = 0;
-			seed = GetRandomInt(0, 256);
+			dotsArray[i] = glm::vec3(0.5f + GetRandomFloat(-dotSpread, dotSpread), 0.5f + GetRandomFloat(-dotSpread, dotSpread), 0.0f);
 		}
+		CacheFlushRange(dotsArray, dotAmount * sizeof(glm::vec3));
 	}
 }
 
@@ -183,6 +232,10 @@ static char numberbuffer[64];
 
 void RadarFX::Draw(FontGL* font)
 {
+	// Draw random thing the same way every time
+	srand(seed);
+
+
 	float x = 0.0f;
 	float y = 0.0f;
 	float z = 0.0f;
@@ -199,7 +252,6 @@ void RadarFX::Draw(FontGL* font)
 	DrawGrid(left, right, top, bottom);
 
 	// Draw the dots/points
-	// TODO DrawArrays and increase amount with time
 	float dz = cellSize/8.0f;
 	glBegin(GL_QUADS);
 		PaletteColor3f(WHITE);
@@ -215,8 +267,6 @@ void RadarFX::Draw(FontGL* font)
 	glEnd();
 
 	// Draw lines
-	// Draw random thing the same way every time
-	srand(seed);
 
 	// Lines start vertically from the center
 	// Orange + or - on line start point
@@ -225,10 +275,11 @@ void RadarFX::Draw(FontGL* font)
 	u32 leftDownIndex = 1;
 	u32 rightUpIndex = 1;
 	u32 rightDownIndex = 1;
+
 	glBegin(GL_LINES);
 	for(u32 di = 0; di < drawAmount; di++)
 	{
-		if (GetRandomInt(0, 4) == 0)
+		if (GetRandomInt(0, rarity) == 0)
 		{
 			if (di == drawAmount-1)
 			{
@@ -240,13 +291,13 @@ void RadarFX::Draw(FontGL* font)
 				PaletteColor3f(GREY);
 			}
 			// Dot position
+
 			float dotx = left + dotsArray[di].x * wh;
 			float doty = top-dotsArray[di].y * wh;
 			glVertex3f(dotx, doty, z);
 			if (dotsArray[di].x < 0.5f)
 			{
 				// Line to the left
-				// TODO Lines in 45 angle only
 				float ly = y;
 				if (dotsArray[di].y < 0.5f)
 				{
@@ -325,7 +376,7 @@ void RadarFX::Draw(FontGL* font)
 	bool plus = true;
 	for(u32 di = 0; di < drawAmount; di++)
 	{
-		if (GetRandomInt(0,4)==0)
+		if (GetRandomInt(0,rarity)==0)
 		{
 			float px = left + dotsArray[di].x * wh;
 			float py = top - dotsArray[di].y * wh;

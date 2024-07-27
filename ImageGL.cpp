@@ -203,6 +203,7 @@ static TextureGL* ReadPNG(const char* filename)
 
 	// Allocate!
 	size_t imageDataSize = sizeof(GLubyte) * w * h * textureInfoPtr->bytesPerPixel;
+	printf("Allocate %lu bytes\n", imageDataSize);
 	textureInfoPtr->texels = (GLubyte*)AllocateAlignedMemory(imageDataSize);
 
 	if (textureInfoPtr->texels == nullptr)
@@ -243,6 +244,8 @@ static TextureGL* ReadPNG(const char* filename)
 	// Reading is over, rows no longer needed
 	free(row_pointers);
 	fclose(fp);
+
+	printf("PNG read done\n");
 
 	// Flush read texels
 	CacheFlushRange(textureInfoPtr->texels, imageDataSize);
