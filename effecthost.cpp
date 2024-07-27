@@ -20,6 +20,7 @@ void EffectHost::Quit()
 	radar.Quit();
 	tuner.Quit();
 	plotter.Quit();
+	credits.Quit();
 }
 
 void EffectHost::Init(sync_device* rocket)
@@ -28,6 +29,7 @@ void EffectHost::Init(sync_device* rocket)
     radar.Init(64, rocket);
 	tuner.Init(640.0f/480.0f, rocket);
 	plotter.Init(32);
+	credits.Init(rocket);
 
 	effect_active = sync_get_track(rocket, "effect_active");
 	activeEffect = clampF(sync_get_val(effect_active, 0), 0.0f, 3.0f);
@@ -67,6 +69,9 @@ void EffectHost::Draw()
 		break;
 		case 3:
 		plotter.Draw();
+		break;
+		case 4:
+		credits.Draw(&font);
 		break;
 	};
 }

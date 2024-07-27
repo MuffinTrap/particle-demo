@@ -1,6 +1,5 @@
 #include "demo.h"
 #include "crossOpenGL.h"
-#include <math.h>
 
 #include "palette.h"
 
@@ -49,9 +48,9 @@ bool Demo::ConnectRocket()
         rocket_in_use = true;
 
         // Register callback functions defined in direction.cpp to use with rocket
-        rocket_callbacks.pause = pause;
-        rocket_callbacks.is_playing = is_playing;
-        rocket_callbacks.set_row = set_row;
+        rocket_callbacks.pause = rocket_pause;
+        rocket_callbacks.is_playing = rocket_is_playing;
+        rocket_callbacks.set_row = rocket_set_row;
     }
 
 #endif

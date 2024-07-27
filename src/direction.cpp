@@ -75,7 +75,7 @@ void unloadAudio()
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wunused-parameter"
-void set_row(int row)
+void rocket_set_row(int row)
 {
     // * NOT IMPLEMENTED ON WII *//
 }
@@ -186,7 +186,7 @@ void unloadAudio()
 
 
 // These are the rocket sync callback functions
-void pause( int __attribute__((__unused__)) flag)
+void rocket_pause( int __attribute__((__unused__)) flag)
 {
 	if (flag)
     	alSourcePause(source);
@@ -194,13 +194,13 @@ void pause( int __attribute__((__unused__)) flag)
     	alSourcePlay(source);
 }
 
-void set_row( int __attribute__((__unused__)) row)
+void rocket_set_row( int __attribute__((__unused__)) row)
 {
     double frow = row - 0.01;
 	alSourcef(source, AL_SEC_OFFSET, frow / row_rate);
 }
 
-int is_playing() 
+int rocket_is_playing()
 {
     // Get the play state of the audio source
     ALint sourceState;

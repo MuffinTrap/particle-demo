@@ -3,6 +3,7 @@
 #include "tunerfx.h"
 #include "FontGL.h"
 #include "plotterfx.h"
+#include "creditsfx.h"
 #include "rocket/sync.h"
 
 namespace gdl
@@ -24,6 +25,7 @@ public:
 	RadarFX radar;
 	TunerFx tuner;
 	PlotterFX plotter;
+	CreditsFX credits;
 
 	FontGL font;
 };
