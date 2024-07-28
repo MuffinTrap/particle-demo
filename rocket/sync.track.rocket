@@ -38,12 +38,14 @@
 		</track>
 		<track name="scene_X">
 			<key interpolation="0" value="0" row="0"/>
+			<key interpolation="0" value="2" row="168"/>
 		</track>
 		<track name="scene_Y">
 			<key interpolation="0" value="0" row="0"/>
 		</track>
 		<track name="scene_Z">
-			<key interpolation="0" value="-0.6" row="0"/>
+			<key interpolation="1" value="-0.6" row="0"/>
+			<key interpolation="0" value="-3" row="80"/>
 			<key interpolation="0" value="-3" row="176"/>
 			<key interpolation="0" value="-12" row="192"/>
 			<key interpolation="0" value="-3" row="256"/>
@@ -99,7 +101,7 @@
 			<key interpolation="0" value="0" row="168"/>
 			<key interpolation="1" value="0.3" row="176"/>
 			<key interpolation="0" value="0" row="184"/>
-			<key interpolation="1" value="0.2" row="192"/>
+			<key interpolation="1" value="0.7" row="192"/>
 			<key interpolation="0" value="0" row="200"/>
 			<key interpolation="1" value="0.3" row="208"/>
 			<key interpolation="0" value="0" row="216"/>
@@ -121,14 +123,16 @@
 		</track>
 		<track name="EffectE">
 			<key interpolation="0" value="1" row="0"/>
+			<key interpolation="1" value="3.14" row="144"/>
 			<key interpolation="1" value="0" row="224"/>
 			<key interpolation="0" value="3.1415" row="336"/>
 		</track>
 		<track name="EffectF">
 			<key interpolation="0" value="0" row="0"/>
-			<key interpolation="0" value="3" row="144"/>
+			<key interpolation="0" value="1" row="144"/>
+			<key interpolation="0" value="3" row="160"/>
 			<key interpolation="0" value="5" row="176"/>
-			<key interpolation="0" value="12" row="192"/>
+			<key interpolation="0" value="1" row="192"/>
 			<key interpolation="0" value="6" row="208"/>
 			<key interpolation="0" value="1" row="224"/>
 			<key interpolation="0" value="4" row="240"/>
