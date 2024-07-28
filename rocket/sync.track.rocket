@@ -1,0 +1,152 @@
+<sync rows="12800">
+	<tracks>
+		<track name="title_rotY">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="radar_dots">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="radar_seed">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="radar_spread">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="radar_rarity">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="tuner_pos">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="tuner_names">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="credits_names">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="effect_active">
+			<key interpolation="0" value="4" row="0"/>
+		</track>
+		<track name="scene_rotX">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="scene_rotY">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="scene_rotZ">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="scene_X">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="scene_Y">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="scene_Z">
+			<key interpolation="0" value="-0.6" row="0"/>
+			<key interpolation="0" value="-3" row="176"/>
+			<key interpolation="0" value="-12" row="192"/>
+			<key interpolation="0" value="-3" row="256"/>
+		</track>
+		<track name="OrbitX">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="OrbitY">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="OrbitZ">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="Repulsion">
+			<key interpolation="1" value="0" row="0"/>
+			<key interpolation="0" value="12" row="147"/>
+		</track>
+		<track name="RepulsionPower">
+			<key interpolation="1" value="0" row="0"/>
+			<key interpolation="0" value="0.4" row="147"/>
+		</track>
+		<track name="Gravity">
+			<key interpolation="1" value="8" row="0"/>
+			<key interpolation="0" value="12" row="168"/>
+			<key interpolation="0" value="32" row="240"/>
+		</track>
+		<track name="GravityPower">
+			<key interpolation="1" value="0.01" row="0"/>
+			<key interpolation="1" value="0.1" row="150"/>
+			<key interpolation="0" value="0.01" row="157"/>
+		</track>
+		<track name="Friction">
+			<key interpolation="1" value="0" row="0"/>
+			<key interpolation="0" value="0.4" row="117"/>
+			<key interpolation="0" value="3" row="240"/>
+		</track>
+		<track name="EffectA">
+			<key interpolation="1" value="-3" row="0"/>
+			<key interpolation="0" value="3" row="143"/>
+			<key interpolation="0" value="0" row="144"/>
+		</track>
+		<track name="EffectB">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="EffectC">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="EffectD">
+			<key interpolation="0" value="1" row="0"/>
+			<key interpolation="1" value="0.5" row="144"/>
+			<key interpolation="0" value="0" row="152"/>
+			<key interpolation="1" value="1" row="160"/>
+			<key interpolation="0" value="0" row="168"/>
+			<key interpolation="1" value="0.3" row="176"/>
+			<key interpolation="0" value="0" row="184"/>
+			<key interpolation="1" value="0.2" row="192"/>
+			<key interpolation="0" value="0" row="200"/>
+			<key interpolation="1" value="0.3" row="208"/>
+			<key interpolation="0" value="0" row="216"/>
+			<key interpolation="1" value="0.4" row="224"/>
+			<key interpolation="0" value="0" row="232"/>
+			<key interpolation="1" value="0.6" row="240"/>
+			<key interpolation="0" value="0" row="248"/>
+			<key interpolation="1" value="0.3" row="256"/>
+			<key interpolation="0" value="0" row="264"/>
+			<key interpolation="1" value="0.7" row="272"/>
+			<key interpolation="0" value="0" row="280"/>
+			<key interpolation="1" value="0.4" row="288"/>
+			<key interpolation="0" value="0" row="296"/>
+			<key interpolation="1" value="0.3" row="304"/>
+			<key interpolation="0" value="0" row="312"/>
+			<key interpolation="1" value="1" row="320"/>
+			<key interpolation="0" value="0" row="328"/>
+			<key interpolation="0" value="0.3" row="336"/>
+		</track>
+		<track name="EffectE">
+			<key interpolation="0" value="1" row="0"/>
+			<key interpolation="1" value="0" row="224"/>
+			<key interpolation="0" value="3.1415" row="336"/>
+		</track>
+		<track name="EffectF">
+			<key interpolation="0" value="0" row="0"/>
+			<key interpolation="0" value="3" row="144"/>
+			<key interpolation="0" value="5" row="176"/>
+			<key interpolation="0" value="12" row="192"/>
+			<key interpolation="0" value="6" row="208"/>
+			<key interpolation="0" value="1" row="224"/>
+			<key interpolation="0" value="4" row="240"/>
+			<key interpolation="0" value="7" row="256"/>
+			<key interpolation="0" value="1" row="288"/>
+		</track>
+		<track name="WindY">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="WindX">
+			<key interpolation="0" value="0.5" row="0"/>
+		</track>
+		<track name="WindZ">
+			<key interpolation="0" value="0" row="0"/>
+		</track>
+		<track name="ParticleCount">
+			<key interpolation="0" value="32" row="0"/>
+		</track>
+	</tracks>
+	<bookmarks/>
+</sync>
