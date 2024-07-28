@@ -12,3 +12,5 @@ struct track_key tuner_pos_keys[] = {{ 0, 0.000000, KEY_STEP}, { 8, 0.000000, KE
 const struct sync_track tuner_pos = { "tuner_pos", tuner_pos_keys,4};
 struct track_key tuner_names_keys[] = {{ 0, 0.000000, KEY_STEP}, { 8, 0.000000, KEY_STEP}, { 15, 0.000000, KEY_STEP}, { 16, 1.000000, KEY_STEP}, };
 const struct sync_track tuner_names = { "tuner_names", tuner_names_keys,4};
+struct track_key credits_names_keys[] = {{ 42, 0.000000, KEY_STEP}, { 45, 1.000000, KEY_STEP}, { 48, 2.000000, KEY_STEP}, { 51, 3.000000, KEY_STEP}, { 55, 4.000000, KEY_STEP}, { 58, 5.000000, KEY_STEP}, };
+const struct sync_track credits_names = { "credits_names", credits_names_keys,6};

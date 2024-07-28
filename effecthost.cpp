@@ -23,13 +23,13 @@ EffectHost::EffectHost()
 
 }
 
-
 void EffectHost::Init(sync_device* rocket)
 {
 	font.LoadFromImage("andvari30x30.png", 30, 30, ' ');
     radar.Init(64, rocket);
 	tuner.Init(640.0f/480.0f, rocket);
 	plotter.Init(32);
+	credits.Init(rocket);
 
 	effect_active = sync_get_track(rocket, "effect_active");
 	activeEffect = static_cast<EffectName>(clampF(sync_get_val(effect_active, 0), 0.0f, 3.0f));
@@ -86,6 +86,9 @@ void EffectHost::Draw()
 {
 	switch(activeEffect)
 	{
+		case fxParticles:
+			// TODO Muffinhop Please draw particle code here
+			break;
 		case fxRadar:
 		radar.Draw(&font);
 		break;
@@ -94,6 +97,9 @@ void EffectHost::Draw()
 		break;
 		case fxPlotter:
 		plotter.Draw();
+		break;
+		case 4:
+		credits.Draw(&font);
 		break;
 	};
 }

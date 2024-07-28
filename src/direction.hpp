@@ -40,9 +40,9 @@ extern "C" {
     double get_row();
 
     // Functions linked to Rocket
-    void pause(int flag);
-    void set_row( int row);
-    int is_playing();
+    void rocket_pause(int flag);
+    void rocket_set_row( int row);
+    int rocket_is_playing();
 
 } // extern "C"
 
