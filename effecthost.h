@@ -5,11 +5,14 @@
 #include "plotterfx.h"
 #include "rocket/sync.h"
 
-namespace gdl
+enum EffectName
 {
-	class Image;
+	fxParticles = 0,
+	fxRadar = 1,
+	fxTuner = 2,
+	fxPlotter = 3,
+	fxCredits = 4
 };
-
 
 class EffectHost
 {
@@ -20,7 +23,7 @@ public:
 	void Draw();
 	void Quit();
 
-	float activeEffect;
+	EffectName activeEffect;
 	RadarFX radar;
 	TunerFx tuner;
 	PlotterFX plotter;
