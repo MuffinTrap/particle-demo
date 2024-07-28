@@ -69,8 +69,14 @@ void Demo::Init(int scrW, int scrH, bool useRocket)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
+    glEnable(GL_DEPTH_TEST);
+    glDepthFunc(GL_LESS);
+
     PaletteClearColor3f(BLACK);
-    glShadeModel(GL_FLAT);
+    glShadeModel(GL_SMOOTH);
+
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
 
     // Use arrays and indices to draw particles
     glEnableClientState(GL_VERTEX_ARRAY);
@@ -105,21 +111,13 @@ void Demo::Update ()
     }
     #endif
 
-    if (controller.ButtonPress(Button1))
-    {
-        host.activeEffect -= 1.0f;
-    }
-    if (controller.ButtonPress(Button2))
-    {
-        host.activeEffect += 1.0f;
-    }
     host.Update();
 }
 
 // Draw effects using OpenGL functions
 void Demo::Draw()
 {
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
 
     // Set the projection matrix
     glMatrixMode(GL_PROJECTION);
@@ -129,14 +127,11 @@ void Demo::Draw()
     // Set the modelview matrix
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
-    gluLookAt(camera.eye.x, camera.eye.y, camera.eye.z,
-              0.0, camera.lookTarget.y, 0.0,  // Center
+    gluLookAt(0.0, 0.0, 1.0,
+              0.0, 0.0, 0.0,  // Center
               0.0, 1.0, 0.0); // Up
 
-    glPushMatrix();
-        glTranslatef(0.0f, 0.0f, -1.0f);
-        host.Draw();
-    glPopMatrix();
+    host.Draw();
 }
 
 // Release memory

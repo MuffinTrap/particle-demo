@@ -84,23 +84,35 @@ void EffectHost::Update ()
 
 void EffectHost::Draw()
 {
+	glPushMatrix();
+	float R = get_row();
+	glTranslatef(sync_get_val(scene_X, R), sync_get_val(scene_Y, R), sync_get_val(scene_Z, R));
+
+	glPushMatrix();
+	glRotatef(sync_get_val(scene_rotX, R), 1.0f, 0.0f, 0.0f);
+	glRotatef(sync_get_val(scene_rotY, R), 0.0f, 1.0f, 0.0f);
+	glRotatef(sync_get_val(scene_rotZ, R), 0.0f, 0.0f, 1.0f);
+
 	switch(activeEffect)
 	{
 		case fxParticles:
 			// TODO Muffinhop Please draw particle code here
 			break;
 		case fxRadar:
-		radar.Draw(&font);
+			radar.Draw(&font);
 		break;
 		case fxTuner:
-		tuner.Draw(&font);
+			tuner.Draw(&font);
 		break;
 		case fxPlotter:
-		plotter.Draw();
+			plotter.Draw();
 		break;
 		case 4:
-		credits.Draw(&font);
+			credits.Draw(&font);
 		break;
 	};
+
+	glPopMatrix();
+	glPopMatrix();
 }
 
