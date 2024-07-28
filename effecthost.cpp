@@ -26,6 +26,8 @@ EffectHost::EffectHost()
 void EffectHost::Init(sync_device* rocket)
 {
 	font.LoadFromImage("andvari30x30.png", 30, 30, ' ');
+
+	title.Init(rocket);
     radar.Init(64, rocket);
 	tuner.Init(640.0f/480.0f, rocket);
 	plotter.Init(32);
@@ -54,6 +56,7 @@ void EffectHost::Quit()
 	save_sync(scene_Y, "src/sync_data.h");
 	save_sync(scene_Z, "src/sync_data.h");
 
+	title.Quit();
 	radar.Quit();
 	tuner.Quit();
 	plotter.Quit();
@@ -95,8 +98,11 @@ void EffectHost::Draw()
 
 	switch(activeEffect)
 	{
+		case fxTitle:
+			title.Draw(&font);
+			break;
 		case fxParticles:
-			// TODO Muffinhop Please draw particle code here
+			// TODO Muffinhop Please call particle drawing code here
 			break;
 		case fxRadar:
 			radar.Draw(&font);
@@ -107,7 +113,7 @@ void EffectHost::Draw()
 		case fxPlotter:
 			plotter.Draw();
 		break;
-		case 4:
+		case fxCredits:
 			credits.Draw(&font);
 		break;
 	};

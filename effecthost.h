@@ -4,15 +4,17 @@
 #include "FontGL.h"
 #include "plotterfx.h"
 #include "creditsfx.h"
+#include "titlefx.h"
 #include "rocket/sync.h"
 
 enum EffectName
 {
-	fxParticles = 0,
+	fxTitle = 0,
 	fxRadar = 1,
 	fxTuner = 2,
 	fxPlotter = 3,
-	fxCredits = 4
+	fxParticles = 4,
+	fxCredits = 5
 };
 
 class EffectHost
@@ -25,6 +27,7 @@ public:
 	void Quit();
 
 	EffectName activeEffect;
+	TitleFX title;
 	RadarFX radar;
 	TunerFx tuner;
 	PlotterFX plotter;

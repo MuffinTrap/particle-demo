@@ -69,14 +69,18 @@ void Demo::Init(int scrW, int scrH, bool useRocket)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    glEnable(GL_DEPTH_TEST);
-    glDepthFunc(GL_LESS);
+    //glEnable(GL_DEPTH_TEST);
+    //glDepthFunc(GL_LESS);
 
     PaletteClearColor3f(BLACK);
     glShadeModel(GL_SMOOTH);
 
-    glEnable(GL_CULL_FACE);
-    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
+
+    // Face culling
+    //glEnable(GL_CULL_FACE);
+    //glCullFace(GL_BACK);
+    glDisable(GL_CULL_FACE);
 
     // Use arrays and indices to draw particles
     glEnableClientState(GL_VERTEX_ARRAY);
