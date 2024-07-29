@@ -100,14 +100,13 @@ float uniform_WindX;
 float uniform_WindY;
 float uniform_WindZ;
 float uniform_ParticleCount;
-int uniform_VisualSelector;
-float uniform_FakeBokeh;
+float uniform_SdfType;
 #define WIND_ENABLED TRUE
 #define ORBIT_ENABLED TRUE
 
 
 
-#define NUM_PARTICLES 1000
+#define NUM_PARTICLES 6000
 #define SPHERE_RADIUS 1.0f
 #define STICK_DISTANCE 0.01f
 #define FRICTION 0.98f  // Friction coefficient
@@ -116,6 +115,7 @@ float uniform_FakeBokeh;
 typedef struct {
     Vector3 position;
     Vector3 velocity;
+    float r,g,b,a;
     float lifetime; // Lifetime of the particle
     float age; // Current age of the particle
     bool active; // If the particle is active
@@ -141,12 +141,63 @@ void initParticles() {
     }
 }
 
+// Function to calculate the length of a vector in 2D
+float length2D(float x, float z) {
+    return sqrt(x * x + z * z);
+}
+
+// Function to calculate the component-wise absolute value of a vec3
+Vector3 absVec3(Vector3 v) {
+    Vector3 result = { fabs(v.x), fabs(v.y), fabs(v.z) };
+    return result;
+}
+
+// Function to calculate the component-wise maximum of two vec3s
+Vector3 maxVec3(Vector3 a, Vector3 b) {
+    Vector3 result = { fmax(a.x, b.x), fmax(a.y, b.y), fmax(a.z, b.z) };
+    return result;
+}
+
+// Function to calculate the component-wise minimum of two vec3s
+Vector3 minVec3(Vector3 a, Vector3 b) {
+    Vector3 result = { fmin(a.x, b.x), fmin(a.y, b.y), fmin(a.z, b.z) };
+    return result;
+}
+
+// Function to calculate the maximum component of a vec3
+float vmax(Vector3 v) {
+    return fmax(fmax(v.x, v.y), v.z);
+}
+
+// Function to calculate the box distance
+float fBox(Vector3 p, Vector3 b) {
+    Vector3 pAbs = absVec3(p);
+    Vector3 d = Vector3_Sub(&pAbs, &b);
+    Vector3 zero = {0.0f, 0.0f, 0.0f};
+    Vector3 dMax = maxVec3(d, zero);
+    Vector3 dMin = minVec3(d, zero);
+    return Vector3_Length(&dMax) + vmax(dMin);
+}
+
+// Function to calculate the torus distance in the XZ-plane
+float fTorus(Vector3 p, float smallRadius, float largeRadius) {
+    float q = length2D(p.x, p.z) - largeRadius;
+    return length2D(q, p.y) - smallRadius;
+}
 // Function to compute the SDF for a sphere
 float sphereSDF(float x, float y, float z) {
     return sqrt(x * x + y * y + z * z) - SPHERE_RADIUS;
 }
 float getDistance(Vector3 position) {
-    return sphereSDF(position.x + uniform_EffectA, position.y + uniform_EffectB, position.z + uniform_EffectC);
+    Vector3 size = {uniform_EffectA, uniform_EffectB, uniform_EffectC};
+    switch((int)uniform_SdfType) {
+        case 0:
+            return sphereSDF(position.x + uniform_EffectA, position.y + uniform_EffectB, position.z + uniform_EffectC);
+        case 1:
+            return fBox(position, size);
+        case 2:
+            return fTorus(position, uniform_EffectA, uniform_EffectB);
+    }
 }
 // Define epsilon for numerical stability
 #define EPSILON 1e-6f
@@ -178,7 +229,7 @@ const Vector3 world_up = {0.0f, 1.0f, 0.0f};
 const Vector3 world_right = {1.0f, 0.0f, 0.0f};
 const Vector3 world_forward = {0.0f, 0.0f, 1.0f};
 void updateParticles(float dt) {
-    for (int i = 0; i < NUM_PARTICLES; i++) {
+    for (int i = 0; i < NUM_PARTICLES/3; i++) {
         Particle *p = &particles[i];
 
         if (!p->active) {
@@ -215,10 +266,32 @@ void updateParticles(float dt) {
 
             direction = Vector3_Scale(&direction, (gravity+repulsion) * dt);
         }
-        particles[i].velocity = Vector3_Add(&particles[i].velocity, &direction);
-        particles[i].velocity = Vector3_Scale(&particles[i].velocity, 1.0f - uniform_Friction * dt);
-        Vector3 velocityScaled = Vector3_Scale(&particles[i].velocity, dt);
-        particles[i].position = Vector3_Add(&particles[i].position,&velocityScaled);
+        p->velocity = Vector3_Add(&p->velocity, &direction);
+        p->velocity = Vector3_Scale(&p->velocity, 1.0f - uniform_Friction * dt);
+        Vector3 velocityScaled = Vector3_Scale(&p->velocity, dt);
+        p->r = 1.0f;
+        p->g = 1.0f;
+        p->b = 1.0f;
+        p->a = 1.0f;
+        p->position = Vector3_Add(&p->position,&velocityScaled);
+        particles[i + NUM_PARTICLES/3].position = {
+            p->position.x + 0.08f,
+            p->position.y,
+            p->position.z + 0.1f
+        };
+        particles[i + NUM_PARTICLES/3].r = 0.8f;
+        particles[i + NUM_PARTICLES/3].g = 0.6f;
+        particles[i + NUM_PARTICLES/3].b = 0.1f;
+        particles[i + NUM_PARTICLES/3].a = 0.4f;
+        particles[i + 2*NUM_PARTICLES/3].position = {
+            p->position.x - 0.08f,
+            p->position.y,
+            p->position.z + 0.1f
+        };
+        particles[i + 2*NUM_PARTICLES/3].r = 0.1f;
+        particles[i + 2*NUM_PARTICLES/3].g = 0.8f;
+        particles[i + 2*NUM_PARTICLES/3].b = 0.6f;
+        particles[i + 2*NUM_PARTICLES/3].a = 0.4f;
     }
 }
 
@@ -226,22 +299,23 @@ void updateParticles(float dt) {
 // Function to display particles
 void displayParticles() {
     glColor3f(1.0f,1.0f,1.0f);
+    glPointSize(1.0f);
     glBegin(GL_POINTS);
     for (int i = 0; i < NUM_PARTICLES; i++) {
-        if (particles[i].active) {
-            glVertex3f(particles[i].position.x, particles[i].position.y, particles[i].position.z);
-        }
+
+        glColor4f(particles[i].r,particles[i].g,particles[i].b,particles[i].a);
+        glVertex3f(particles[i].position.x, particles[i].position.y, particles[i].position.z);
     }
     glEnd();
     if(uniform_EffectF==0) return;
+    glPointSize(1.0f);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glBegin(GL_LINES);
-    for (int i = 0; i < NUM_PARTICLES; i+=uniform_EffectF) {
+    for (int i = 0; i < NUM_PARTICLES/3; i+=uniform_EffectF) {
         glColor4f(1.0f,0.4f,0.0f, sin(i+uniform_EffectE)*uniform_EffectD);
-        if (particles[i].active) {
-            glVertex3f(particles[i].position.x, particles[i].position.y, particles[i].position.z);
-        }
+        glVertex3f(particles[i].position.x, particles[i].position.y, particles[i].position.z);
+        
     }
     glEnd();
 }

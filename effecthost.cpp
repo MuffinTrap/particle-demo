@@ -34,6 +34,7 @@
 	const struct sync_track *WindY; // particle effect variable - against SDF
 	const struct sync_track *WindZ; // particle effect variable - against SDF
 	const struct sync_track *ParticleCount; // particle count total
+	const struct sync_track *SdfType; // what kind of sdf?
 #else
     // This is for the wii version.
     // Read track data from a header
@@ -90,6 +91,7 @@ void EffectHost::Init(sync_device* rocket)
 	WindY = sync_get_track(rocket, "WindY");
 	WindZ = sync_get_track(rocket, "WindZ");
 	ParticleCount = sync_get_track(rocket, "ParticleCount");
+	SdfType = sync_get_track(rocket, "SdfType");
 #endif
 
 	activeEffect = fxTitle;
@@ -128,6 +130,7 @@ void EffectHost::Quit()
 	save_sync(WindY, SYNC_FILE_H, SYNC_FILE_CPP);
 	save_sync(WindZ, SYNC_FILE_H, SYNC_FILE_CPP);
 	save_sync(ParticleCount, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(SdfType, SYNC_FILE_H, SYNC_FILE_CPP);
 #endif
 
 	title.Quit();
@@ -166,6 +169,8 @@ void EffectHost::Update ()
 			uniform_WindY = sync_get_val(WindY, R);
 			uniform_WindZ = sync_get_val(WindZ, R);
 			uniform_ParticleCount = sync_get_val(ParticleCount, R);
+			uniform_SdfType = sync_get_val(SdfType, R);
+
 			updateParticles(1.0f/60.0f);
 			break;
 		case fxRadar:

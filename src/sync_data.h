@@ -27,6 +27,7 @@ extern const sync_track WindX;
 extern const sync_track WindY;
 extern const sync_track WindZ;
 extern const sync_track ParticleCount;
+extern const sync_track SdfType;
 extern const sync_track title_rotY;
 extern const sync_track radar_dots;
 extern const sync_track radar_seed;
