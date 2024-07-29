@@ -13,12 +13,14 @@ void RocketDebug::Draw ( FontGL* font )
 	glPushMatrix();
 
 	// What is the row
-	glTranslatef(-0.9f, -0.9f, 0.0f);
-	u32 rowX = static_cast<u32>(floor(get_row()));
-	font->Printf(WHITE, 0.1f, LJustify, LJustify, "Row: %x", rowX);
-
+	glTranslatef(-0.9f, 0.0f, -0.5f);
+	u32 rowX = static_cast<u32>((get_row()));
+	font->Printf(WHITE, 0.1f, LJustify, LJustify, "Row: %.5x", rowX);
+	glTranslatef(0.0f, -0.1f, 0.0f);
+	font->Printf(WHITE, 0.1f, LJustify, LJustify, "Row F: %f", get_row());
+	glTranslatef(0.0f, -0.1f, 0.0f);
 	// What is elapsed
-	glTranslatef(0.0f, 0.1f, 0.0f);
+	glTranslatef(0.0f, -0.1f, 0.0f);
 	font->Printf(WHITE, 0.1f, LJustify, LJustify, "Time: %.2f", getTime());
 	glPopMatrix();
 }

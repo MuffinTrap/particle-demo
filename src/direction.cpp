@@ -7,19 +7,21 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <stdint.h>
+#include <cmath>
 
 static const bool music_enabled = true;
 static double __attribute__((__unused__)) time_secs = 0.0;
 static double __attribute__((__unused__)) time_secs_offset = 0.0f;
 static int time_frames = 0;
-double bpm; /* beats per minute */
-int rpb; /* rows per beat */
-double row_rate;
+static double bpm; /* beats per minute */
+static int rpb; /* rows per beat */
+static double row_rate;
+static int sample_rate = 0; // Read this from the file
 
 void setupDirection(double beatsPerMin, int rowsPerBeat) {
 	bpm = beatsPerMin;
 	rpb = rowsPerBeat;
-	row_rate = ((double)(bpm) / 60.0) * rpb;
+	row_rate = (bpm / 60.0) * (double)rpb;
 }
 
 double getTime() {
@@ -36,7 +38,9 @@ void frameCounterIncrement() {
 
 double get_row()
 {
-	return time_secs * row_rate + 0.016;
+    // Without ceil() will return row 0 twice
+    // and then by off by one
+	return ceil(time_secs * row_rate);
 }
 
 
@@ -135,11 +139,14 @@ int loadAudio(const char* filename)
         return 1;
     }
 
-    printf("Load audio file\n");
+    printf("Load audio file. Sample rate %d\n", sfinfo.samplerate);
+    sample_rate = sfinfo.samplerate;
+
     alcMakeContextCurrent(context);
 
     alGenBuffers(1, &buffer);
     alGenSources(1, &source);
+
 
     // Read audio data from the WAV file
     ALsizei dataSize = sfinfo.frames * sfinfo.channels * sizeof(short);
@@ -151,6 +158,8 @@ int loadAudio(const char* filename)
 
     // Set the source's buffer and play
     alSourcei(source, AL_BUFFER, buffer);
+
+    sf_close(sndfile);
     return 0;
 }
 
@@ -164,11 +173,7 @@ void updateAudio()
 {
 	ALint sampleOffset;
 	alGetSourcei(source, AL_SAMPLE_OFFSET, &sampleOffset);
-
-	// Assuming you've already opened the audio file using sf_open
-	sf_command(sndfile, SFC_GET_LOG_INFO, &sfinfo, sizeof(sfinfo));
-	double sampleRate = 44100.0;
-	time_secs = (double)sampleOffset / sampleRate;
+	time_secs = (double)sampleOffset / (double)sample_rate;
 }
 
 void unloadAudio()
@@ -177,7 +182,6 @@ void unloadAudio()
 	alcMakeContextCurrent(NULL);
 	alcDestroyContext(context);
 	alcCloseDevice(device);
-	sf_close(sndfile);
 
 	alDeleteSources(1, &source);
 	alDeleteBuffers(1, &buffer);
@@ -186,17 +190,21 @@ void unloadAudio()
 
 
 // These are the rocket sync callback functions
-void rocket_pause( int __attribute__((__unused__)) flag)
+void rocket_pause( int flag)
 {
 	if (flag)
+    {
     	alSourcePause(source);
+    }
 	else
+    {
     	alSourcePlay(source);
+    }
 }
 
-void rocket_set_row( int __attribute__((__unused__)) row)
+void rocket_set_row( int row)
 {
-    double frow = row - 0.01;
+    double frow = row;// - 0.01;
 	alSourcef(source, AL_SEC_OFFSET, frow / row_rate);
 }
 
