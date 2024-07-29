@@ -60,6 +60,9 @@ void EffectHost::Init(sync_device* rocket)
 	plotter.Init(32);
 	credits.Init(rocket);
 
+
+	rocketDebug.Init();
+
 #ifndef SYNC_PLAYER
 	effect_active = sync_get_track(rocket, "effect_active");
 	scene_rotX = sync_get_track(rocket, "scene_rotX");
@@ -132,6 +135,8 @@ void EffectHost::Quit()
 	tuner.Quit();
 	plotter.Quit();
 	credits.Quit();
+
+	rocketDebug.Quit();
 }
 
 
@@ -213,5 +218,7 @@ void EffectHost::Draw()
 
 	glPopMatrix();
 	glPopMatrix();
+
+	rocketDebug.Draw(&font);
 }
 
