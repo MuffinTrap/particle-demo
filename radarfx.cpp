@@ -22,7 +22,8 @@
     const struct sync_track *radar_rarity;  // One in a "radar_rarity" change of drawing + or - mark over dot and printing values
     const struct sync_track *radar_spread;  // How scattered the dots are from origo: max 1.0. Change causes dot place randomization
 #else
-#include "src/sync_data.h"
+	#include "src/sync_data.cpp"
+	#include "src/sync_data.h"
 #endif
 
 RadarFX::RadarFX()
@@ -43,10 +44,12 @@ void RadarFX::Init ( u32 dotAmount, sync_device* rocket )
 	size_t dotArraySize = dotAmount * sizeof(glm::vec3);
 	dotsArray = (glm::vec3*)malloc(dotArraySize);
 
+#ifndef SYNC_PLAYER
 	radar_dots = sync_get_track(rocket, "radar_dots");
 	radar_seed = sync_get_track(rocket, "radar_seed");
 	radar_spread = sync_get_track(rocket, "radar_spread");
 	radar_rarity = sync_get_track(rocket, "radar_rarity");
+#endif
 
 	rarity = static_cast<u32>(floor(sync_get_val(radar_rarity, 0)));
 	dotSpread = clampF(sync_get_val(radar_spread, 0), 0.0f, 1.0f) / 2.0f;
@@ -62,10 +65,12 @@ void RadarFX::Init ( u32 dotAmount, sync_device* rocket )
 
 void RadarFX::Quit()
 {
-	save_sync(radar_dots, "src/sync_data.h");
-	save_sync(radar_seed, "src/sync_data.h");
-	save_sync(radar_spread, "src/sync_data.h");
-	save_sync(radar_rarity, "src/sync_data.h");
+#ifndef SYNC_PLAYER
+	save_sync(radar_dots, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(radar_seed, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(radar_spread, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(radar_rarity, SYNC_FILE_H, SYNC_FILE_CPP);
+#endif
 	if (dotsArray != nullptr)
 	{
 		free(dotsArray);

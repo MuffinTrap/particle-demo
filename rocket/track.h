@@ -29,8 +29,9 @@ struct sync_track {
 	int num_keys;
 };
 
-void start_save_sync(const char *filename);
-void save_sync(const struct sync_track *t, const char *filename);
+void start_save_sync ( const char* filename_h, const char* filename_cpp );
+void save_sync(const struct sync_track *t, const char *filename_h, const char* filename_cpp);
+void end_save_sync( const char* filename_h, const char* filename_cpp );
 int sync_find_key(const struct sync_track *, int);
 static inline int key_idx_floor(const struct sync_track *t, int row)
 {

@@ -10,7 +10,8 @@
 #ifndef SYNC_PLAYER
     const struct sync_track *credits_names;  // How many names to draw
 #else
-#include "src/sync_data.h"
+	#include "src/sync_data.cpp"
+	#include "src/sync_data.h"
 #endif
 
 void CreditsFX::Init ( sync_device* rocket )
@@ -21,7 +22,9 @@ void CreditsFX::Init ( sync_device* rocket )
 	names.push_back("RACCOONVIOLET      MUSIC");
 	names.push_back("MUFFINTRAP          CODE");
 
+#ifndef SYNC_PLAYER
 	credits_names = sync_get_track(rocket, "credits_names");
+#endif
 }
 
 void CreditsFX::Draw ( FontGL* font )
@@ -41,6 +44,8 @@ void CreditsFX::Draw ( FontGL* font )
 
 void CreditsFX::Quit()
 {
-	save_sync(credits_names, "src/sync_data.h");
+#ifndef SYNC_PLAYER
+	save_sync(credits_names, SYNC_FILE_H, SYNC_FILE_CPP);
+#endif
 }
 

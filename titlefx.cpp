@@ -12,17 +12,22 @@
 #ifndef SYNC_PLAYER
     const struct sync_track *title_rotY;  // rotation of the symbol
 #else
-#include "src/sync_data.h"
+	#include "src/sync_data.cpp"
+	#include "src/sync_data.h"
 #endif
 
 void TitleFX::Init(sync_device* rocket)
 {
+#ifndef SYNC_PLAYER
 	title_rotY = sync_get_track(rocket, "title_rotY");
+#endif
 }
 
 void TitleFX::Quit()
 {
-	save_sync(title_rotY, "src/sync_data.h");
+#ifndef SYNC_PLAYER
+	save_sync(title_rotY, SYNC_FILE_H, SYNC_FILE_CPP);
+#endif
 }
 
 void TitleFX::Draw ( FontGL* font )

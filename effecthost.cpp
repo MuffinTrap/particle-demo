@@ -35,7 +35,14 @@
 	const struct sync_track *WindZ; // particle effect variable - against SDF
 	const struct sync_track *ParticleCount; // particle count total
 #else
-#include "src/sync_data.h"
+    // This is for the wii version.
+    // Read track data from a header
+
+    // NOTE
+    // I spent over an hour trying to figure this one out
+    // If the .cpp file is not included, the linker does not find the tracks.
+	#include "src/sync_data.cpp"
+	#include "src/sync_data.h"
 #endif
 
 EffectHost::EffectHost()
@@ -53,9 +60,8 @@ void EffectHost::Init(sync_device* rocket)
 	plotter.Init(32);
 	credits.Init(rocket);
 
+#ifndef SYNC_PLAYER
 	effect_active = sync_get_track(rocket, "effect_active");
-	activeEffect = static_cast<EffectName>(clampF(sync_get_val(effect_active, 0), 0.0f, 3.0f));
-
 	scene_rotX = sync_get_track(rocket, "scene_rotX");
 	scene_rotY = sync_get_track(rocket, "scene_rotY");
 	scene_rotZ = sync_get_track(rocket, "scene_rotZ");
@@ -81,6 +87,9 @@ void EffectHost::Init(sync_device* rocket)
 	WindY = sync_get_track(rocket, "WindY");
 	WindZ = sync_get_track(rocket, "WindZ");
 	ParticleCount = sync_get_track(rocket, "ParticleCount");
+#endif
+
+	activeEffect = fxTitle;
 
 	init_perlin(0x1337);  // a LEET number
 	initParticles();
@@ -89,37 +98,40 @@ void EffectHost::Init(sync_device* rocket)
 
 void EffectHost::Quit()
 {
-	save_sync(effect_active, "src/sync_data.h");
-	save_sync(scene_rotX, "src/sync_data.h");
-	save_sync(scene_rotY, "src/sync_data.h");
-	save_sync(scene_rotZ, "src/sync_data.h");
-	save_sync(scene_X, "src/sync_data.h");
-	save_sync(scene_Y, "src/sync_data.h");
-	save_sync(scene_Z, "src/sync_data.h");
+#ifndef SYNC_PLAYER
+	save_sync(effect_active, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(scene_rotX, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(scene_rotY, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(scene_rotZ, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(scene_X, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(scene_Y, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(scene_Z, SYNC_FILE_H, SYNC_FILE_CPP);
 
-	save_sync(OrbitX, "src/sync_data.h");
-	save_sync(OrbitY, "src/sync_data.h");
-	save_sync(OrbitZ, "src/sync_data.h");
-	save_sync(Repulsion, "src/sync_data.h");
-	save_sync(RepulsionPower, "src/sync_data.h");
-	save_sync(Gravity, "src/sync_data.h");
-	save_sync(GravityPower, "src/sync_data.h");
-	save_sync(Friction, "src/sync_data.h");
-	save_sync(EffectA, "src/sync_data.h");
-	save_sync(EffectB, "src/sync_data.h");
-	save_sync(EffectC, "src/sync_data.h");
-	save_sync(EffectD, "src/sync_data.h");
-	save_sync(EffectE, "src/sync_data.h");
-	save_sync(EffectF, "src/sync_data.h");
-	save_sync(WindX, "src/sync_data.h");
-	save_sync(WindY, "src/sync_data.h");
-	save_sync(WindZ, "src/sync_data.h");
-	save_sync(ParticleCount, "src/save_sync");
+	save_sync(OrbitX, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(OrbitY, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(OrbitZ, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(Repulsion, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(RepulsionPower, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(Gravity, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(GravityPower, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(Friction, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(EffectA, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(EffectB, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(EffectC, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(EffectD, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(EffectE, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(EffectF, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(WindX, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(WindY, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(WindZ, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(ParticleCount, SYNC_FILE_H, SYNC_FILE_CPP);
+#endif
 
 	title.Quit();
 	radar.Quit();
 	tuner.Quit();
 	plotter.Quit();
+	credits.Quit();
 }
 
 

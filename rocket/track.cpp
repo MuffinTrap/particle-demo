@@ -93,11 +93,29 @@ double sync_get_val(const struct sync_track *t, double row) {
 }
 #endif
 
-void start_save_sync(const char *filename) {
-    FILE *file = fopen(filename, "w");
-    fprintf(file, "// sync data\n");
-    fprintf(file, "#include \"../rocket/track.h\"\n");
-    fclose(file);
+void start_save_sync(const char *filename_h, const char *filename_cpp) {
+    FILE *file_h = fopen(filename_h, "w");
+    fprintf(file_h, "// sync data declaration\n");
+    fprintf(file_h, "#ifdef SYNC_PLAYER\n");
+    fprintf(file_h, "#pragma once\n");
+    fprintf(file_h, "#include \"../rocket/track.h\"\n");
+    fclose(file_h);
+
+    FILE *file_cpp = fopen(filename_cpp, "w");
+    fprintf(file_cpp, "// sync data implementation\n");
+    fprintf(file_h, "#ifdef SYNC_PLAYER\n");
+    fprintf(file_cpp, "#include \"../rocket/track.h\"\n");
+    fclose(file_cpp);
+}
+
+void end_save_sync(const char *filename_h, const char *filename_cpp) {
+    FILE *file_h = fopen(filename_h, "a");
+    fprintf(file_h, "#endif\n // SYNC_PLAYER");
+    fclose(file_h);
+
+    FILE *file_cpp = fopen(filename_cpp, "a");
+    fprintf(file_h, "#endif\n // SYNC_PLAYER");
+    fclose(file_cpp);
 }
 
 const char* key_type_to_string(enum key_type tp) {
@@ -110,27 +128,43 @@ const char* key_type_to_string(enum key_type tp) {
     };
 }
 
-void save_sync(const struct sync_track *t, const char *filename) {
-    FILE *file = fopen(filename, "a");
-    if (file == NULL) {
+void save_sync(const struct sync_track *t, const char *filename_h, const char *filename_cpp) {
+    FILE *file_h = fopen(filename_h, "a");
+    if (file_h == NULL) {
+        perror("Error opening file");
+        return;
+    }
+    FILE *file_cpp = fopen(filename_cpp, "a");
+    if (file_cpp == NULL) {
         perror("Error opening file");
         return;
     }
 
-    fprintf(file, "struct track_key %s_keys[] = {", t->name);
+    // Track contents as static in .cpp file
+    fprintf(file_cpp, "static track_key %s_keys[] = {", t->name);
     for (int i = 0; i < t->num_keys; i++) {
         int row = t->keys[i].row;
         float value = t->keys[i].value;
         enum key_type type = t->keys[i].type;
 
-        fprintf(file, "{ %d, %f, %s}, ", row, value, key_type_to_string(type));
+        fprintf(file_cpp, "{ %d, %f, %s}, ", row, value, key_type_to_string(type));
     }
-    fprintf(file, "};\n");
+    fprintf(file_cpp, "};\n");
 
-    fprintf(file, "const struct sync_track %s = { \"%s\", ", t->name, t->name);
-    fprintf(file, "%s_keys", t->name);
-    fprintf(file, ",%d};\n", t->num_keys);
-    fclose(file);
+    // Track names as extern in .h file
+    fprintf(file_h, "extern const sync_track %s;\n",  t->name);
+
+    // Tracks in .cpp file
+    // define the variable
+    //fprintf(file_cpp, "const sync_track %s;\n", t->name);
+
+    // assign to it
+    fprintf(file_cpp, "const sync_track %s = { \"%s\", ", t->name, t->name);
+    fprintf(file_cpp, "%s_keys", t->name);
+    fprintf(file_cpp, ",%d};\n", t->num_keys);
+
+    fclose(file_h);
+    fclose(file_cpp);
 }
 
 int sync_find_key(const struct sync_track *t, int row) {

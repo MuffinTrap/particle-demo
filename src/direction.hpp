@@ -1,6 +1,9 @@
 #ifndef DIRECTION_H
 #define DIRECTION_H
 
+#define SYNC_FILE_H "src/sync_data.h"
+#define SYNC_FILE_CPP "src/sync_data.cpp"
+
 #include <stdbool.h>
 
 #ifdef GEKKO

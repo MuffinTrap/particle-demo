@@ -203,7 +203,7 @@ static TextureGL* ReadPNG(const char* filename)
 
 	// Allocate!
 	size_t imageDataSize = sizeof(GLubyte) * w * h * textureInfoPtr->bytesPerPixel;
-	printf("Allocate %lu bytes\n", imageDataSize);
+	printf("Allocate %zu bytes\n", imageDataSize);
 	textureInfoPtr->texels = (GLubyte*)AllocateAlignedMemory(imageDataSize);
 
 	if (textureInfoPtr->texels == nullptr)

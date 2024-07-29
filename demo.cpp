@@ -18,10 +18,6 @@ struct sync_device *rocket;
     static sync_cb rocket_callbacks;
 #else
 
-    // This is for the wii version.
-    // Read track data from a header
-    // This header contains the sync_tracks
-    #include "src/sync_data.h"
 #endif
 
 
@@ -75,7 +71,10 @@ void Demo::Init(int scrW, int scrH, bool useRocket)
     PaletteClearColor3f(BLACK);
     glShadeModel(GL_SMOOTH);
 
+    // On Wii the winding is ClockWise and cannot be changed
+#ifndef GEKKO
     glFrontFace(GL_CW);
+#endif
 
     // Face culling
     //glEnable(GL_CULL_FACE);
@@ -148,9 +147,11 @@ void Demo::Quit()
 #define SAVE_TO_HEADER
 #ifdef SAVE_TO_HEADER
             printf("Saving tracks to header file\n");
-            start_save_sync("src/sync_data.h");
+            start_save_sync(SYNC_FILE_H, SYNC_FILE_CPP);
 
             host.Quit();
+
+            end_save_sync(SYNC_FILE_H, SYNC_FILE_CPP);
 #else
             // Save as binary file:
             // The Wii exe fails to read these, maybe endianness error?

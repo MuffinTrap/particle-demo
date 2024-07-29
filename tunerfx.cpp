@@ -11,7 +11,8 @@
     const struct sync_track *tuner_pos;  // Position of orange line, 0-1
     const struct sync_track *tuner_names;  // How many names are visible. Change of 1.0f causes a new name to appear on the lines current position.
 #else
-#include "src/sync_data.h"
+	#include "src/sync_data.cpp"
+	#include "src/sync_data.h"
 #endif
 
 TunerFx::TunerFx()
@@ -32,8 +33,10 @@ void TunerFx::Init(float aspectRatio, sync_device* rocket)
 	top = 1.0f;
 	bottom = -1.0f;
 
+#ifndef SYNC_PLAYER
 	tuner_pos = sync_get_track(rocket, "tuner_pos");
 	tuner_names = sync_get_track(rocket, "tuner_names");
+#endif
 
 	visibleNames = 0.0f;
 	names.push_back(CreateName(0.2f, 0, "Beans"));
@@ -42,9 +45,10 @@ void TunerFx::Init(float aspectRatio, sync_device* rocket)
 
 void TunerFx::Quit()
 {
-	save_sync(tuner_pos, "src/sync_data.h");
-	save_sync(tuner_names, "src/sync_data.h");
-
+#ifndef SYNC_PLAYER
+	save_sync(tuner_pos, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(tuner_names, SYNC_FILE_H, SYNC_FILE_CPP);
+#endif
 }
 
 void TunerFx::Update ()
