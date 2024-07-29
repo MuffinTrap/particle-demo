@@ -1,25 +1,14 @@
-#define GL_SILENCE_DEPRECATION 1
+#pragma once
 
-#ifdef __APPLE__
-    #include <OpenGL/gl.h>
-    #include <OpenGL/glu.h>
-    #include <GLUT/glut.h>
-#else
-    #include <GL/gl.h>
-    #include <GL/glu.h>
-    #include <GL/glut.h>
-#endif
-#include <stdbool.h> 
+#include <stdbool.h>
 #include <stdlib.h>
 #include <stdio.h>
 #include <math.h>
+
+#include "../crossOpenGL.h"
 #include "myrandom.h"
-#include <stdlib.h>
-#include <stdio.h>
 #include "vector3.h"
 
-#include <math.h>
-#include <stdlib.h>
 
 extern GLuint textures[4];
 #define GL_SILENCE_DEPRECATION 1
@@ -33,6 +22,8 @@ int sign(float x) {
 }
 // Permutation table
 static int p[512];
+
+extern "C" {
 
 void init_perlin(int seed) {
     int permutation[] = {151,160,137,91,90,15,131,13,201,95,96,53,194,233,7,225,140,
@@ -248,3 +239,5 @@ void displayParticles() {
     }
     glEnd();
 }
+
+} // End extern "C"

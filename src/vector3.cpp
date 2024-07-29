@@ -1,12 +1,3 @@
-#ifdef N64
-    #include <libdragon.h>
-    #include <GL/gl.h>
-    #include <fmath.h>
-#else
-    #include <OpenGL/gl.h>
-    #include <math.h>
-#endif
-
 #include "vector3.h"
 
 Vector3 Vector3_Create(GLfloat x, GLfloat y, GLfloat z) {
