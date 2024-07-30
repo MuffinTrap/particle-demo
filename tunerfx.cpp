@@ -10,6 +10,8 @@
 #ifndef SYNC_PLAYER
     const struct sync_track *tuner_pos;  // Position of orange line, 0-1
     const struct sync_track *tuner_names;  // How many names are visible. Change of 1.0f causes a new name to appear on the lines current position.
+    const struct sync_track *tuner_row;  // On what row to place the next name. 0 is top row
+    const struct sync_track *tuner_page;  // From what page the next name is taken
 #else
 	#include "src/sync_data.cpp"
 	#include "src/sync_data.h"
@@ -18,9 +20,12 @@
 TunerFx::TunerFx()
 {
 	rows = 6;
-	step = 0.05f;
 	textToRowScale = 0.25f;
 	linePos = 0.0f;
+	notchWidth = 0.01f;
+	notchHeight = 0.03f;
+	notchLargeHeight =  0.06f;
+	lineWidth = 0.01f;
 }
 
 
@@ -36,11 +41,21 @@ void TunerFx::Init(float aspectRatio, sync_device* rocket)
 #ifndef SYNC_PLAYER
 	tuner_pos = sync_get_track(rocket, "tuner_pos");
 	tuner_names = sync_get_track(rocket, "tuner_names");
+	tuner_row = sync_get_track(rocket, "tuner_row");
+	tuner_page = sync_get_track(rocket, "tuner_page");
 #endif
 
 	visibleNames = 0.0f;
-	names.push_back(CreateName(0.2f, 0, "Beans"));
-	names.push_back(CreateName(0.42f, 2, "Muffins"));
+	short page = 0;
+	names.push_back(CreateName(page, "THIS"));
+	names.push_back(CreateName(page, "WAS"));
+	names.push_back(CreateName(page, "A TRIUMPH"));
+	page += 1;
+	names.push_back(CreateName(page, "I'M MAKING"));
+	names.push_back(CreateName(page, "A NOTE"));
+	names.push_back(CreateName(page, "HERE"));
+	names.push_back(CreateName(page, "GREAT"));
+	names.push_back(CreateName(page, "SUCCESS"));
 }
 
 void TunerFx::Save()
@@ -48,25 +63,29 @@ void TunerFx::Save()
 #ifndef SYNC_PLAYER
 	save_sync(tuner_pos, SYNC_FILE_H, SYNC_FILE_CPP);
 	save_sync(tuner_names, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(tuner_row, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(tuner_page, SYNC_FILE_H, SYNC_FILE_CPP);
 #endif
 }
 
 void TunerFx::Update ()
 {
-	linePos = clampF(sync_get_val(tuner_pos, get_row()), 0.0f, 1.0f);
-	float newVisible = sync_get_val(tuner_names, get_row());
+	float R = get_row();
+	float prevpos = linePos;
+	linePos = width * sync_get_val(tuner_pos, R);
+	float newVisible = sync_get_val(tuner_names, R);
+	activeNameRow = sync_get_val(tuner_row, R);
+	activeNamePage = sync_get_val(tuner_page, R);
 	float diff =  newVisible - visibleNames;
 	while(diff >= 1.0f)
 	{
 		diff -= 1.0f;
 		for (size_t i = 0; i < names.size(); i++)
 		{
-			if (names[i].found == false)
+			if (names[i].page == activeNamePage && names[i].found == false)
 			{
-				// TODO find row that has space on it
 				names[i].pos = GetNamePos(linePos, activeNameRow);
 				names[i].found = true;
-				activeNameRow = (activeNameRow + 1)%rows;
 				break;
 			}
 		}
@@ -74,6 +93,18 @@ void TunerFx::Update ()
 	if (newVisible > visibleNames)
 	{
 		visibleNames = newVisible;
+	}
+
+	// if linepos moves backward, hide all found names on this page and decrease counter
+	if (prevpos > linePos) {
+		for (size_t i = 0; i < names.size(); i++)
+		{
+			if (names[i].page == activeNamePage && names[i].found == true)
+			{
+				names[i].found = false;
+				visibleNames -= 1;
+			}
+		}
 	}
 }
 
@@ -86,14 +117,13 @@ void TunerFx::Draw ( FontGL* font )
 	float rowHeight = 2.0f/(float)rows;
 	// Draw the guide lines
 	float mid = 0.0f;
-	float lineWidth = 0.01f;
 
 	glBegin(GL_QUADS);
 		PaletteColor3f(ORANGE);
 		// Draw the orange line
 		glVertex3f(left + linePos, top, z);
-		glVertex3f(left + linePos + step/2.0f, top, z);
-		glVertex3f(left + linePos + step/2.0f, bottom, z);
+		glVertex3f(left + linePos + notchWidth, top, z);
+		glVertex3f(left + linePos + notchWidth, bottom, z);
 		glVertex3f(left + linePos, bottom, z);
 	glEnd();
 
@@ -105,26 +135,29 @@ void TunerFx::Draw ( FontGL* font )
 		//
 		// |----|----|----|----|
 		PaletteColor3f(WHITE);
+		float dx = left - notchWidth/2.0f;
 		for (int h = 1; h < rows; h++)
 		{
+			// Horizontal line
 			mid = top - rowHeight * (float)h;
 			glVertex3f(left, mid+lineWidth, z);
 			glVertex3f(right, mid+lineWidth, z);
 			glVertex3f(right, mid-lineWidth, z);
 			glVertex3f(left, mid-lineWidth, z);
 
-			short steps = (width)/0.05f;
-			for (short s = 0; s < steps; s += 1)
+			short notches = 80;
+			step = width / (float)notches;
+			for (short s = 0; s <= notches; s += 1)
 			{
-				float h = step;
+				float h = notchHeight;
 				if (s % 5 == 0)
 				{
-					h *= 2.0f;
+					h = notchLargeHeight;
 				}
-				glVertex3f(left+s*step, mid-h, z);
-				glVertex3f(left+s*step+lineWidth, mid-h, z);
-				glVertex3f(left+s*step+lineWidth, mid+h, z);
-				glVertex3f(left+s*step, mid+h, z);
+				glVertex3f(dx+s*step, mid-h, z);
+				glVertex3f(dx+s*step+notchWidth, mid-h, z);
+				glVertex3f(dx+s*step+notchWidth, mid+h, z);
+				glVertex3f(dx+s*step, mid+h, z);
 			}
 		}
 	glEnd();
@@ -141,12 +174,10 @@ void TunerFx::Draw ( FontGL* font )
 	// Draw names
 	for (size_t ni = 0; ni < names.size(); ni++)
 	{
-		if (names[ni].found == false)
-		{
-			continue;
-		}
 		glm::vec3& p = names[ni].pos;
-		if (p.x < left+linePos)
+		if (names[ni].found
+			&& names[ni].page == activeNamePage
+			&& p.x < left+linePos)
 		{
 			// Draw cross on the position.
 			// Draw in orange if found recently
@@ -164,7 +195,7 @@ void TunerFx::Draw ( FontGL* font )
 			font->Printf(nameColor, rowHeight * textToRowScale, RJustify, Centered, names[ni].text.c_str());
 
 			// Draw cross on position
-			glTranslatef(crossSize, -crossSize, 0.0f);
+			glTranslatef(crossSize, 0.0f, 0.0f);
 			glBegin(GL_LINES);
 				if (close) {
 					PaletteColor3f(ORANGE);
@@ -189,11 +220,12 @@ glm::vec3 TunerFx::GetNamePos(float linePosition, short row)
 		1.0f - ((float)row +0.5f) * 2.0f/(float)rows,
 		0.0f);
 }
-Name TunerFx::CreateName(float x, short row, const char* text)
+Name TunerFx::CreateName(short page, std::string text)
 {
 	Name n;
-	n.pos = GetNamePos(x, row);
-	n.found = false;
+	n.pos = glm::vec3(1000.0f, 0.0f, 0.0f);
+	n.page = page;
 	n.text = text;
+	n.found = false;
 	return n;
 }

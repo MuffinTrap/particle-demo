@@ -18,6 +18,7 @@
 
 void TitleFX::Init(sync_device* rocket)
 {
+	crossPattern = "$ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $ $";
 #ifndef SYNC_PLAYER
 	title_rotY = sync_get_track(rocket, "title_rotY");
 #endif
@@ -41,5 +42,40 @@ void TitleFX::Draw ( FontGL* font )
 	glPushMatrix();
 		glTranslatef(0.1f, 0.0f, 0.0f);
 		font->Printf(WHITE, 0.15f, Centered, Centered, "NUMBERS");
+	glPopMatrix();
+
+	float size = 0.10f;
+	float sp = 0.03f;
+	float top = 1.0f;
+	glPushMatrix();
+		glTranslatef(-2.0f, top, 0.0f);
+
+		for (int i = 0; i < 1; i ++)
+		{
+			font->SetSpacingOnce(-sp, 0.0f);
+			font->Printf(WHITE, size, LJustify, LJustify, crossPattern.c_str());
+
+			glTranslatef(size-sp, -size/2.0f, 0.0f);
+			font->SetSpacingOnce(-sp, 0.0f);
+			font->Printf(ORANGE, size, LJustify, LJustify, crossPattern.c_str());
+			glTranslatef(-size+sp, -size/2.0f, 0.0f);
+
+			font->SetSpacingOnce(-sp, 0.0f);
+			font->Printf(WHITE, size, LJustify, LJustify, crossPattern.c_str());
+
+			glTranslatef(size-sp, -size/2.0f, 0.0f);
+			font->SetSpacingOnce(-sp, 0.0f);
+			font->Printf(WHITE, size, LJustify, LJustify, crossPattern.c_str());
+			glTranslatef(-size+sp, -size/2.0f, 0.0f);
+
+			font->SetSpacingOnce(-sp, 0.0f);
+			font->Printf(ORANGE, size, LJustify, LJustify, crossPattern.c_str());
+
+			glTranslatef(size-sp, -size/2.0f, 0.0f);
+			font->SetSpacingOnce(-sp, 0.0f);
+			font->Printf(WHITE, size, LJustify, LJustify, crossPattern.c_str());
+			glTranslatef(-size+sp, -size/2.0f, 0.0f);
+		}
+
 	glPopMatrix();
 }

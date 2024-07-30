@@ -17,7 +17,11 @@ public:
 	void Printf(ColorName color, float scale, FontAlignment alignmentX, FontAlignment alignmentY, const char* format, ... );
 	void DrawSheet();
 	void Bind(ImageGL& sheet,  short charw, short charh, char firstCharacter);
+	void SetSpacingOnce(float x, float y);
 private:
+
+	float spacingX;
+	float spacingY;
 
 	void CreateTextureCoordList(short rows, short charactersPerRow, short texW, short texH);
 	glm::vec2 GetTextureCoordinate(char character, char subIndex);

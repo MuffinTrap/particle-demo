@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 class FontGL;
 struct sync_device;
 
@@ -10,4 +12,7 @@ public:
 	void Update();
 	void Draw(FontGL* font);
 	void Save();
+
+	std::string crossPattern;
+	std::string hatchPattern;
 };

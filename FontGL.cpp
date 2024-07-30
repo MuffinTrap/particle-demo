@@ -60,6 +60,7 @@ void FontGL::Printf(ColorName color, float scale, FontAlignment alignmentX, Font
 		float width = step * strlen(buff);
 		dx -= width / 2;
 	}
+	float left = dx;
 	if (alignmentY == RJustify)
 	{
 		dy += scale;
@@ -80,6 +81,12 @@ void FontGL::Printf(ColorName color, float scale, FontAlignment alignmentX, Font
 	for (short c = 0; buff[c] != '\0'; c++)
 	{
 		char character = buff[c];
+		if (character == '\n')
+		{
+			dx = left;
+			dy -= scale + spacingY;
+			continue;
+		}
 		glm::vec2 tx0 = GetTextureCoordinate(character, 0); // TOP LEFT
 		glm::vec2 tx1= GetTextureCoordinate(character, 1); // TOP RIGHT
 
@@ -102,13 +109,23 @@ void FontGL::Printf(ColorName color, float scale, FontAlignment alignmentX, Font
 		glTexCoord2f(tx3.x, tx3.y);
 		glVertex3f(dx, dy - scale, dz);
 
-		dx += step;
+		dx += step + spacingX;
 	}
 	glEnd();
 	glBindTexture(GL_TEXTURE_2D, 0);
 	glDisable(GL_ALPHA_TEST);
 	glDisable(GL_TEXTURE_2D);
+
+	spacingX = 0.0f;
+	spacingY = 0.0f;
 }
+
+void FontGL::SetSpacingOnce ( float x, float y )
+{
+	spacingX = x;
+	spacingY = y;
+}
+
 
 void FontGL::DrawSheet ()
 {

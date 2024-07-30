@@ -9,6 +9,7 @@ class FontGL;
 struct Name
 {
 	glm::vec3 pos;
+	short page;
 	bool found;
 	std::string text;
 };
@@ -30,17 +31,25 @@ public:
 	float visibleNames = 0.0f;
 	// On what row the next name is created
 	short activeNameRow = 0;
+	// What page of names is shown
+	short activeNamePage;
+
+	// How many rows are shown
+	short rows;
 
 	// Configuration values
-	short rows;
 	float step;
+	float notchWidth;
+	float notchHeight;
+	float notchLargeHeight;
 	float textToRowScale;
+	float lineWidth;
 
 
 	std::vector<Name> names;
 private:
 	glm::vec3 GetNamePos(float x, short row);
-	Name CreateName(float x, short row, const char* text);
+	Name CreateName(short page, std::string text);
 
 	float aspect;
 	float width;
