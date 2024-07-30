@@ -20,7 +20,10 @@ public:
 
 	static float GetDeltaTime();
 	static float GetElapsedSeconds();
+	static int GetScreenWidth();
+	static int GetScreenHeight();
 
-	int screenWidth;
-	int screenHeight;
+private:
+	static int screenWidth;
+	static int screenHeight;
 };

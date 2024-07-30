@@ -48,3 +48,6 @@ build/
 
 # Kate meta files
 *.kate-swp
+
+# RocketEditor recent files
+.rocket-recents.txt

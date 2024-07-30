@@ -3,6 +3,8 @@
 #include <stdio.h>
 #include <cmath>
 
+#include "platform.h"
+
 #include "rocket/track.h"
 
 #include "src/direction.hpp"
@@ -56,8 +58,8 @@ void EffectHost::Init(sync_device* rocket)
 	font.LoadFromImage("data/andvari62x62CAPS.png", 62, 62, ' ');
 
 	title.Init(rocket);
-    radar.Init(64, rocket);
-	tuner.Init(640.0f/480.0f, rocket);
+    radar.Init(1024, rocket);
+	tuner.Init((float)Platform::GetScreenWidth()/(float)Platform::GetScreenHeight(), rocket);
 	plotter.Init(32);
 	credits.Init(rocket);
 

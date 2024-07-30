@@ -12,6 +12,7 @@
 
 #include "FontGL.h"
 #include "palette.h"
+#include "platform.h"
 
 #include "rocket/track.h"
 
@@ -35,11 +36,25 @@ RadarFX::RadarFX()
 	elapsed = 0.0f;
 	dotSpread = 0.5f;
 	rarity = 4;
+
+	// How far away the text is from the side of the grid relative to width;
+	gap = 1.0f/8.0f;
+
+	// How big text relative to width;
+	textHeightRatio = 1.0f/32.0f;
+
+	// Size of chevrons and +- symbols. Relative to cell size;
+	chevronWidthRatio = 1.0f/6.0f;
+	chevronLengthRatio = 1.0f/3.0f;
+
+	symbolRatio = 1.0f/6.0f;
+
 }
 
 void RadarFX::Init ( u32 dotAmount, sync_device* rocket )
 {
 	this->dotAmount = dotAmount;
+	numberEntries.reserve(dotAmount);
 
 	size_t dotArraySize = dotAmount * sizeof(glm::vec3);
 	dotsArray = (glm::vec3*)malloc(dotArraySize);
@@ -56,11 +71,7 @@ void RadarFX::Init ( u32 dotAmount, sync_device* rocket )
 	seed = static_cast<u32>(sync_get_val(radar_seed, 0));
 	srand(seed);
 
-	for(u32 i = 0; i < dotAmount; i++)
-	{
-		dotsArray[i] = glm::vec3(0.5f + GetRandomFloat(-dotSpread, dotSpread), 0.5f + GetRandomFloat(-dotSpread, dotSpread), 0.0f);
-	}
-	CacheFlushRange(dotsArray, dotArraySize);
+	RandomizeDots();
 }
 
 void RadarFX::Quit()
@@ -77,6 +88,20 @@ void RadarFX::Quit()
 	}
 	dotsArray = nullptr;
 }
+
+void RadarFX::RandomizeDots()
+{
+	printf("radar randomize %u dots\n", dotAmount);
+	for(u32 i = 0; i < dotAmount; i++)
+	{
+		dotsArray[i] = glm::vec3(0.5f + GetRandomFloat(-dotSpread, dotSpread), 0.5f + GetRandomFloat(-dotSpread, dotSpread), 0.0f);
+	}
+	CacheFlushRange(dotsArray, dotAmount * sizeof(glm::vec3));
+	raresFound = 0;
+	lastRareFound = -1;
+	numberEntries.clear();
+}
+
 
 
 void RadarFX::Update ()
@@ -106,11 +131,7 @@ void RadarFX::Update ()
 
 	if (newDots)
 	{
-		for(u32 i = 0; i < dotAmount; i++)
-		{
-			dotsArray[i] = glm::vec3(0.5f + GetRandomFloat(-dotSpread, dotSpread), 0.5f + GetRandomFloat(-dotSpread, dotSpread), 0.0f);
-		}
-		CacheFlushRange(dotsArray, dotAmount * sizeof(glm::vec3));
+		RandomizeDots();
 	}
 }
 
@@ -168,8 +189,8 @@ void RadarFX::DrawGrid(float left, float right, float top, float bottom)
 	glEnd();
 
 	// Center cross and chevrons in white
-	float c2= cellSize/4.0f;
-	float c8= cellSize/8.0f;
+	float c2= cellSize * chevronLengthRatio / 2.0f;
+	float c8= cellSize * chevronLengthRatio;
 	glBegin(GL_QUADS);
 	PaletteColor3f(WHITE);
 
@@ -237,22 +258,18 @@ static char numberbuffer[64];
 
 void RadarFX::Draw(FontGL* font)
 {
-	// Draw random thing the same way every time
-	srand(seed);
-
-
-	float x = 0.0f;
-	float y = 0.0f;
-	float z = 0.0f;
+	float center_x = 0.0f;
+	float center_y = 0.0f;
+	float center_z = 0.0f;
 
 	cellSize = 1.0f/(float)gridSize;
 	float wh = 1.0f;
-	float left = x - wh/2.0f;
+	float left = center_x - wh/2.0f;
 	float right = left + wh;
-	float top = y + wh/2.0f;
+	float top = center_y + wh/2.0f;
 	float bottom = top - wh;
 
-	float lineLength = wh/8.0f;
+	float lineLength = wh * gap;
 
 	DrawGrid(left, right, top, bottom);
 
@@ -264,10 +281,10 @@ void RadarFX::Draw(FontGL* font)
 		{
 			float dx = left + dotsArray[di].x * wh;
 			float dy = top - dotsArray[di].y * wh ;
-			glVertex3f(dx - dz, dy + dz, z);
-			glVertex3f(dx + dz, dy + dz, z);
-			glVertex3f(dx + dz, dy - dz, z);
-			glVertex3f(dx - dz, dy - dz, z);
+			glVertex3f(dx - dz, dy + dz, center_z);
+			glVertex3f(dx + dz, dy + dz, center_z);
+			glVertex3f(dx + dz, dy - dz, center_z);
+			glVertex3f(dx - dz, dy - dz, center_z);
 		}
 	glEnd();
 
@@ -275,11 +292,14 @@ void RadarFX::Draw(FontGL* font)
 
 	// Lines start vertically from the center
 	// Orange + or - on line start point
-	float textHeight = wh / 32.0f;
+	float textHeight = wh *textHeightRatio;
 	u32 leftUpIndex = 1;
-	u32 leftDownIndex = 1;
+	u32 leftDownIndex = 0;
 	u32 rightUpIndex = 1;
-	u32 rightDownIndex = 1;
+	u32 rightDownIndex = 0;
+
+	// Draw random thing the same way every time
+	srand(seed);
 
 	glBegin(GL_LINES);
 	for(u32 di = 0; di < drawAmount; di++)
@@ -299,71 +319,89 @@ void RadarFX::Draw(FontGL* font)
 
 			float dotx = left + dotsArray[di].x * wh;
 			float doty = top-dotsArray[di].y * wh;
-			glVertex3f(dotx, doty, z);
+			glVertex3f(dotx, doty, center_z);
 			if (dotsArray[di].x < 0.5f)
 			{
 				// Line to the left
-				float ly = y;
+				float lineEndY = center_y;
 				if (dotsArray[di].y < 0.5f)
 				{
-					ly = y + (leftUpIndex) * textHeight;
+					lineEndY = center_y + (leftUpIndex) * textHeight;
 					leftUpIndex++;
 				}
 				else
 				{
-					ly = y - (leftDownIndex) * textHeight;
+					lineEndY = center_y - (leftDownIndex) * textHeight;
 					leftDownIndex++;
 				}
-				float ydiff = ly - doty;
-				float lx = dotx - abs(ydiff);
-				glVertex3f(lx, ly, z);
+				float ydiff = lineEndY - doty;
+				float lineCornerX = dotx - fabs(ydiff);
+				float lineCornerY = lineEndY;
+				float lineEndX = left-lineLength;
 
-				glVertex3f(lx, ly, z);
-				glVertex3f(left - lineLength, ly, z);
+				if (lineCornerX < lineEndX)
+				{
+					// too far!
+					lineCornerX = dotx;
+				}
 
-				// Add to numbers vector if it is not there yet
-				if (numberEntries.size() <= di)
+				glVertex3f(lineCornerX, lineCornerY, center_z);
+				glVertex3f(lineCornerX, lineCornerY, center_z);
+				glVertex3f(lineEndX, lineCornerY, center_z);
+
+				// if this is a new rare, add it to entries
+				if ((int)di > lastRareFound)
 				{
 					NumberEntry e;
-					e.lineEnd = glm::vec3(left-lineLength, ly, z);
-					sprintf(numberbuffer, "%.4f %.4f %.4f", e.lineEnd.x, e.lineEnd.y, e.lineEnd.z);
+					e.lineEnd = glm::vec3(lineEndX, lineEndY, center_z);
+					sprintf(numberbuffer, "%.4f %.4f %.4f", fabs(e.lineEnd.x), fabs(e.lineEnd.y), e.lineEnd.z);
 					e.text = numberbuffer;
 					e.alignmentX = RJustify;
-					e.index = di;
 					numberEntries.push_back(e);
 				}
 			}
 			else
 			{
-				float ry = y;
+				float ry = center_y;
 				if (dotsArray[di].y < 0.5f)
 				{
-					ry = y + (rightUpIndex) * textHeight;
+					ry = center_y + (rightUpIndex) * textHeight;
 					rightUpIndex++;
 				}
 				else
 				{
-					ry = y - (rightDownIndex) * textHeight;
+					ry = center_y - (rightDownIndex) * textHeight;
 					rightDownIndex++;
 				}
 				// Line to the right
 				float ydiff = ry - doty;
-				float rx = dotx + abs(ydiff);
-				glVertex3f(rx, ry, z);
+				float lineCornerX = dotx + abs(ydiff);
+				float lineEndX = right + lineLength;
+				if (lineCornerX > lineEndX)
+				{
+					lineCornerX = dotx;
+				}
+				glVertex3f(lineCornerX, ry, center_z);
+				glVertex3f(lineCornerX, ry, center_z);
+				glVertex3f(lineEndX, ry, center_z);
 
-				glVertex3f(rx, ry, z);
-				glVertex3f(right + lineLength, ry, z);
-
-				if (numberEntries.size() <= di)
+				if ((int)di > lastRareFound)
 				{
 					NumberEntry e;
-					e.lineEnd = glm::vec3(right + lineLength, ry, z);
-					snprintf(numberbuffer, 64, "%.4f %.4f %.4f", e.lineEnd.x, e.lineEnd.y, e.lineEnd.z);
+					e.lineEnd = glm::vec3(lineEndX, ry, center_z);
+					snprintf(numberbuffer, 64, "%.4f %.4f %.4f", fabs(e.lineEnd.x), fabs(e.lineEnd.y), e.lineEnd.z);
 					e.text = numberbuffer;
 					e.alignmentX = LJustify;
-					e.index = di;
 					numberEntries.push_back(e);
 				}
+			}
+
+			if ((int)di > lastRareFound)
+			{
+				// new rare point!
+				// update last
+				lastRareFound = (int)di;
+				raresFound += 1;
 			}
 		}
 	}
@@ -373,8 +411,8 @@ void RadarFX::Draw(FontGL* font)
 	// Reset generator to get the marks on the same dots as lines
 	srand(seed);
 
-	float c2= cellSize/4.0f;
-	float c8= cellSize/8.0f;
+	float c2= cellSize * symbolRatio / 2.0f;
+	float c8= cellSize * symbolRatio;
 
 	glBegin(GL_QUADS);
 	PaletteColor3f(ORANGE);
@@ -385,36 +423,31 @@ void RadarFX::Draw(FontGL* font)
 		{
 			float px = left + dotsArray[di].x * wh;
 			float py = top - dotsArray[di].y * wh;
-			glVertex3f(px-c2, py+c8, z);
-			glVertex3f(px+c2, py+c8, z);
-			glVertex3f(px+c2, py-c8, z);
-			glVertex3f(px-c2, py-c8, z);
+			glVertex3f(px-c2, py+c8, center_z);
+			glVertex3f(px+c2, py+c8, center_z);
+			glVertex3f(px+c2, py-c8, center_z);
+			glVertex3f(px-c2, py-c8, center_z);
 			if (plus)
 			{
-				glVertex3f(px-c8, py+c2, z);
-				glVertex3f(px+c8, py+c2, z);
-				glVertex3f(px+c8, py-c2, z);
-				glVertex3f(px-c8, py-c2, z);
+				glVertex3f(px-c8, py+c2, center_z);
+				glVertex3f(px+c8, py+c2, center_z);
+				glVertex3f(px+c8, py-c2, center_z);
+				glVertex3f(px-c8, py-c2, center_z);
 			}
 			plus = !plus;
 		}
 	}
 	glEnd();
 
-	// Draw texts
-	for (u32 di = 0; di < drawAmount; di++)
+	// Draw text for each rare that has been found
+	u32 visible = minU32(raresFound, drawAmount);
+	u32 namedraws = minU32(visible, numberEntries.size());
+	for (u32 ti = 0; ti < namedraws; ti++)
 	{
-		if (di >= numberEntries.size())
-		{
-			break;
-		}
-		NumberEntry &e = numberEntries[di];
-		if (e.index == di)
-		{
-			glPushMatrix();
-			glTranslatef(e.lineEnd.x, e.lineEnd.y, e.lineEnd.z);
+		NumberEntry &e = numberEntries[ti];
+		glPushMatrix();
+		glTranslatef(e.lineEnd.x, e.lineEnd.y, e.lineEnd.z);
 			font->Printf(WHITE, textHeight, e.alignmentX, Centered, e.text.c_str());
-			glPopMatrix();
-		}
+		glPopMatrix();
 	}
 }

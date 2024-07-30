@@ -11,7 +11,6 @@
 struct NumberEntry
 {
 	FontAlignment alignmentX;
-	uint32_t index;
 	glm::vec3 lineEnd;
 	std::string text;
 };
@@ -27,11 +26,24 @@ public:
 	void DrawGrid(float left, float right, float top, float bottom);
 	void Quit();
 
+private:
+	void RandomizeDots();
+
 	glm::vec3* dotsArray;
 	u32 dotAmount;
 	u32 gridSize;
 	float cellSize;
+	float gap;
+	float textHeightRatio;
+	float chevronWidthRatio;
+	float chevronLengthRatio;
+	float symbolRatio;
 
+	// The rare points are added to number entries
+	// in the order they appear.
+	// Make sure to add each only once
+	u32 raresFound;
+	int lastRareFound;
 	std::vector<NumberEntry> numberEntries;
 
 	// Rocket controlled:

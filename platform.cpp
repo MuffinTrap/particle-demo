@@ -7,6 +7,8 @@
 #include "src/direction.hpp"
 
 static Demo demoInstance;
+int Platform::screenWidth;
+int Platform::screenHeight;
 
 // //////////////////////////////////
 // NINTENDO WII
@@ -69,9 +71,13 @@ void Platform::Init ( int argc, char ** argv, ScreenAspect aspectRatio, bool use
     {
         case Screen4x3:
             mode = gdl::Aspect4x3;
+            screenWidth = 640;
+            screenHeight = 480;
             break;
         case Screen16x9:
             mode = gdl::Aspect16x9;
+            screenWidth = 854;
+            screenHeight = 480;
             break;
     };
 	fatInitDefault();
@@ -346,9 +352,17 @@ float Platform::GetElapsedSeconds()
     return (float)getTime();
 }
 
-
-
 #endif // WIN - MAC - LINUX
 
 
+// Shared
 
+int Platform::GetScreenWidth()
+{
+    return screenWidth;
+}
+
+int Platform::GetScreenHeight()
+{
+    return screenHeight;
+}
