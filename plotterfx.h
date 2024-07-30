@@ -8,7 +8,8 @@ public:
 	void Init(int lineAmount);
 	void SetPhase(float phase);
 	void Draw();
-	void Quit();
+	void Save();
+	void Free();
 
 private:
 	void GeneratePoints(int width, int depth);

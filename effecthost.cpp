@@ -18,6 +18,8 @@
     const struct sync_track *scene_Y;  // Offset to Origo Y
     const struct sync_track *scene_Z;  // Offset to Origo Z
 
+    const struct sync_track *fade_A;	// Fade alpha. 0 clear 1 black screen
+
 	const struct sync_track *OrbitX; // particle effect variable - against SDF
 	const struct sync_track *OrbitY; // particle effect variable - against SDF
 	const struct sync_track *OrbitZ; // particle effect variable - against SDF
@@ -74,6 +76,7 @@ void EffectHost::Init(sync_device* rocket)
 	scene_X = sync_get_track(rocket, "scene_X");
 	scene_Y = sync_get_track(rocket, "scene_Y");
 	scene_Z = sync_get_track(rocket, "scene_Z");
+	fade_A = sync_get_track(rocket, "fade_A");
 
 	OrbitX = sync_get_track(rocket, "OrbitX");
 	OrbitY = sync_get_track(rocket, "OrbitY");
@@ -103,7 +106,7 @@ void EffectHost::Init(sync_device* rocket)
 	printf("host init done\n");
 }
 
-void EffectHost::Quit()
+void EffectHost::Save()
 {
 #ifndef SYNC_PLAYER
 	save_sync(effect_active, SYNC_FILE_H, SYNC_FILE_CPP);
@@ -113,6 +116,7 @@ void EffectHost::Quit()
 	save_sync(scene_X, SYNC_FILE_H, SYNC_FILE_CPP);
 	save_sync(scene_Y, SYNC_FILE_H, SYNC_FILE_CPP);
 	save_sync(scene_Z, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(fade_A, SYNC_FILE_H, SYNC_FILE_CPP);
 
 	save_sync(OrbitX, SYNC_FILE_H, SYNC_FILE_CPP);
 	save_sync(OrbitY, SYNC_FILE_H, SYNC_FILE_CPP);
@@ -135,45 +139,28 @@ void EffectHost::Quit()
 	save_sync(SdfType, SYNC_FILE_H, SYNC_FILE_CPP);
 #endif
 
-	title.Quit();
-	radar.Quit();
-	tuner.Quit();
-	plotter.Quit();
-	credits.Quit();
-
-	rocketDebug.Quit();
+	title.Save();
+	radar.Save();
+	tuner.Save();
+	plotter.Save();
+	credits.Save();
 }
 
+void EffectHost::Free()
+{
+	radar.Free();
+	plotter.Free();
+	rocketDebug.Free();
+}
 
 void EffectHost::Update ()
 {
 	activeEffect = static_cast<EffectName>(sync_get_val(effect_active, get_row()));
 
-	float R = get_row();
 	switch(activeEffect)
 	{
 		case fxParticles:
-			uniform_OrbitX = sync_get_val(OrbitX, R);
-			uniform_OrbitY = sync_get_val(OrbitY, R);
-			uniform_OrbitZ = sync_get_val(OrbitZ, R);
-			uniform_Repulsion = sync_get_val(Repulsion, R);
-			uniform_RepulsionPower = sync_get_val(RepulsionPower, R);
-			uniform_Gravity = sync_get_val(Gravity, R);
-			uniform_GravityPower = sync_get_val(GravityPower, R);
-			uniform_Friction = sync_get_val(Friction, R);
-			uniform_EffectA = sync_get_val(EffectA, R);
-			uniform_EffectB = sync_get_val(EffectB, R);
-			uniform_EffectC = sync_get_val(EffectC, R);
-			uniform_EffectD = sync_get_val(EffectD, R);
-			uniform_EffectE = sync_get_val(EffectE, R);
-			uniform_EffectF = sync_get_val(EffectF, R);
-			uniform_WindX = sync_get_val(WindX, R);
-			uniform_WindY = sync_get_val(WindY, R);
-			uniform_WindZ = sync_get_val(WindZ, R);
-			uniform_ParticleCount = sync_get_val(ParticleCount, R);
-			uniform_SdfType = sync_get_val(SdfType, R);
-
-			updateParticles(1.0f/60.0f);
+			ParticleUpdate();
 			break;
 		case fxRadar:
 			radar.Update();
@@ -187,10 +174,39 @@ void EffectHost::Update ()
 	};
 }
 
+// Separate so that other effects can also update particles when they want to
+void EffectHost::ParticleUpdate()
+{
+	float R = get_row();
+	uniform_OrbitX = sync_get_val(OrbitX, R);
+	uniform_OrbitY = sync_get_val(OrbitY, R);
+	uniform_OrbitZ = sync_get_val(OrbitZ, R);
+	uniform_Repulsion = sync_get_val(Repulsion, R);
+	uniform_RepulsionPower = sync_get_val(RepulsionPower, R);
+	uniform_Gravity = sync_get_val(Gravity, R);
+	uniform_GravityPower = sync_get_val(GravityPower, R);
+	uniform_Friction = sync_get_val(Friction, R);
+	uniform_EffectA = sync_get_val(EffectA, R);
+	uniform_EffectB = sync_get_val(EffectB, R);
+	uniform_EffectC = sync_get_val(EffectC, R);
+	uniform_EffectD = sync_get_val(EffectD, R);
+	uniform_EffectE = sync_get_val(EffectE, R);
+	uniform_EffectF = sync_get_val(EffectF, R);
+	uniform_WindX = sync_get_val(WindX, R);
+	uniform_WindY = sync_get_val(WindY, R);
+	uniform_WindZ = sync_get_val(WindZ, R);
+	uniform_ParticleCount = sync_get_val(ParticleCount, R);
+	uniform_SdfType = sync_get_val(SdfType, R);
+
+	updateParticles(Platform::GetDeltaTime());
+}
+
+
 void EffectHost::Draw()
 {
 	glPushMatrix();
 	float R = get_row();
+
 	glTranslatef(sync_get_val(scene_X, R), sync_get_val(scene_Y, R), sync_get_val(scene_Z, R));
 
 	glPushMatrix();
@@ -229,6 +245,31 @@ void EffectHost::Draw()
 
 	glPopMatrix();
 	glPopMatrix();
+
+	float fade = sync_get_val(fade_A, R);
+	if (fade > 0.0f)
+	{
+		glEnable(GL_BLEND);
+		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+		glMatrixMode(GL_PROJECTION);
+		glLoadIdentity();
+		float W = Platform::GetScreenWidth();
+		float H = Platform::GetScreenHeight();
+		glOrtho(0, W, H, 0.0f, 1.0f, -1.0f);
+
+		// Set the modelview matrix
+		glMatrixMode(GL_MODELVIEW);
+		glLoadIdentity();
+		glBegin(GL_QUADS);
+			PaletteColor4f(BLACK, fade);
+			glVertex3f(0.0f, 0.0f, 0.9999f);
+			glVertex3f(W, 0.0f, 0.9999f);
+			glVertex3f(W, H, 0.9999f);
+			glVertex3f(0.0f, H, 0.9999f);
+		glEnd();
+		glDisable(GL_BLEND);
+
+	}
 
 #ifdef PROFILING
 	rocketDebug.Draw(&font);

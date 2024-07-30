@@ -9,5 +9,5 @@ public:
 	void Init(sync_device* rocket);
 	void Update();
 	void Draw(FontGL* font);
-	void Quit();
+	void Save();
 };

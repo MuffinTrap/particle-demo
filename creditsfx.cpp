@@ -16,11 +16,15 @@
 
 void CreditsFX::Init ( sync_device* rocket )
 {
+	names.push_back("ANALYSIS COMPLETE");
+	names.push_back("ROOT CAUSES FOUND");
 	names.push_back("HANDLE:            ROLE:");
 	names.push_back("MUFFINHOP           CODE");
 	names.push_back("MUFFINHOP         DESIGN");
 	names.push_back("RACCOONVIOLET      MUSIC");
 	names.push_back("MUFFINTRAP          CODE");
+	names.push_back("SPECIAL MENTIONS:");
+	names.push_back("RYOJI IKEDA  INSPIRATION");
 
 #ifndef SYNC_PLAYER
 	credits_names = sync_get_track(rocket, "credits_names");
@@ -42,7 +46,7 @@ void CreditsFX::Draw ( FontGL* font )
 	glPopMatrix();
 }
 
-void CreditsFX::Quit()
+void CreditsFX::Save()
 {
 #ifndef SYNC_PLAYER
 	save_sync(credits_names, SYNC_FILE_H, SYNC_FILE_CPP);

@@ -23,7 +23,7 @@ void RocketDebug::Init()
 	index = 0;
 }
 
-void RocketDebug::Quit()
+void RocketDebug::Free()
 {
 	free(frameTimes);
 }

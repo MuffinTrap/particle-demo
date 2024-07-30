@@ -12,6 +12,7 @@ public:
 	void Update();
 	void Draw(FontGL *font);
 	void Quit();
+	void Save();
 
 	std::vector<std::string> names;
 

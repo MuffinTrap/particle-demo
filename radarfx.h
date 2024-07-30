@@ -24,7 +24,8 @@ public:
 	void Update();
 	void Draw(FontGL* font);
 	void DrawGrid(float left, float right, float top, float bottom);
-	void Quit();
+	void Save();
+	void Free();
 
 private:
 	void RandomizeDots();
@@ -37,7 +38,8 @@ private:
 	float textHeightRatio;
 	float chevronWidthRatio;
 	float chevronLengthRatio;
-	float symbolRatio;
+	float symbolWidthRatio;
+	float symbolLengthRatio;
 
 	// The rare points are added to number entries
 	// in the order they appear.

@@ -12,13 +12,18 @@ void PlotterFX::Init ( int lineAmount )
 	plasmaPhase = 0.0f;
 }
 
-void PlotterFX::Quit()
+void PlotterFX::Free()
 {
 	if (points != nullptr)
 	{
 		free(points);
 	}
 	points = nullptr;
+}
+
+void PlotterFX::Save()
+{
+	// nothing yet
 }
 
 

@@ -14,7 +14,8 @@ public:
 	void Update();
 	bool ConnectRocket();
 	void Draw();
-	void Quit();
+	void Free();
+	void Save();
 	void UpdateController(WiiController& controllerState);
 	bool QuitRequested();
 

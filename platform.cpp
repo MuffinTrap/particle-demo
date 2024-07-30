@@ -152,7 +152,7 @@ void Platform::RunMainLoop()
 		gdl::Display();
 	}
 
-	demoInstance.Quit();
+	demoInstance.Free();
 	gdl::wii::DoProgramExit();
 }
 
@@ -193,9 +193,15 @@ static void quit()
 		// Clean up resources and exit the program
 
     unloadAudio();
-	demoInstance.Quit();
+	demoInstance.Free();
 
 	exit(0);
+}
+
+static void writeTracks()
+{
+    demoInstance.Save();
+
 }
 
 void sceneUpdate() {
@@ -209,6 +215,11 @@ void sceneUpdate() {
     if (demoInstance.QuitRequested())
     {
         quit();
+    }
+
+    if (glutInput->ButtonPress(ButtonPlus))  // F5 key to save tracks
+    {
+		writeTracks();
     }
 
     updateAudio();
@@ -301,7 +312,7 @@ void Platform::Init ( int argc, char ** argv, ScreenAspect aspectRatio, bool use
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_SINGLE | GLUT_RGB | GLUT_DEPTH);
     glutInitWindowSize(screenWidth, screenHeight);
-    glutCreateWindow("My Mac/PC program window");
+    glutCreateWindow("Press F5 to write Rocket tracks");
 
     glutDisplayFunc(renderLoop);
 

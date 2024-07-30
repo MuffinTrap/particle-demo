@@ -128,6 +128,9 @@ void specialKeyDown(int key, int x, int y) {
     else if (key == GLUT_KEY_RIGHT) {
 		glutController.SetButtonDown(ButtonRight);
 	}
+	else if (key == GLUT_KEY_F5) {
+		glutController.SetButtonDown(ButtonPlus);
+	}
 }
 
 void specialKeyUp(int key, int x, int y) {
@@ -143,6 +146,9 @@ void specialKeyUp(int key, int x, int y) {
 	}
     else if (key == GLUT_KEY_RIGHT) {
 		glutController.SetButtonUp(ButtonRight);
+	}
+	else if (key == GLUT_KEY_F5) {
+		glutController.SetButtonUp(ButtonPlus);
 	}
 }
 

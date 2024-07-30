@@ -143,29 +143,37 @@ bool Demo::QuitRequested()
 }
 
 // Release memory
-void Demo::Quit()
+void Demo::Save()
 {
 	if (rocket_in_use)
 	{
 #ifndef SYNC_PLAYER
 
-#define SAVE_TO_HEADER
-#ifdef SAVE_TO_HEADER
-            printf("Saving tracks to header file\n");
-            start_save_sync(SYNC_FILE_H, SYNC_FILE_CPP);
+    #define SAVE_TO_HEADER
+    #ifdef SAVE_TO_HEADER
+                printf("Saving tracks to header file\n");
+                start_save_sync(SYNC_FILE_H, SYNC_FILE_CPP);
 
-            host.Quit();
+                host.Save();
 
-            end_save_sync(SYNC_FILE_H, SYNC_FILE_CPP);
-#else
-            // Save as binary file:
-            // The Wii exe fails to read these, maybe endianness error?
-            sync_save_tracks(rocket);
-#endif
+                end_save_sync(SYNC_FILE_H, SYNC_FILE_CPP);
+    #else
+                // Save as binary file:
+                // The Wii exe fails to read these, maybe endianness error?
+                sync_save_tracks(rocket);
+    #endif // Save to header
 
 #endif// Syncplayer
-        sync_destroy_device(rocket);
 	}
+}
+
+void Demo::Free()
+{
+    if (rocket_in_use)
+    {
+        sync_destroy_device(rocket);
+    }
+    host.Free();
 }
 
 

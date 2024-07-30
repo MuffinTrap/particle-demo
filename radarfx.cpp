@@ -47,7 +47,8 @@ RadarFX::RadarFX()
 	chevronWidthRatio = 1.0f/6.0f;
 	chevronLengthRatio = 1.0f/3.0f;
 
-	symbolRatio = 1.0f/6.0f;
+	symbolLengthRatio = 1.0f/4.0f;
+	symbolWidthRatio = 1.0f/7.0f;
 
 }
 
@@ -74,7 +75,7 @@ void RadarFX::Init ( u32 dotAmount, sync_device* rocket )
 	RandomizeDots();
 }
 
-void RadarFX::Quit()
+void RadarFX::Save()
 {
 #ifndef SYNC_PLAYER
 	save_sync(radar_dots, SYNC_FILE_H, SYNC_FILE_CPP);
@@ -82,6 +83,10 @@ void RadarFX::Quit()
 	save_sync(radar_spread, SYNC_FILE_H, SYNC_FILE_CPP);
 	save_sync(radar_rarity, SYNC_FILE_H, SYNC_FILE_CPP);
 #endif
+}
+
+void RadarFX::Free()
+{
 	if (dotsArray != nullptr)
 	{
 		free(dotsArray);
@@ -189,65 +194,71 @@ void RadarFX::DrawGrid(float left, float right, float top, float bottom)
 	glEnd();
 
 	// Center cross and chevrons in white
-	float c2= cellSize * chevronLengthRatio / 2.0f;
-	float c8= cellSize * chevronLengthRatio;
+	float cw = cellSize * chevronWidthRatio / 2.0f;
+	float cl = cellSize * chevronLengthRatio;
 	glBegin(GL_QUADS);
 	PaletteColor3f(WHITE);
 
 	// Center
-	glVertex3f(x-c2, y+c8, z);
-	glVertex3f(x+c2, y+c8, z);
-	glVertex3f(x+c2, y-c8, z);
-	glVertex3f(x-c2, y-c8, z);
 
-	glVertex3f(x-c8, y+c2, z);
-	glVertex3f(x+c8, y+c2, z);
-	glVertex3f(x+c8, y-c2, z);
-	glVertex3f(x-c8, y-c2, z);
+	// |
+	glVertex3f(x-cw, y+cl, z);
+	glVertex3f(x+cw, y+cl, z);
+	glVertex3f(x+cw, y-cl, z);
+	glVertex3f(x-cw, y-cl, z);
+
+	// -
+	glVertex3f(x-cl, y+cw, z);
+	glVertex3f(x+cl, y+cw, z);
+	glVertex3f(x+cl, y-cw, z);
+	glVertex3f(x-cl, y-cw, z);
 
 	// Top left
-	glVertex3f(left-c8, top+c8, z);
-	glVertex3f(left+c2, top+c8, z);
-	glVertex3f(left+c2, top-c8, z);
-	glVertex3f(left-c8, top-c8, z);
 
-	glVertex3f(left-c8, top+c8, z);
-	glVertex3f(left+c8, top+c8, z);
-	glVertex3f(left+c8, top-c2, z);
-	glVertex3f(left-c8, top-c2, z);
+	// Down
+	glVertex3f(left-cw, top+cw, z);
+	glVertex3f(left+cw, top+cw, z);
+	glVertex3f(left+cw, top-cl, z);
+	glVertex3f(left-cw, top-cl, z);
+
+	// Right
+	glVertex3f(left-cw, top+cw, z);
+	glVertex3f(left+cl, top+cw, z);
+	glVertex3f(left+cl, top-cw, z);
+	glVertex3f(left-cw, top-cw, z);
 
 	// Top right
-	glVertex3f(right-c2, top+c8, z);
-	glVertex3f(right+c8, top+c8, z);
-	glVertex3f(right+c8, top-c8, z);
-	glVertex3f(right-c2, top-c8, z);
+	glVertex3f(right-cw, top+cw, z);
+	glVertex3f(right+cw, top+cw, z);
+	glVertex3f(right+cw, top-cl, z);
+	glVertex3f(right-cw, top-cl, z);
 
-	glVertex3f(right-c8, top+c8, z);
-	glVertex3f(right+c8, top+c8, z);
-	glVertex3f(right+c8, top-c2, z);
-	glVertex3f(right-c8, top-c2, z);
+	glVertex3f(right-cl, top+cw, z);
+	glVertex3f(right+cw, top+cw, z);
+	glVertex3f(right+cw, top-cw, z);
+	glVertex3f(right-cl, top-cw, z);
 
 	// Bottom right
-	glVertex3f(right-c2, bottom+c8, z);
-	glVertex3f(right+c8, bottom+c8, z);
-	glVertex3f(right+c8, bottom-c8, z);
-	glVertex3f(right-c2, bottom-c8, z);
+	glVertex3f(right-cw, bottom+cl, z);
+	glVertex3f(right+cw, bottom+cl, z);
+	glVertex3f(right+cw, bottom-cw, z);
+	glVertex3f(right-cw, bottom-cw, z);
 
-	glVertex3f(right-c8, bottom-c8, z);
-	glVertex3f(right+c8, bottom-c8, z);
-	glVertex3f(right+c8, bottom+c2, z);
-	glVertex3f(right-c8, bottom+c2, z);
+	glVertex3f(right-cl, bottom-cw, z);
+	glVertex3f(right+cw, bottom-cw, z);
+	glVertex3f(right+cw, bottom+cw, z);
+	glVertex3f(right-cl, bottom+cw, z);
 
 	// Bottom left
-	glVertex3f(left-c8, bottom+c8, z);
-	glVertex3f(left+c2, bottom+c8, z);
-	glVertex3f(left+c2, bottom-c8, z);
-	glVertex3f(left-c8, bottom-c8, z);
+	glVertex3f(left-cw, bottom+cl, z);
+	glVertex3f(left+cw, bottom+cl, z);
+	glVertex3f(left+cw, bottom-cw, z);
+	glVertex3f(left-cw, bottom-cw, z);
 
-	glVertex3f(left-c8, bottom+c8, z);
-	glVertex3f(left+c8, bottom+c8, z);
-	glVertex3f(left+c8, bottom+c2, z);
-	glVertex3f(left-c8, bottom+c2, z);
+	glVertex3f(left-cw, bottom+cw, z);
+	glVertex3f(left+cl, bottom+cw, z);
+	glVertex3f(left+cl, bottom-cw, z);
+	glVertex3f(left-cw, bottom-cw, z);
 
 	glEnd();
 
@@ -411,8 +422,8 @@ void RadarFX::Draw(FontGL* font)
 	// Reset generator to get the marks on the same dots as lines
 	srand(seed);
 
-	float c2= cellSize * symbolRatio / 2.0f;
-	float c8= cellSize * symbolRatio;
+	float cw= cellSize * symbolWidthRatio;
+	float cl= cellSize * symbolLengthRatio;
 
 	glBegin(GL_QUADS);
 	PaletteColor3f(ORANGE);
@@ -423,16 +434,16 @@ void RadarFX::Draw(FontGL* font)
 		{
 			float px = left + dotsArray[di].x * wh;
 			float py = top - dotsArray[di].y * wh;
-			glVertex3f(px-c2, py+c8, center_z);
-			glVertex3f(px+c2, py+c8, center_z);
-			glVertex3f(px+c2, py-c8, center_z);
-			glVertex3f(px-c2, py-c8, center_z);
+			glVertex3f(px-cw, py+cl, center_z);
+			glVertex3f(px+cw, py+cl, center_z);
+			glVertex3f(px+cw, py-cl, center_z);
+			glVertex3f(px-cw, py-cl, center_z);
 			if (plus)
 			{
-				glVertex3f(px-c8, py+c2, center_z);
-				glVertex3f(px+c8, py+c2, center_z);
-				glVertex3f(px+c8, py-c2, center_z);
-				glVertex3f(px-c8, py-c2, center_z);
+				glVertex3f(px-cl, py+cw, center_z);
+				glVertex3f(px+cl, py+cw, center_z);
+				glVertex3f(px+cl, py-cw, center_z);
+				glVertex3f(px-cl, py-cw, center_z);
 			}
 			plus = !plus;
 		}
@@ -440,8 +451,7 @@ void RadarFX::Draw(FontGL* font)
 	glEnd();
 
 	// Draw text for each rare that has been found
-	u32 visible = minU32(raresFound, drawAmount);
-	u32 namedraws = minU32(visible, numberEntries.size());
+	u32 namedraws = minU32(drawAmount, numberEntries.size());
 	for (u32 ti = 0; ti < namedraws; ti++)
 	{
 		NumberEntry &e = numberEntries[ti];

@@ -23,7 +23,7 @@ void TitleFX::Init(sync_device* rocket)
 #endif
 }
 
-void TitleFX::Quit()
+void TitleFX::Save()
 {
 #ifndef SYNC_PLAYER
 	save_sync(title_rotY, SYNC_FILE_H, SYNC_FILE_CPP);

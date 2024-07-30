@@ -43,7 +43,7 @@ void TunerFx::Init(float aspectRatio, sync_device* rocket)
 	names.push_back(CreateName(0.42f, 2, "Muffins"));
 }
 
-void TunerFx::Quit()
+void TunerFx::Save()
 {
 #ifndef SYNC_PLAYER
 	save_sync(tuner_pos, SYNC_FILE_H, SYNC_FILE_CPP);

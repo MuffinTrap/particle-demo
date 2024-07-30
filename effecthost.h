@@ -29,7 +29,10 @@ public:
 	void Init(sync_device* rocket);
 	void Update();
 	void Draw();
-	void Quit();
+	void Save();
+	void Free();
+
+	void ParticleUpdate();
 
 	EffectName activeEffect;
 	TitleFX title;
