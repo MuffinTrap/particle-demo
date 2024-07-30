@@ -4,12 +4,14 @@
 
 :: Copy from here
 SET src=C:\msys64\ucrt64\bin
+
 :: and here: This is the github repo folder. eg. C:\Dev\Project\particle-demo
 SET repo=D:\Dev\Wii\Projects\particle-demo
 
 :: To this folder
-SET dest=.
+SET dest=..\..\win_build
 
+:: Copy DLL files
 xcopy %src%\libgcc_s_seh-1.dll %dest% /y
 xcopy %src%\libfreeglut.dll %dest% /y
 xcopy %src%\libopenal-1.dll %dest% /y
@@ -28,7 +30,7 @@ xcopy %src%\libvorbisenc-2.dll %dest% /y
 
 :: Copy exe
 xcopy %repo%\gldemo.exe %dest% /y 
-:: Copy all images
-xcopy %repo%\*.png %dest% /s /e /y
-:: Copy music
-xcopy %repo%\*.wav %dest% /y 
+
+:: Copy all images and music files
+xcopy %repo%\data\*.png %dest%\data /i /y
+xcopy %repo%\data\*.wav %dest%\data /i /y

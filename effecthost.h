@@ -16,7 +16,10 @@ enum EffectName
 	fxPlotter = 3,
 	fxParticles = 4,
 	fxCredits = 5,
-	fxRocketDebug = 6
+	fxRocketDebug = 6,
+
+	//////////////////////////
+	fxQUIT_DEMO = 999
 };
 
 class EffectHost

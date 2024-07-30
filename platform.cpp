@@ -87,6 +87,8 @@ void Platform::Init ( int argc, char ** argv, ScreenAspect aspectRatio, bool use
 	demoInstance.Init(gdl::ScreenXres, gdl::ScreenYres, useRocket);
 
 
+    /* Startup debug loop */
+    /*
     while(true)
     {
         ReadControllerInput(controller);
@@ -95,6 +97,7 @@ void Platform::Init ( int argc, char ** argv, ScreenAspect aspectRatio, bool use
         }
         VIDEO_WaitVSync();
     }
+    */
 
 }
 #pragma GCC diagnostic pop
@@ -129,6 +132,10 @@ void Platform::RunMainLoop()
 		if (controller.ButtonPress(WPAD_BUTTON_HOME)){
 			break;
 		}
+        if (demoInstance.QuitRequested()) {
+            break;
+        }
+
         demoInstance.UpdateController(controller);
 		demoInstance.Update();
 		gdl::PrepDisplay();
@@ -191,6 +198,11 @@ void sceneUpdate() {
     if (glutInput->ButtonPress(ButtonHome))
     {
 		quit();
+    }
+
+    if (demoInstance.QuitRequested())
+    {
+        quit();
     }
 
     updateAudio();

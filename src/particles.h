@@ -105,8 +105,9 @@ float uniform_SdfType;
 #define ORBIT_ENABLED TRUE
 
 
+// 3000 is safe 60fps on Wii
+#define NUM_PARTICLES 3000
 
-#define NUM_PARTICLES 6000
 #define SPHERE_RADIUS 1.0f
 #define STICK_DISTANCE 0.01f
 #define FRICTION 0.98f  // Friction coefficient
@@ -193,10 +194,16 @@ float getDistance(Vector3 position) {
     switch((int)uniform_SdfType) {
         case 0:
             return sphereSDF(position.x + uniform_EffectA, position.y + uniform_EffectB, position.z + uniform_EffectC);
+            break;
         case 1:
             return fBox(position, size);
+            break;
         case 2:
             return fTorus(position, uniform_EffectA, uniform_EffectB);
+            break;
+        default:
+            return 0.0f;
+            break;
     }
 }
 // Define epsilon for numerical stability

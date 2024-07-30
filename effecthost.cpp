@@ -53,7 +53,7 @@ EffectHost::EffectHost()
 
 void EffectHost::Init(sync_device* rocket)
 {
-	font.LoadFromImage("andvari30x30.png", 30, 30, ' ');
+	font.LoadFromImage("data/andvari62x62CAPS.png", 62, 62, ' ');
 
 	title.Init(rocket);
     radar.Init(64, rocket);
@@ -219,11 +219,17 @@ void EffectHost::Draw()
 		case fxRocketDebug:
 			rocketDebug.Draw(&font);
 		break;
+
+		case fxQUIT_DEMO:
+			// NOP
+		break;
 	};
 
 	glPopMatrix();
 	glPopMatrix();
 
+#ifdef PROFILING
 	rocketDebug.Draw(&font);
+#endif
 }
 

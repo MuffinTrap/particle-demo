@@ -2,8 +2,10 @@
 #include <stdio.h>
 #include <png.h>
 #include <cstdlib>
+#include <cstring>
 #include "crossCache.h"
 #include "crossAlloc.h"
+#include "crossAssert.h"
 
 struct TextureGL
 {
@@ -42,17 +44,9 @@ static bool GetPNGtextureInfo(int color_type, TextureGL* texInfo)
 	return true;
 }
 
-static TextureGL* ReadPNG(const char* filename)
+static TextureGL* ReadPNG(FILE* fp)
 {
-	FILE *fp = fopen(filename, "rb");
-	if (fp == nullptr)
-	{
-		printf("[NOT FOUND!]\n");
-		fclose(fp);
-		return nullptr;
-	}
-
-	TextureGL* textureInfoPtr = nullptr;
+	// Read from file pointer
 	png_byte magic[8];
 	png_structp png_ptr;
 	png_infop info_ptr;
@@ -88,6 +82,7 @@ static TextureGL* ReadPNG(const char* filename)
 		return nullptr;
 	}
 
+	TextureGL* textureInfoPtr = nullptr;
 	textureInfoPtr = new TextureGL();
 
 	// This sets what happens if there is an error during read
@@ -243,7 +238,6 @@ static TextureGL* ReadPNG(const char* filename)
 
 	// Reading is over, rows no longer needed
 	free(row_pointers);
-	fclose(fp);
 
 	printf("PNG read done\n");
 
@@ -252,12 +246,59 @@ static TextureGL* ReadPNG(const char* filename)
 	return textureInfoPtr;
 }
 
+static TextureGL* ReadPNGBuffer(void* buffer, size_t size)
+{
+// fmemopen cannot read from const buffer :U
+	// Copy data to temporary buffer before reading
+	void *tempBuffer = aligned_alloc(32, size);
+	gdl_assert_print((tempBuffer != nullptr), "Cannot allocate enough memory for image buffer.");
+
+	// Copy
+	memcpy(tempBuffer, buffer, size);
+
+	// Make sure that the data is in the main memory
+	CacheFlushRange(tempBuffer, size);
+
+	// Open file
+	FILE *fp;
+	if (!(fp = fmemopen(tempBuffer, size, "rb"))) {
+		printf("Image buffer failed to open\n");
+		fclose(fp);
+		free(tempBuffer);
+		return nullptr;
+	}
+	else
+	{
+		TextureGL* textureInfoPtr = ReadPNG(fp);
+		fclose(fp);
+		return textureInfoPtr;
+	}
+}
+
+static TextureGL* ReadPNGFile(const char* filename)
+{
+	FILE *fp = fopen(filename, "rb");
+	if (fp == nullptr)
+	{
+		printf("[NOT FOUND!]\n");
+		fclose(fp);
+		return nullptr;
+	}
+	else
+	{
+		TextureGL* textureInfoPtr = ReadPNG(fp);
+		fclose(fp);
+		return textureInfoPtr;
+	}
+}
+
+
 bool ImageGL::LoadImage ( const char* filename, GLuint filterMode)
 {
 	// Load using png
 	printf("gdl:: Loading image %s for OpenGX...", filename);
 
-	TextureGL* textureDataPtr = ReadPNG(filename);
+	TextureGL* textureDataPtr = ReadPNGFile(filename);
 	if (textureDataPtr == nullptr || textureDataPtr->texels == nullptr)
 	{
 		return false;

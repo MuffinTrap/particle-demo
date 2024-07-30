@@ -1,10 +1,14 @@
-# particle-demo
+# NUMBERS
 
 ## Credits
 - Group: ???
+- - Revolution R&D
+- - Revolutionary
+- - Three Critters in a Trench Coat
+- - Three of Them
 - Code & Design: Muffinhop
 - Code: Muffintrap
-- Music: ???
+- Music: RaccoonViolet
 - Graphics: Free to use assets (see credits.txt)
 
 ## Development
@@ -32,10 +36,17 @@
 ### Compiling the demo and getting the .dll files
 1. Navigate to the github repository.
 2. Run command <code>make -f Makefile_computer</code>
-3. Create a new folder __outside__ the repository and name it something like win_build.
-4. Copy the **tools/copy_dll_files.cmd** to win_build
-5. Edit the CMD file to have the repository path
-6. Run the CMD file to copy all the dlls.
+
+####  Get or link to DLL files
+**Link to files**
+- Add the folder <code>C:\msys64\ucrt64\bin</code> to PATH on windows. That way windows will look there for the dll files.
+
+**Get the files**
+1. Create a new folder __outside__ the repository and name it something like win_build.
+2. Copy the **tools/copy_dll_files.cmd** to win_build
+3. Edit the CMD file to have the repository path
+4. Run the CMD file to copy all the dlls.
+5. Also copy the asset files from the **data/** folder to **win_buid/data/** so that the demo finds them
 
 #### These are the dll files that the demo needs to run.
 - libgcc_s_seh-1.dll
@@ -53,6 +64,7 @@
 - libvorbis-0.dll
 - libopus-0.dll
 - libvorbisenc-2.dll
+
 
 ## Libraries needed for Wii
 - mtek-gdl  (see Frameworks above)

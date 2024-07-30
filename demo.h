@@ -16,6 +16,7 @@ public:
 	void Draw();
 	void Quit();
 	void UpdateController(WiiController& controllerState);
+	bool QuitRequested();
 
 	int screenWidth;
 	int screenHeight;

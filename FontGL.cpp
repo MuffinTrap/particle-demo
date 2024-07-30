@@ -10,7 +10,7 @@
 void FontGL::LoadFromImage(const char* filename, short charw, short charh, char firstCharacter )
 {
 	ImageGL fontImage;
-	bool imageOk = fontImage.LoadImage(filename, GL_NEAREST);
+	bool imageOk = fontImage.LoadImage(filename, GL_LINEAR);
 	gdl_assert_printf(imageOk, "Did not load font image file: %s", filename);
 	textureName = fontImage.textureName; // Store this for rendering the letters
 	if (imageOk)

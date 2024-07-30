@@ -137,6 +137,11 @@ void Demo::Draw()
     host.Draw();
 }
 
+bool Demo::QuitRequested()
+{
+    return host.activeEffect == fxQUIT_DEMO;
+}
+
 // Release memory
 void Demo::Quit()
 {
