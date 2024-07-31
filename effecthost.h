@@ -32,7 +32,7 @@ public:
 	void Save();
 	void Free();
 
-	void ParticleUpdate();
+	void ParticleUpdate(float delta);
 
 	EffectName activeEffect;
 	TitleFX title;

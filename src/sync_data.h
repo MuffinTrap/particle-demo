@@ -9,6 +9,7 @@ extern const sync_track scene_rotZ;
 extern const sync_track scene_X;
 extern const sync_track scene_Y;
 extern const sync_track scene_Z;
+extern const sync_track fade_A;
 extern const sync_track OrbitX;
 extern const sync_track OrbitY;
 extern const sync_track OrbitZ;
@@ -35,6 +36,11 @@ extern const sync_track radar_spread;
 extern const sync_track radar_rarity;
 extern const sync_track tuner_pos;
 extern const sync_track tuner_names;
+extern const sync_track tuner_row;
+extern const sync_track tuner_page;
+extern const sync_track plotter_impact;
+extern const sync_track plotter_decay;
+extern const sync_track plotter_updateHz;
 extern const sync_track credits_names;
 #endif
  // SYNC_PLAYER

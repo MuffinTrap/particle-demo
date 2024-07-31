@@ -65,8 +65,8 @@ void Demo::Init(int scrW, int scrH, bool useRocket)
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-    //glEnable(GL_DEPTH_TEST);
-    //glDepthFunc(GL_LESS);
+    // glEnable(GL_DEPTH_TEST);
+    // glDepthFunc(GL_LESS);
 
     PaletteClearColor3f(BLACK);
     glShadeModel(GL_SMOOTH);

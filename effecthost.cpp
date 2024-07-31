@@ -62,7 +62,7 @@ void EffectHost::Init(sync_device* rocket)
 	title.Init(rocket);
     radar.Init(1024, rocket);
 	tuner.Init((float)Platform::GetScreenWidth()/(float)Platform::GetScreenHeight(), rocket);
-	plotter.Init(32);
+	plotter.Init(64, rocket);
 	credits.Init(rocket);
 
 
@@ -160,13 +160,17 @@ void EffectHost::Update ()
 	switch(activeEffect)
 	{
 		case fxParticles:
-			ParticleUpdate();
+			ParticleUpdate(Platform::GetDeltaTime());
 			break;
 		case fxRadar:
 			radar.Update();
 		break;
 		case fxTuner:
 			tuner.Update();
+		break;
+		case fxPlotter:
+			ParticleUpdate(Platform::GetDeltaTime() * 0.05f);
+			plotter.Update();
 		break;
 		default:
 			// Other effects don't need an update
@@ -175,7 +179,7 @@ void EffectHost::Update ()
 }
 
 // Separate so that other effects can also update particles when they want to
-void EffectHost::ParticleUpdate()
+void EffectHost::ParticleUpdate(float delta)
 {
 	float R = get_row();
 	uniform_OrbitX = sync_get_val(OrbitX, R);
@@ -198,7 +202,7 @@ void EffectHost::ParticleUpdate()
 	uniform_ParticleCount = sync_get_val(ParticleCount, R);
 	uniform_SdfType = sync_get_val(SdfType, R);
 
-	updateParticles(Platform::GetDeltaTime());
+	updateParticles(delta);
 }
 
 
