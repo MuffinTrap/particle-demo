@@ -38,6 +38,10 @@ INCLUDES	:=	include
 CFLAGS	= -O3 -Wall -Wextra -DPLATFORM_WII $(MACHDEP) $(INCLUDE) -DSYNC_PLAYER
 CXXFLAGS	= -Wwrite-strings $(CFLAGS) -std=c++11
 
+#########################################################################
+# Show cpu time profile
+# CXXFLAGS += -DPROFILING
+
 LDFLAGS	=	$(MACHDEP) -Wl,-Map,$(notdir $@).map
 
 #---------------------------------------------------------------------------------

@@ -5,9 +5,6 @@
 #include "crossUtil.h"
 #include "palette.h"
 
-
-#include "src/particles.h"
-
 #include <math.h>
 #include <stdio.h>
 
@@ -16,7 +13,7 @@
 #ifndef SYNC_PLAYER
     const struct sync_track *plotter_impact;  // How much impact a particle has
     const struct sync_track *plotter_decay;  // how fast the heat decays
-    const struct sync_track *plotter_update;  // how many frames to skip between updates
+    const struct sync_track *plotter_updateHz;  // how many frames to skip between updates
 #else
 	#include "src/sync_data.cpp"
 	#include "src/sync_data.h"
@@ -38,7 +35,7 @@ void PlotterFX::Init ( int lineAmount, sync_device* rocket )
 #ifndef SYNC_PLAYER
 	plotter_impact = sync_get_track(rocket, "plotter_impact");
 	plotter_decay = sync_get_track(rocket, "plotter_decay");
-	plotter_update = sync_get_track(rocket, "plotter_updateHz");
+	plotter_updateHz = sync_get_track(rocket, "plotter_updateHz");
 #endif
 
 	frameCounter= 0;
@@ -58,7 +55,7 @@ void PlotterFX::Save()
 #ifndef SYNC_PLAYER
 	save_sync(plotter_impact, SYNC_FILE_H, SYNC_FILE_CPP);
 	save_sync(plotter_decay, SYNC_FILE_H, SYNC_FILE_CPP);
-	save_sync(plotter_update, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(plotter_updateHz, SYNC_FILE_H, SYNC_FILE_CPP);
 #endif
 }
 
@@ -68,14 +65,14 @@ void PlotterFX::SetPhase ( float phase )
 	plasmaPhase = phase;
 }
 
-void PlotterFX::Update()
+void PlotterFX::Update(Particle* particlesArray, u32 amount)
 {
-	u32 interval = maxU32(1, (u32)sync_get_val(plotter_update, get_row()));
+	u32 interval = maxU32(1, (u32)sync_get_val(plotter_updateHz, get_row()));
 	frameCounter++;
 	if (frameCounter % interval == 0)
 	{
 		frameCounter = 0;
-		ReadParticles();
+		ReadParticles(particlesArray, amount);
 	}
 }
 
@@ -274,7 +271,7 @@ void PlotterFX::GeneratePoints ( int w, int d)
 	}
 }
 
-void PlotterFX::ReadParticles()
+void PlotterFX::ReadParticles(Particle* particles, u32 particle_amount)
 {
 
 	const float decay = sync_get_val(plotter_decay, get_row());
@@ -288,7 +285,7 @@ void PlotterFX::ReadParticles()
 		points[i].w = 1.0f;
 	}
 
-	for (u32 i = 0; i < NUM_PARTICLES; i ++)
+	for (u32 i = 0; i < particle_amount; i ++)
 	{
 		// map to [0, AREA_SZ]
 		float x = (particles[i].position.x) + 2.0f;

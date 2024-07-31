@@ -246,7 +246,7 @@ static TextureGL* ReadPNG(FILE* fp)
 	return textureInfoPtr;
 }
 
-static TextureGL* ReadPNGBuffer(void* buffer, size_t size)
+static TextureGL* ReadPNGBuffer(const void* buffer, size_t size)
 {
 // fmemopen cannot read from const buffer :U
 	// Copy data to temporary buffer before reading
@@ -260,19 +260,18 @@ static TextureGL* ReadPNGBuffer(void* buffer, size_t size)
 	CacheFlushRange(tempBuffer, size);
 
 	// Open file
-	FILE *fp;
-	if (!(fp = fmemopen(tempBuffer, size, "rb"))) {
+	FILE *fp= fmemopen(tempBuffer, size, "rb");
+
+	if (fp == nullptr)
+	{
 		printf("Image buffer failed to open\n");
-		fclose(fp);
 		free(tempBuffer);
 		return nullptr;
 	}
-	else
-	{
-		TextureGL* textureInfoPtr = ReadPNG(fp);
-		fclose(fp);
-		return textureInfoPtr;
-	}
+	TextureGL* textureInfoPtr = ReadPNG(fp);
+	free(tempBuffer);
+	fclose(fp);
+	return textureInfoPtr;
 }
 
 static TextureGL* ReadPNGFile(const char* filename)
@@ -281,17 +280,25 @@ static TextureGL* ReadPNGFile(const char* filename)
 	if (fp == nullptr)
 	{
 		printf("[NOT FOUND!]\n");
-		fclose(fp);
 		return nullptr;
 	}
-	else
-	{
-		TextureGL* textureInfoPtr = ReadPNG(fp);
-		fclose(fp);
-		return textureInfoPtr;
-	}
-}
 
+	TextureGL* textureInfoPtr = ReadPNG(fp);
+	fclose(fp);
+	return textureInfoPtr;
+}
+bool ImageGL::LoadImageBuffer (const void* buffer, size_t size, GLuint filterMode )
+{
+	// Load using png
+	printf("gdl:: Loading image buffer\n");
+
+	TextureGL* textureDataPtr = ReadPNGBuffer(buffer, size);
+	if (textureDataPtr == nullptr || textureDataPtr->texels == nullptr)
+	{
+		return false;
+	}
+	return Load(textureDataPtr, filterMode);
+}
 
 bool ImageGL::LoadImage ( const char* filename, GLuint filterMode)
 {
@@ -303,6 +310,11 @@ bool ImageGL::LoadImage ( const char* filename, GLuint filterMode)
 	{
 		return false;
 	}
+	return Load(textureDataPtr, filterMode);
+}
+
+bool ImageGL::Load(TextureGL* textureDataPtr, GLuint filterMode)
+{
 	width = textureDataPtr->width;
 	height = textureDataPtr->height;
 
@@ -333,3 +345,48 @@ bool ImageGL::LoadImage ( const char* filename, GLuint filterMode)
 	free(textureDataPtr);
 	return true;
 }
+
+void ImageGL::Draw2D ( float cx, float cy, float scale, bool alphaEnabled)
+{
+	float z = 0.0f;
+	if (alphaEnabled)
+	{
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0.3f);
+	}
+	glPushMatrix();
+	glTranslatef(cx, cy, 0.0f);
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textureName);
+	glBegin(GL_QUADS);
+		glColor3f(1.0f, 1.0f, 1.0f);
+
+		// Upper left
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(0.0f, 0.0f, z);
+
+		// Upper right
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex3f((float)width*scale, 0.0f, z);
+
+		// Lower right
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f((float)width*scale, (float)height*scale, z);
+
+		// Lower left
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex3f(0.0f, (float)height*scale, z);
+
+	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
+
+	if (alphaEnabled)
+	{
+		glDisable(GL_ALPHA_TEST);
+	}
+}
+

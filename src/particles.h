@@ -1,4 +1,6 @@
 #pragma once
+#ifndef PARTICLES_H
+#define PARTICLES_H
 
 #include <stdbool.h>
 #include <stdlib.h>
@@ -8,6 +10,7 @@
 #include "../crossOpenGL.h"
 #include "myrandom.h"
 #include "vector3.h"
+#include "particle_struct.h"
 
 
 extern GLuint textures[4];
@@ -113,16 +116,10 @@ float uniform_SdfType;
 #define FRICTION 0.98f  // Friction coefficient
 #define MAX_LIFETIME 100.0f // Maximum lifetime of a particle
 
-typedef struct {
-    Vector3 position;
-    Vector3 velocity;
-    float r,g,b,a;
-    float lifetime; // Lifetime of the particle
-    float age; // Current age of the particle
-    bool active; // If the particle is active
-} Particle;
 
-Particle particles[NUM_PARTICLES];
+// NOTE Wii crashes on NULL read if this
+// is statically reserved!
+Particle* particles = nullptr;//[NUM_PARTICLES];
 
 // Function to initialize a single particle
 void initParticle(Particle *p) {
@@ -137,8 +134,17 @@ void initParticle(Particle *p) {
 
 // Function to initialize all particles
 void initParticles() {
+    particles = (Particle*)malloc(sizeof(Particle) * NUM_PARTICLES);
     for (int i = 0; i < NUM_PARTICLES; i++) {
         initParticle(&particles[i]);
+    }
+}
+
+void freeParticles() {
+    if (particles != nullptr)
+    {
+        free(particles);
+        particles = nullptr;
     }
 }
 
@@ -328,3 +334,5 @@ void displayParticles() {
 }
 
 } // End extern "C"
+
+#endif // PARTICLES_H ifdef

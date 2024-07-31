@@ -94,6 +94,7 @@ void Platform::Init ( int argc, char ** argv, ScreenAspect aspectRatio, bool use
 
 
     /* Startup debug loop */
+
     /*
     while(true)
     {
@@ -159,6 +160,11 @@ void Platform::RunMainLoop()
 float Platform::GetDeltaTime()
 {
     return deltaTimeS;
+}
+
+float Platform::GetCpuWork()
+{
+    return gdl::Delta;
 }
 float Platform::GetElapsedSeconds()
 {
@@ -362,6 +368,12 @@ float Platform::GetElapsedSeconds()
 {
     return (float)getTime();
 }
+
+float Platform::GetCpuWork()
+{
+    return 1.0f; // Unknown
+}
+
 
 #endif // WIN - MAC - LINUX
 

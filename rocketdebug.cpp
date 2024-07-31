@@ -10,15 +10,18 @@
 #include "src/direction.hpp"
 
 static float* frameTimes;
+static float* cpuTimes;
 static size_t index;
 static const size_t size = 1024;
 
 void RocketDebug::Init()
 {
 	frameTimes = (float*)malloc(size * sizeof(float));
+	cpuTimes = (float*)malloc(size * sizeof(float));
 	for(size_t i = 0; i < size; i ++)
 	{
 		frameTimes[i] = 0.0f;
+		cpuTimes[i] = 0.0f;
 	}
 	index = 0;
 }
@@ -26,6 +29,7 @@ void RocketDebug::Init()
 void RocketDebug::Free()
 {
 	free(frameTimes);
+	free(cpuTimes);
 }
 
 
@@ -48,41 +52,40 @@ void RocketDebug::Draw ( FontGL* font )
 	*/
 
 	frameTimes[index] = Platform::GetDeltaTime() / 0.016f;
+	cpuTimes[index] = Platform::GetCpuWork();
 	index = (index + 1 ) % size;
 
 	float width = 620.0f;
 	float height = 64.0f;
 	float hh = height/2.0f;
 
-	float top = 480.0f - height - 2;
+	float bottom = height - 2;
 	float left =(640.0f - width) / 2.0f;
 
 
 	/* Performance metrics */
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
-    glOrtho(0, 640.0f, 480.0f, 0.0f, 1.0f, -1.0f);
+    glOrtho(0, 640.0f, 0.0f, 480.0f, 1.0f, -1.0f);
 
     // Set the modelview matrix
     glMatrixMode(GL_MODELVIEW);
     glLoadIdentity();
 
-	/*
 	glPushMatrix();
-	glTranslatef(0.0f, 0.0f, 0.0f);
-	font->Printf(GREY, 3.0f, LJustify, LJustify, "Time: %.2f", getTime());
+		glTranslatef(left, font->GetCharacterHeight(), 0.0f);
+		font->Printf(ORANGE, font->GetCharacterWidth()/2.0f, LJustify, LJustify, "TIME: %.2f", getTime());
 	glPopMatrix();
-	*/
 
 	// Box
 	glBegin(GL_LINE_STRIP);
 	PaletteColor3f(GREY);
-		glVertex2f(left, top);
-		glVertex2f(left + width, top);
-		glVertex2f(left + width, top + height);
-		glVertex2f(left, top + height);
-		glVertex2f(left, top + hh);
-		glVertex2f(left + width, top + hh);
+		glVertex2f(left, bottom);
+		glVertex2f(left + width, bottom);
+		glVertex2f(left + width, bottom + height);
+		glVertex2f(left, bottom + height);
+		glVertex2f(left, bottom + hh);
+		glVertex2f(left + width, bottom + hh);
 	glEnd();
 
 	// Metrix
@@ -92,12 +95,28 @@ void RocketDebug::Draw ( FontGL* font )
 	float dx = left + 1.0f;
 	for (size_t i = index; i < size; i++)
 	{
-		glVertex2f(dx, top + height - frameTimes[i] * hh);
+		glVertex2f(dx, bottom - height + frameTimes[i] * hh);
 		dx += step;
 	}
 	for (size_t i = 0; i < index; i++)
 	{
-		glVertex2f(dx, top + height - frameTimes[i] * hh);
+		glVertex2f(dx, bottom - height + frameTimes[i] * hh);
+		dx += step;
+	}
+	glEnd();
+
+	glBegin(GL_LINE_STRIP);
+	PaletteColor3f(WHITE);
+	step = width/(float)size;
+	dx = left + 1.0f;
+	for (size_t i = index; i < size; i++)
+	{
+		glVertex2f(dx, bottom - height + cpuTimes[i] * hh);
+		dx += step;
+	}
+	for (size_t i = 0; i < index; i++)
+	{
+		glVertex2f(dx, bottom - hh + cpuTimes[i] * hh);
 		dx += step;
 	}
 	glEnd();

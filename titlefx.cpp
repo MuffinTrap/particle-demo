@@ -44,6 +44,7 @@ void TitleFX::Draw ( FontGL* font )
 		font->Printf(WHITE, 0.15f, Centered, Centered, "NUMBERS");
 	glPopMatrix();
 
+
 	float size = 0.10f;
 	float sp = 0.03f;
 	float top = 1.0f;

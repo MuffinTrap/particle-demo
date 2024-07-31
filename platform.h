@@ -19,6 +19,7 @@ public:
 	void RunMainLoop();
 
 	static float GetDeltaTime();
+	static float GetCpuWork();
 	static float GetElapsedSeconds();
 	static int GetScreenWidth();
 	static int GetScreenHeight();

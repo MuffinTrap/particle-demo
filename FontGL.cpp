@@ -7,21 +7,30 @@
 #include "crossAssert.h"
 #include "crossAlloc.h"
 
+void FontGL::LoadFromBuffer (const void* buffer, size_t size, short charw, short charh, char firstCharacter )
+{
+	bool imageOk = fontImage.LoadImageBuffer(buffer, size, GL_LINEAR);
+	gdl_assert_print(imageOk, "Did not load font image buffer");
+	textureName = fontImage.textureName; // Store this for rendering the letters
+	if (imageOk)
+	{
+		Bind(charw, charh, firstCharacter);
+	}
+}
+
 void FontGL::LoadFromImage(const char* filename, short charw, short charh, char firstCharacter )
 {
-	ImageGL fontImage;
 	bool imageOk = fontImage.LoadImage(filename, GL_LINEAR);
 	gdl_assert_printf(imageOk, "Did not load font image file: %s", filename);
 	textureName = fontImage.textureName; // Store this for rendering the letters
 	if (imageOk)
 	{
-		Bind(fontImage, charw, charh, firstCharacter);
+		Bind(charw, charh, firstCharacter);
 	}
-
 }
-void FontGL::Bind ( ImageGL &fontImage, short charw, short charh, char firstCharacter )
-{
 
+void FontGL::Bind (short charw, short charh, char firstCharacter )
+{
 	printf("Binding font\n");
 	short charactersPerRow = fontImage.width/ charw;
 	short rows = fontImage.height / charh;
@@ -29,8 +38,12 @@ void FontGL::Bind ( ImageGL &fontImage, short charw, short charh, char firstChar
 	this->firstIndex = firstCharacter;
 	this->cw = charw;
 	this->ch = charh;
+	aspect = (float)cw/(float)ch;
 	CreateTextureCoordList(rows, charactersPerRow, fontImage.width, fontImage.height);
 	printf("Bind done\n");
+
+	spacingX = 0.0f;
+	spacingY = 0.0f;
 }
 
 void FontGL::Printf(ColorName color, float scale, FontAlignment alignmentX, FontAlignment alignmentY, const char* format, ... )
@@ -43,7 +56,6 @@ void FontGL::Printf(ColorName color, float scale, FontAlignment alignmentX, Font
 	vsprintf(buff, format, args);
 	va_end(args);
 
-	float aspect = (float)cw/(float)ch;
 	float step = aspect * scale;
 
 	float dx = 0.0f;
@@ -130,16 +142,15 @@ void FontGL::SetSpacingOnce ( float x, float y )
 void FontGL::DrawSheet ()
 {
 
-	float aspect = 128.0f/96.0f;
+	float aspect = (float)cw/(float)ch;
 	float x = 0.0f;
 	float y = 0.0f;
 	float z = 0.0f;
 
+	glEnable(GL_TEXTURE_2D);
 	glBindTexture(GL_TEXTURE_2D, textureName);
 	glBegin(GL_QUADS);
 		glColor3f(1.0f, 1.0f, 1.0f);
-		glNormal3f(0.0f, 0.0f, 1.0f);
-
 
 		// Upper left
 		glTexCoord2f(0.0f, 0.0f);
@@ -152,7 +163,6 @@ void FontGL::DrawSheet ()
 		// Lower right
 		glTexCoord2f(1.0f, 1.0f);
 		glVertex3f(x+aspect*0.5f, y-0.5f, z);
-		glEnd();
 
 		// Lower left
 		glTexCoord2f(0.0f, 1.0f);
@@ -160,6 +170,25 @@ void FontGL::DrawSheet ()
 
 	glEnd();
 	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_TEXTURE_2D);
+
+
+	glBegin(GL_LINE_LOOP);
+		glColor3f(1.0f, 1.0f, 1.0f);
+
+		// Upper left
+		glVertex3f(x-aspect*0.5f, y+0.5f, z);
+
+		// Upper right
+		glVertex3f(x+aspect*0.5f, y+0.5f, z);
+
+		// Lower right
+		glVertex3f(x+aspect*0.5f, y-0.5f, z);
+
+		// Lower left
+		glVertex3f(x-aspect*0.5f, y-0.5f, z);
+
+	glEnd();
 }
 
 void FontGL::CreateTextureCoordList(short rows, short charactersPerRow, short texW, short texH)
@@ -213,3 +242,8 @@ glm::vec2 FontGL::GetTextureCoordinate(char character, char subIndex)
 	int	tc = 4*(character - firstIndex);
 	return tList[tc + subIndex];
 }
+
+
+
+short FontGL::GetCharacterWidth() { return cw;}
+short FontGL::GetCharacterHeight() {return ch;}

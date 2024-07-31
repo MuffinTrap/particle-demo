@@ -5,12 +5,14 @@
 #include "rocket/sync.h"
 #include "crossTypedefs.h"
 
+#include "src/particle_struct.h"
+
 class PlotterFX
 {
 public:
 	void Init(int lineAmount, sync_device* rocket);
 	void SetPhase(float phase);
-	void Update();
+	void Update(Particle* particlesArray, u32 amount);
 	void Draw();
 	void DrawBox();
 	void DrawLines(ColorName colo, int skip);
@@ -19,7 +21,7 @@ public:
 	void Free();
 
 	void ApplyPlasma();
-	void ReadParticles();
+	void ReadParticles(Particle* particlesArray, u32 amount);
 
 private:
 	void GeneratePoints ( int w, int d );

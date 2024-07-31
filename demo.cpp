@@ -91,7 +91,6 @@ void Demo::Init(int scrW, int scrH, bool useRocket)
 		ConnectRocket();
 	}
 
-	camera.Init(screenWidth, screenHeight);
 	host.Init(rocket);
 }
 

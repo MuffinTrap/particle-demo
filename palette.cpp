@@ -24,6 +24,8 @@ const Col& GetColor(ColorName name)
 			break;
 		case ORANGE: return Orange;
 			break;
+		default: return White;
+		break;
 	};
 }
 

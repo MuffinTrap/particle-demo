@@ -1,8 +1,8 @@
 // sync data implementation
 #ifdef SYNC_PLAYER
 #include "../rocket/track.h"
-static track_key effect_active_keys[] = {{ 0, 4.000000, KEY_STEP}, };
-const sync_track effect_active = { "effect_active", effect_active_keys,1};
+static track_key effect_active_keys[] = {{ 0, 4.000000, KEY_STEP}, { 24, 0.000000, KEY_STEP}, { 40, 1.000000, KEY_STEP}, { 56, 2.000000, KEY_STEP}, { 72, 3.000000, KEY_STEP}, { 88, 5.000000, KEY_STEP}, };
+const sync_track effect_active = { "effect_active", effect_active_keys,6};
 static track_key scene_rotX_keys[] = {{ 0, 0.000000, KEY_STEP}, { 720, 90.000000, KEY_STEP}, };
 const sync_track scene_rotX = { "scene_rotX", scene_rotX_keys,2};
 static track_key scene_rotY_keys[] = {{ 0, 0.000000, KEY_STEP}, };
@@ -69,17 +69,17 @@ static track_key tuner_pos_keys[] = {{ 0, 0.000000, KEY_STEP}, };
 const sync_track tuner_pos = { "tuner_pos", tuner_pos_keys,1};
 static track_key tuner_names_keys[] = {{ 0, 0.000000, KEY_STEP}, };
 const sync_track tuner_names = { "tuner_names", tuner_names_keys,1};
-static track_key tuner_row_keys[] = {};
-const sync_track tuner_row = { "tuner_row", tuner_row_keys,0};
-static track_key tuner_page_keys[] = {};
-const sync_track tuner_page = { "tuner_page", tuner_page_keys,0};
-static track_key plotter_impact_keys[] = {{ 0, 0.050000, KEY_STEP}, };
+static track_key tuner_row_keys[] = {{ 0, 0.000000, KEY_STEP}, };
+const sync_track tuner_row = { "tuner_row", tuner_row_keys,1};
+static track_key tuner_page_keys[] = {{ 0, 0.000000, KEY_STEP}, };
+const sync_track tuner_page = { "tuner_page", tuner_page_keys,1};
+static track_key plotter_impact_keys[] = {{ 0, 0.015000, KEY_STEP}, };
 const sync_track plotter_impact = { "plotter_impact", plotter_impact_keys,1};
-static track_key plotter_decay_keys[] = {{ 0, 0.150000, KEY_STEP}, };
+static track_key plotter_decay_keys[] = {{ 0, 0.400000, KEY_STEP}, };
 const sync_track plotter_decay = { "plotter_decay", plotter_decay_keys,1};
 static track_key plotter_updateHz_keys[] = {{ 0, 4.000000, KEY_STEP}, };
 const sync_track plotter_updateHz = { "plotter_updateHz", plotter_updateHz_keys,1};
-static track_key credits_names_keys[] = {{ 0, 0.000000, KEY_STEP}, };
-const sync_track credits_names = { "credits_names", credits_names_keys,1};
+static track_key credits_names_keys[] = {{ 0, 0.000000, KEY_STEP}, { 88, 1.000000, KEY_STEP}, };
+const sync_track credits_names = { "credits_names", credits_names_keys,2};
 #endif
  // SYNC_PLAYER

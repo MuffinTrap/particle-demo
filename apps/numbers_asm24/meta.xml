@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<app version="1">
+  <name>Numbers</name>
+  <coder>muffintrap,RaccoonViolet,MuffinHop</coder>
+  <version>1.0</version>
+  <release_date>20240801</release_date>
+  <short_description>Numbers demo for ASM 24</short_description>
+  <long_description>Demo made for Assembly 2024 demoparty Real Wild competition.
+   </long_description>
+</app>

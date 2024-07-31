@@ -28,6 +28,5 @@ public:
 	float angle;
 
 	EffectHost host;
-	DebugCamera camera;
 	WiiController controller;
 };

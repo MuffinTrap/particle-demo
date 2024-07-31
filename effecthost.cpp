@@ -4,11 +4,8 @@
 #include <cmath>
 
 #include "platform.h"
-
 #include "rocket/track.h"
-
 #include "src/direction.hpp"
-#include "src/particles.h"
 #ifndef SYNC_PLAYER
     const struct sync_track *effect_active;  // Which effect is active.
     const struct sync_track *scene_rotX;  // Rotation around X for all scenes
@@ -50,6 +47,10 @@
 	#include "src/sync_data.h"
 #endif
 
+
+// Pass the particles to the plotter
+#include "src/particles.h"
+
 EffectHost::EffectHost()
 {
 
@@ -57,7 +58,8 @@ EffectHost::EffectHost()
 
 void EffectHost::Init(sync_device* rocket)
 {
-	font.LoadFromImage("data/andvari62x62CAPS.png", 62, 62, ' ');
+	// Needs to be power of 2 image
+	font.LoadFromImage("apps/numbers_asm24/andvari32x32CAPS.png", 32, 32, ' ');
 
 	title.Init(rocket);
     radar.Init(1024, rocket);
@@ -151,6 +153,7 @@ void EffectHost::Free()
 	radar.Free();
 	plotter.Free();
 	rocketDebug.Free();
+	freeParticles();
 }
 
 void EffectHost::Update ()
@@ -170,7 +173,7 @@ void EffectHost::Update ()
 		break;
 		case fxPlotter:
 			ParticleUpdate(Platform::GetDeltaTime() * 0.05f);
-			plotter.Update();
+			plotter.Update(particles, NUM_PARTICLES);
 		break;
 		default:
 			// Other effects don't need an update
@@ -204,7 +207,6 @@ void EffectHost::ParticleUpdate(float delta)
 
 	updateParticles(delta);
 }
-
 
 void EffectHost::Draw()
 {
@@ -272,7 +274,6 @@ void EffectHost::Draw()
 			glVertex3f(0.0f, H, 0.9999f);
 		glEnd();
 		glDisable(GL_BLEND);
-
 	}
 
 #ifdef PROFILING
