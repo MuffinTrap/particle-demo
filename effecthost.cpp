@@ -240,6 +240,9 @@ void EffectHost::Draw()
 		case fxCredits:
 			credits.Draw(&font);
 		break;
+		case fxDataCenter:
+			dataCenter.Draw(&font);
+			break;
 		case fxRocketDebug:
 			rocketDebug.Draw(&font);
 		break;

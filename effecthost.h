@@ -5,6 +5,7 @@
 #include "plotterfx.h"
 #include "creditsfx.h"
 #include "titlefx.h"
+#include "datacenterfx.h"
 #include "rocketdebug.h"
 #include "rocket/sync.h"
 
@@ -16,7 +17,8 @@ enum EffectName
 	fxPlotter = 3,
 	fxParticles = 4,
 	fxCredits = 5,
-	fxRocketDebug = 6,
+	fxDataCenter = 6,
+	fxRocketDebug = 7,
 
 	//////////////////////////
 	fxQUIT_DEMO = 999
@@ -40,6 +42,7 @@ public:
 	TunerFx tuner;
 	PlotterFX plotter;
 	CreditsFX credits;
+	DataCenterFX dataCenter;
 	RocketDebug rocketDebug;
 
 	FontGL font;
