@@ -77,6 +77,7 @@ void TunerFx::Init(float aspectRatio, sync_device* rocket)
 	names.push_back(CreateName(page, "BASSCADET"));
 	names.push_back(CreateName(page, "GARGAJ"));
 	names.push_back(CreateName(page, "BUS ERROR"));
+	names.push_back(CreateName(page, "POROCYON"));
 	names.push_back(CreateName(page, "LAMEGUY64"));
 
 	page += 1;
