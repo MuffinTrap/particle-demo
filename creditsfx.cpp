@@ -23,8 +23,6 @@ void CreditsFX::Init ( sync_device* rocket )
 	names.push_back("MUFFINHOP         DESIGN");
 	names.push_back("RACCOONVIOLET      MUSIC");
 	names.push_back("MUFFINTRAP          CODE");
-	names.push_back("SPECIAL MENTIONS:");
-	names.push_back("RYOJI IKEDA  INSPIRATION");
 
 #ifndef SYNC_PLAYER
 	credits_names = sync_get_track(rocket, "credits_names");

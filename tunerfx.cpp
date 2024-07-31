@@ -47,15 +47,42 @@ void TunerFx::Init(float aspectRatio, sync_device* rocket)
 
 	visibleNames = 0.0f;
 	short page = 0;
-	names.push_back(CreateName(page, "THIS"));
-	names.push_back(CreateName(page, "WAS"));
-	names.push_back(CreateName(page, "A TRIUMPH"));
+	names.push_back(CreateName(page, "FURRY"));
+	names.push_back(CreateName(page, "TRASH"));
+	names.push_back(CreateName(page, "GROUP"));
+
+	names.push_back(CreateName(page, "JML"));
+	names.push_back(CreateName(page, "TUHB"));
+	names.push_back(CreateName(page, "RIFT"));
+
 	page += 1;
-	names.push_back(CreateName(page, "I'M MAKING"));
-	names.push_back(CreateName(page, "A NOTE"));
-	names.push_back(CreateName(page, "HERE"));
-	names.push_back(CreateName(page, "GREAT"));
-	names.push_back(CreateName(page, "SUCCESS"));
+	names.push_back(CreateName(page, "TPOLM"));
+	names.push_back(CreateName(page, "SLIPSTREAM"));
+	names.push_back(CreateName(page, "SVATG"));
+
+	names.push_back(CreateName(page, "TRUCK"));
+	names.push_back(CreateName(page, "EPOCH"));
+	names.push_back(CreateName(page, "QUADTRIP"));
+
+	page += 1;
+	names.push_back(CreateName(page, "PEISIK"));
+	names.push_back(CreateName(page, "FARMIYAH"));
+	names.push_back(CreateName(page, "IVORY"));
+
+	names.push_back(CreateName(page, "MFX"));
+	names.push_back(CreateName(page, "KEWLERS"));
+	names.push_back(CreateName(page, "MERCURY"));
+
+	page += 1;
+	names.push_back(CreateName(page, "BASSCADET"));
+	names.push_back(CreateName(page, "GARGAJ"));
+	names.push_back(CreateName(page, "BUS ERROR"));
+	names.push_back(CreateName(page, "LAMEGUY64"));
+
+	page += 1;
+	names.push_back(CreateName(page, "RYOJI IKEDA"));
+	names.push_back(CreateName(page, "DEVKITPRO"));
+	names.push_back(CreateName(page, "NINTENDO R&D"));
 }
 
 void TunerFx::Save()
