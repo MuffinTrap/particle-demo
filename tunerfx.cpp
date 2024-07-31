@@ -57,9 +57,9 @@ void TunerFx::Init(float aspectRatio, sync_device* rocket)
 
 	page += 1;
 	names.push_back(CreateName(page, "TPOLM"));
+	names.push_back(CreateName(page, "RBBS"));
 	names.push_back(CreateName(page, "SLIPSTREAM"));
 	names.push_back(CreateName(page, "SVATG"));
-
 	names.push_back(CreateName(page, "TRUCK"));
 	names.push_back(CreateName(page, "EPOCH"));
 	names.push_back(CreateName(page, "QUADTRIP"));
