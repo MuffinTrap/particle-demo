@@ -248,13 +248,12 @@ void EffectHost::Draw()
 		case fxDataCenter:
 			dataCenter.Draw(&font);
 			break;
-		case fxRocketDebug:
-			rocketDebug.Draw(&font);
-		break;
-
 		case fxQUIT_DEMO:
 			// NOP
 		break;
+		default:
+			// ROCKETDEBUG see below
+			break;
 	};
 
 	glPopMatrix();
@@ -285,7 +284,11 @@ void EffectHost::Draw()
 	}
 
 #ifdef PROFILING
-	rocketDebug.Draw(&font);
+	rocketDebug.DrawFramerate(&font);
+#endif
+
+#ifdef THIRDS
+	rocketDebug.DrawThirds();
 #endif
 }
 

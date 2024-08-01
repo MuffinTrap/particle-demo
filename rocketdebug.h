@@ -6,6 +6,7 @@ class RocketDebug
 {
 	public:
 	void Init();
-	void Draw(FontGL* font);
+	void DrawFramerate(FontGL* font);
+	void DrawThirds();
 	void Free();
 };

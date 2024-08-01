@@ -346,6 +346,52 @@ bool ImageGL::Load(TextureGL* textureDataPtr, GLuint filterMode)
 	return true;
 }
 
+void ImageGL::Draw3DCentered(float scale, bool alphaCut)
+{
+	float z = 0.0f;
+	if (alphaCut)
+	{
+		glEnable(GL_ALPHA_TEST);
+		glAlphaFunc(GL_GREATER, 0.3f);
+	}
+
+	float aspect = (float)width/(float)height;
+	glPushMatrix();
+
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textureName);
+	glBegin(GL_QUADS);
+		glColor3f(1.0f, 1.0f, 1.0f);
+
+		// Upper left
+		glTexCoord2f(0.0f, 0.0f);
+		glVertex3f(-scale*aspect/2.0f, scale/2.0f, z);
+
+		// Upper right
+		glTexCoord2f(1.0f, 0.0f);
+		glVertex3f(scale*aspect/2.0f, scale/2.0f, z);
+
+		// Lower right
+		glTexCoord2f(1.0f, 1.0f);
+		glVertex3f(scale*aspect/2.0f, -scale/2.0f, z);
+
+		// Lower left
+		glTexCoord2f(0.0f, 1.0f);
+		glVertex3f(-scale*aspect/2.0f, -scale/2.0f, z);
+
+	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_TEXTURE_2D);
+
+	glPopMatrix();
+
+	if (alphaCut)
+	{
+		glDisable(GL_ALPHA_TEST);
+	}
+}
+
 void ImageGL::Draw2D ( float cx, float cy, float scale, bool alphaEnabled)
 {
 	float z = 0.0f;

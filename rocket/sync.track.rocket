@@ -4,7 +4,8 @@
 beatsPerMin="125">
 	<track name="title_rotY" folded="0" muteKeyCount="0"
 color="ffb27474">
-		<key row="0" value="0.000000" interpolation="0" />
+		<key row="0" value="-0.100000" interpolation="0" />
+		<key row="1" value="2.000000" interpolation="0" />
 	</track>
 	<track name="radar_dots" folded="0" muteKeyCount="0"
 color="ffb28050">
@@ -37,6 +38,7 @@ color="ffb25091">
 	<track name="effect_active" folded="0" muteKeyCount="0"
 color="ffb27474">
 		<key row="0" value="4.000000" interpolation="0" />
+		<key row="1" value="6.000000" interpolation="0" />
 	</track>
 	<track name="scene_rotX" folded="0" muteKeyCount="0"
 color="ffb28050">
@@ -45,7 +47,8 @@ color="ffb28050">
 	</track>
 	<track name="scene_rotY" folded="0" muteKeyCount="0"
 color="ffa9b250">
-		<key row="0" value="0.000000" interpolation="0" />
+		<key row="0" value="0.000000" interpolation="1" />
+		<key row="1" value="90.000000" interpolation="1" />
 	</track>
 	<track name="scene_rotZ" folded="0" muteKeyCount="0"
 color="ff60b250">
@@ -66,11 +69,14 @@ color="ff4fb292">
 	<track name="scene_Y" folded="0" muteKeyCount="0"
 color="ff4f71b2">
 		<key row="0" value="0.000000" interpolation="0" />
+		<key row="1" value="-0.500000" interpolation="0" />
 	</track>
 	<track name="scene_Z" folded="0" muteKeyCount="0"
 color="ff8850b2">
 		<key row="0" value="-0.600000" interpolation="1" />
-		<key row="80" value="-3.000000" interpolation="0" />
+		<key row="1" value="-1.000000" interpolation="1" />
+		<key row="2" value="-0.974684" interpolation="1" />
+		<key row="80" value="1.000000" interpolation="1" />
 		<key row="176" value="-3.000000" interpolation="0" />
 		<key row="192" value="-12.000000" interpolation="0" />
 		<key row="256" value="-3.000000" interpolation="0" />
@@ -323,6 +329,16 @@ color="ff8850b2">
 	</track>
 	<track name="fade_A" folded="0" muteKeyCount="0" color="ffb25091">
 		<key row="0" value="0.000000" interpolation="0" />
+	</track>
+	<track name="data_floorW" folded="0" muteKeyCount="0"
+color="ffb27474">
+		<key row="0" value="0.000000" interpolation="0" />
+		<key row="1" value="4.000000" interpolation="0" />
+	</track>
+	<track name="data_floorD" folded="0" muteKeyCount="0"
+color="ffb28050">
+		<key row="0" value="0.000000" interpolation="0" />
+		<key row="1" value="2.000000" interpolation="0" />
 	</track>
 </tracks>
 	</rootElement>
