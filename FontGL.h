@@ -16,6 +16,7 @@ public:
 	void LoadFromBuffer(const void* buffer, size_t size, short charw, short charh, char firstCharacter);
 	void LoadFromImage(const char* filename, short charw, short charh, char firstCharacter);
 	void Printf(ColorName color, float scale, FontAlignment alignmentX, FontAlignment alignmentY, const char* format, ... );
+	void PrintfPreColor(float scale, FontAlignment alignmentX, FontAlignment alignmentY, const char* format, ... );
 	void DrawSheet();
 	void Bind(short charw, short charh, char firstCharacter);
 	void SetSpacingOnce(float x, float y);

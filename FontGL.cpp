@@ -46,6 +46,91 @@ void FontGL::Bind (short charw, short charh, char firstCharacter )
 	spacingY = 0.0f;
 }
 
+void FontGL::PrintfPreColor(float scale, FontAlignment alignmentX, FontAlignment alignmentY, const char* format, ... )
+{
+	// Draw quads
+	va_list args;
+	char	buff[256];
+
+	va_start(args, format);
+	vsprintf(buff, format, args);
+	va_end(args);
+
+	float step = aspect * scale;
+
+	float dx = 0.0f;
+	float dy = 0.0f;
+	float dz = 0.0f;
+
+	if (alignmentX == RJustify)
+	{
+		float width = step * strlen(buff);
+		dx -= width;
+	}
+	else if (alignmentX == Centered)
+	{
+		float width = step * strlen(buff);
+		dx -= width / 2;
+	}
+	float left = dx;
+	if (alignmentY == RJustify)
+	{
+		dy += scale;
+	}
+	else if (alignmentY == Centered)
+	{
+		dy += scale/2.0f;
+	}
+    glEnable(GL_ALPHA_TEST);
+    glAlphaFunc(GL_GREATER, 0.3f);
+
+	glEnable(GL_TEXTURE_2D);
+	glBindTexture(GL_TEXTURE_2D, textureName);
+    // Discard pixels with low alpha
+
+	glBegin(GL_QUADS);
+	for (short c = 0; buff[c] != '\0'; c++)
+	{
+		char character = buff[c];
+		if (character == '\n')
+		{
+			dx = left;
+			dy -= scale + spacingY;
+			continue;
+		}
+		glm::vec2 tx0 = GetTextureCoordinate(character, 0); // TOP LEFT
+		glm::vec2 tx1= GetTextureCoordinate(character, 1); // TOP RIGHT
+
+		glm::vec2 tx2= GetTextureCoordinate(character, 2); // LOW RIGHT
+		glm::vec2 tx3= GetTextureCoordinate(character, 3); //LOW LEFT!
+
+		// TOP LEFT
+		glTexCoord2f(tx0.x, tx0.y);
+		glVertex3f(dx, dy, dz);
+
+		// TOP RIGHT
+		glTexCoord2f(tx1.x, tx1.y);
+		glVertex3f(dx + step, dy, dz);
+
+		// LOW RIGHT
+		glTexCoord2f(tx2.x, tx2.y);
+		glVertex3f(dx + step, dy - scale, dz);
+
+		// LOW LEFT!
+		glTexCoord2f(tx3.x, tx3.y);
+		glVertex3f(dx, dy - scale, dz);
+
+		dx += step + spacingX;
+	}
+	glEnd();
+	glBindTexture(GL_TEXTURE_2D, 0);
+	glDisable(GL_ALPHA_TEST);
+	glDisable(GL_TEXTURE_2D);
+
+	spacingX = 0.0f;
+	spacingY = 0.0f;
+}
+
 void FontGL::Printf(ColorName color, float scale, FontAlignment alignmentX, FontAlignment alignmentY, const char* format, ... )
 {
 	// Draw quads

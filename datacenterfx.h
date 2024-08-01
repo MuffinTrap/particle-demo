@@ -18,4 +18,8 @@ public:
 private:
 	float floorWidth;
 	float floorDepth;
+
+	float computerLight;
+	float floorLight;
+	float logoLight;
 };

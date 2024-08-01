@@ -10,6 +10,9 @@
 #ifndef SYNC_PLAYER
     const struct sync_track *data_floorW;  // How wide the floor is in white tiles x2
     const struct sync_track *data_floorD;  // How deep the floor is in white tiles x2
+    const struct sync_track *data_floorLight;  // How white the floor is [0, 1]
+    const struct sync_track *data_logoLight;  // How orange the logo on computer is [0, 1]
+    const struct sync_track *data_computerLight;  // How white the bottom vertices of the computers are [0,1]
 #else
 	#include "src/sync_data.cpp"
 	#include "src/sync_data.h"
@@ -20,6 +23,10 @@ void DataCenterFX::Init ( sync_device* rocket )
 #ifndef SYNC_PLAYER
 	data_floorW = sync_get_track(rocket, "data_floorW");
 	data_floorD = sync_get_track(rocket, "data_floorD");
+
+	data_floorLight = sync_get_track(rocket, "data:floorLight");
+	data_logoLight = sync_get_track(rocket, "data:logoLight");
+	data_computerLight = sync_get_track(rocket, "data:computerLight");
 #endif
 }
 
@@ -28,14 +35,23 @@ void DataCenterFX::Save()
 #ifndef SYNC_PLAYER
 	save_sync(data_floorW, SYNC_FILE_H, SYNC_FILE_CPP);
 	save_sync(data_floorD, SYNC_FILE_H, SYNC_FILE_CPP);
+
+	save_sync(data_floorLight, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(data_logoLight, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(data_computerLight, SYNC_FILE_H, SYNC_FILE_CPP);
 #endif
 }
 
 
 void DataCenterFX::Update()
 {
-	floorWidth = sync_get_val(data_floorW, get_row());
-	floorDepth = sync_get_val(data_floorD, get_row());
+	float R = get_row();
+	floorWidth = sync_get_val(data_floorW, R);
+	floorDepth = sync_get_val(data_floorD, R);
+
+	computerLight = sync_get_val(data_computerLight, R);
+	floorLight = sync_get_val(data_floorLight, R);
+	logoLight = sync_get_val(data_logoLight, R);
 }
 
 void DataCenterFX::Draw(FontGL* font)
@@ -162,7 +178,8 @@ void DataCenterFX::DrawComputer(FontGL* font, short number)
 
 	glPushMatrix();
 		glTranslatef(tfl.x + 0.1f, tfl.y - 0.1f, tfl.z + 0.001f);
-		font->Printf(ORANGE, 0.3f, LJustify, LJustify, "&");
+		PaletteLerpColor3f(BLACK, logoLight, ORANGE);
+		font->PrintfPreColor(0.3f, LJustify, LJustify, "&");
 	glPopMatrix();
 }
 
@@ -172,10 +189,10 @@ void DataCenterFX::DrawComputer(FontGL* font, short number)
 static float dx = 0;
 static float dz = 0;
 
-static void WhiteSquare()
+static void WhiteSquare(float intensity)
 {
 	float y = 0;
-	PaletteColor3f(WHITE);
+	PaletteLerpColor3f(BLACK, intensity, WHITE);
 	glVertex3f(dx-size/2.0f, y, dz-size/2.0f);
 	glVertex3f(dx+size/2.0f, y, dz-size/2.0f);
 	glVertex3f(dx+size/2.0f, y, dz+size/2.0f);
@@ -212,6 +229,7 @@ void DataCenterFX::DrawFloor(float wide, float deep)
 	float hw = (float)w/2.0f;
 	float hd = (float)d/2.0f;
 
+
 	glPushMatrix();
 	glTranslatef(-hw * (size + gap), 0.0f, -hd * (size + gap));
 
@@ -233,7 +251,7 @@ void DataCenterFX::DrawFloor(float wide, float deep)
 		// White row
 		for(short wi=0; wi < w; wi++)
 		{
-			WhiteSquare();
+			WhiteSquare(floorLight);
 			dx += size + gap;
 		}
 
