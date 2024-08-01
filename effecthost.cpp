@@ -66,6 +66,7 @@ void EffectHost::Init(sync_device* rocket)
 	tuner.Init((float)Platform::GetScreenWidth()/(float)Platform::GetScreenHeight(), rocket);
 	plotter.Init(64, rocket);
 	credits.Init(rocket);
+	dataCenter.Init(rocket);
 
 
 	rocketDebug.Init();
@@ -146,6 +147,7 @@ void EffectHost::Save()
 	tuner.Save();
 	plotter.Save();
 	credits.Save();
+	dataCenter.Save();
 }
 
 void EffectHost::Free()
@@ -175,6 +177,9 @@ void EffectHost::Update ()
 			ParticleUpdate(Platform::GetDeltaTime() * 0.05f);
 			plotter.Update(particles, NUM_PARTICLES);
 		break;
+		case fxDataCenter:
+			dataCenter.Update();
+			break;
 		default:
 			// Other effects don't need an update
 			break;

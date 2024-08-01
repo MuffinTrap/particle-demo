@@ -5,21 +5,44 @@
 #include "crossVector3.h"
 #include "FontGL.h"
 
+#include "rocket/track.h"
+#include "src/direction.hpp"
+#ifndef SYNC_PLAYER
+    const struct sync_track *data_floorW;  // How wide the floor is in white tiles x2
+    const struct sync_track *data_floorD;  // How deep the floor is in white tiles x2
+#else
+	#include "src/sync_data.cpp"
+	#include "src/sync_data.h"
+#endif
+
 void DataCenterFX::Init ( sync_device* rocket )
 {
-
+	data_floorW = sync_get_track(rocket, "data_floorW");
+	data_floorD = sync_get_track(rocket, "data_floorD");
 }
+
+void DataCenterFX::Save()
+{
+#ifndef SYNC_PLAYER
+	save_sync(data_floorW, SYNC_FILE_H, SYNC_FILE_CPP);
+	save_sync(data_floorD, SYNC_FILE_H, SYNC_FILE_CPP);
+#endif
+}
+
 
 void DataCenterFX::Update()
 {
+	floorWidth = sync_get_val(data_floorW, get_row());
+	floorDepth = sync_get_val(data_floorD, get_row());
 }
 
 void DataCenterFX::Draw(FontGL* font)
 {
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
-	DrawFloor();
-	DrawComputer(font);
+	DrawFloor(floorWidth * 2.0f, floorDepth * 2.0f);
+	DrawComputers(font);
+	// Draw one computer for one width and depth
     glDisable(GL_DEPTH_TEST);
 }
 
@@ -31,7 +54,66 @@ static void Quad(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, con
 	glVertex3f(d.x, d.y, d.z);
 }
 
-void DataCenterFX::DrawComputer(FontGL* font)
+// FLOOOR DRAWING
+
+static float size = 1.0f;
+static float gap = size / 20.0f;
+
+void DataCenterFX::DrawComputers(FontGL* font)
+{
+	// Draw computers on intersections : on black tiles
+
+	// starts from origo, on origo is always a black tile
+	glPushMatrix();
+	short fw = (short)floor(floorWidth);
+	short fd = (short)floor(floorDepth);
+
+	// Back left corner
+	if (fw == 1)
+	{
+		glTranslatef(0.0f, 0.0f, 0.0f);
+	}
+	else
+	{
+		glTranslatef(-floorWidth/2.0f * (size+gap), 0.0f, 0.0f);
+	}
+	if (fd == 1)
+	{
+		glTranslatef(0.0f, 0.0f, 0.0f);
+	}
+	else
+	{
+		glTranslatef(0.0f, 0.0f, -floorDepth/2.0f * (size+gap));
+	}
+
+
+	for (short d = 0; d < floorDepth; d++)
+	{
+		for (short w = 0; w < floorWidth; w++)
+		{
+			// TODO: push and rotate
+			bool rotate = (d > 0 && d%2 == 1);
+			if (rotate)
+			{
+				glPushMatrix();
+				glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+			}
+
+			DrawComputer(font, w + d%2);
+			if (rotate)
+			{
+				glPopMatrix();
+			}
+			glTranslatef((size + gap) * 2.0f, 0.0f, 0.0f);
+		}
+
+		// Reset row, advance 2 depths
+		glTranslatef((size+gap)* 2.0f *-floorWidth, 0.0f, (size + gap) * 2.0f);
+	}
+	glPopMatrix();
+}
+
+void DataCenterFX::DrawComputer(FontGL* font, short number)
 {
 	float height = 2.0f;
 	glm::vec3 bl = {-0.5f, 0.0f, -0.5f};
@@ -72,8 +154,8 @@ void DataCenterFX::DrawComputer(FontGL* font)
 	glEnd();
 
 	glPushMatrix();
-		glTranslatef(id_bl.x + 0.1f, id_bl.y + 0.1f, id_bl.z + 0.001f);
-		font->Printf(BLACK, 0.4f, LJustify, RJustify, "3");
+		glTranslatef(id_bl.x + 0.05f, id_bl.y + 0.2f, id_bl.z + 0.001f);
+		font->Printf(BLACK, 0.2f, LJustify, RJustify, "%.2X", number);
 	glPopMatrix();
 
 	glPushMatrix();
@@ -84,10 +166,6 @@ void DataCenterFX::DrawComputer(FontGL* font)
 
 
 
-// FLOOOR DRAWING
-
-static float size = 1.0f;
-static float gap = size / 20.0f;
 
 static float dx = 0;
 static float dz = 0;
@@ -113,7 +191,7 @@ static void BlackSquare()
 	glVertex3f(dx-small/2.0f, y, 	dz);
 }
 
-void DataCenterFX::DrawFloor()
+void DataCenterFX::DrawFloor(float wide, float deep)
 {
 	dx = 0.0f;
 	dz = 0.0f;
@@ -125,8 +203,8 @@ void DataCenterFX::DrawFloor()
 	//	B B B
 
 	// Dimensions in white squares
-	short w = 4;
-	short d = 4;
+	short w = (short)floor(wide);
+	short d = (short)floor(deep);
 
 	// go to back left corner
 	float hw = (float)w/2.0f;

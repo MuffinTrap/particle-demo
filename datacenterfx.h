@@ -11,6 +11,11 @@ public:
 	void Draw(FontGL* font);
 	void Save();
 
-	void DrawFloor();
-	void DrawComputer(FontGL* font);
+	void DrawComputers(FontGL* font);
+	void DrawFloor(float wide, float deep);
+	void DrawComputer(FontGL* font, short number);
+
+private:
+	float floorWidth;
+	float floorDepth;
 };
