@@ -47,7 +47,7 @@
 	#include "src/sync_data.h"
 #endif
 
-
+#include "kawaseblur.h"
 // Pass the particles to the plotter
 #include "src/particles.h"
 
@@ -103,7 +103,7 @@ void EffectHost::Init(sync_device* rocket)
 #endif
 
 	activeEffect = fxTitle;
-
+	initKawase();
 	init_perlin(0x1337);  // a LEET number
 	initParticles();
 	printf("host init done\n");
@@ -210,7 +210,8 @@ void EffectHost::ParticleUpdate(float delta)
 	uniform_ParticleCount = sync_get_val(ParticleCount, R);
 	uniform_SdfType = sync_get_val(SdfType, R);
 
-	updateParticles(delta);
+	if(activeEffect == fxParticles)
+		updateParticles(delta);
 }
 
 void EffectHost::Draw()
@@ -282,7 +283,7 @@ void EffectHost::Draw()
 		glEnd();
 		glDisable(GL_BLEND);
 	}
-
+	//displayKawase();
 #ifdef PROFILING
 	rocketDebug.DrawFramerate(&font);
 #endif

@@ -288,7 +288,7 @@ void updateParticles(float dt) {
         p->a = 1.0f;
         p->position = Vector3_Add(&p->position,&velocityScaled);
         particles[i + NUM_PARTICLES/3].position = {
-            p->position.x + 0.08f,
+            p->position.x + 0.03f,
             p->position.y,
             p->position.z + 0.1f
         };
@@ -297,7 +297,7 @@ void updateParticles(float dt) {
         particles[i + NUM_PARTICLES/3].b = 0.1f;
         particles[i + NUM_PARTICLES/3].a = 0.4f;
         particles[i + 2*NUM_PARTICLES/3].position = {
-            p->position.x - 0.08f,
+            p->position.x - 0.03f,
             p->position.y,
             p->position.z + 0.1f
         };
