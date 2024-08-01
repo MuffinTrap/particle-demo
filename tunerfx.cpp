@@ -45,7 +45,7 @@ void TunerFx::Init(float aspectRatio, sync_device* rocket)
 	tuner_page = sync_get_track(rocket, "tuner_page");
 #endif
 
-	visibleNames = 0.0f;
+	visibleNamesPerPage = {0.0f, 0.0f, 0.0f, 0.0f, 0.0f};
 
 	/// PAGE 0
 	short page = 0;
@@ -108,25 +108,23 @@ void TunerFx::Update ()
 	float prevpos = linePos;
 	linePos = width * sync_get_val(tuner_pos, R);
 	float newVisible = sync_get_val(tuner_names, R);
-	activeNameRow = sync_get_val(tuner_row, R);
-	activeNamePage = sync_get_val(tuner_page, R);
-	float diff =  newVisible - visibleNames;
-	while(diff >= 1.0f)
+	activeNameRow = (short)floor(sync_get_val(tuner_row, R));
+	activeNamePage = (short)floor(sync_get_val(tuner_page, R));
+	float diff =  newVisible - visibleNamesPerPage[activeNamePage];
+
+	// only add one name per frame
+	if(diff >= 1.0f)
 	{
-		diff -= 1.0f;
 		for (size_t i = 0; i < names.size(); i++)
 		{
 			if (names[i].page == activeNamePage && names[i].found == false)
 			{
 				names[i].pos = GetNamePos(linePos, activeNameRow);
 				names[i].found = true;
+				visibleNamesPerPage[activeNamePage] += 1.0f;
 				break;
 			}
 		}
-	}
-	if (newVisible > visibleNames)
-	{
-		visibleNames = newVisible;
 	}
 
 	// if linepos moves backward, hide all found names on this page and decrease counter
@@ -136,7 +134,15 @@ void TunerFx::Update ()
 			if (names[i].page == activeNamePage && names[i].found == true)
 			{
 				names[i].found = false;
-				visibleNames -= 1;
+				if (visibleNamesPerPage[activeNamePage] == 1)
+				{
+					// prevent negative and underflow
+					visibleNamesPerPage[activeNamePage]= 0;
+				}
+				else
+				{
+					visibleNamesPerPage[activeNamePage] -= 1;
+				}
 			}
 		}
 	}

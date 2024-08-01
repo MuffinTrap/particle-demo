@@ -3,6 +3,7 @@
 #include <vector>
 #include "crossVector3.h"
 #include "rocket/sync.h"
+#include <vector>
 
 class FontGL;
 
@@ -27,8 +28,8 @@ public:
 	// Rocket configuration values:
 	float linePos = 0.0f;
 
-	// how many names are visible
-	float visibleNames = 0.0f;
+	// how many names are visible on each page
+	std::vector<float> visibleNamesPerPage;
 	// On what row the next name is created
 	short activeNameRow = 0;
 	// What page of names is shown
