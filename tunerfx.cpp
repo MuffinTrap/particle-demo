@@ -46,6 +46,8 @@ void TunerFx::Init(float aspectRatio, sync_device* rocket)
 #endif
 
 	visibleNames = 0.0f;
+
+	/// PAGE 0
 	short page = 0;
 	names.push_back(CreateName(page, "FURRY"));
 	names.push_back(CreateName(page, "TRASH"));
@@ -55,6 +57,7 @@ void TunerFx::Init(float aspectRatio, sync_device* rocket)
 	names.push_back(CreateName(page, "TUHB"));
 	names.push_back(CreateName(page, "RIFT"));
 
+	/// PAGE 1
 	page += 1;
 	names.push_back(CreateName(page, "TPOLM"));
 	names.push_back(CreateName(page, "RBBS"));
@@ -64,6 +67,7 @@ void TunerFx::Init(float aspectRatio, sync_device* rocket)
 	names.push_back(CreateName(page, "EPOCH"));
 	names.push_back(CreateName(page, "QUADTRIP"));
 
+	/// PAGE 2
 	page += 1;
 	names.push_back(CreateName(page, "PEISIK"));
 	names.push_back(CreateName(page, "FARMIYAH"));
@@ -73,6 +77,7 @@ void TunerFx::Init(float aspectRatio, sync_device* rocket)
 	names.push_back(CreateName(page, "KEWLERS"));
 	names.push_back(CreateName(page, "MERCURY"));
 
+	/// PAGE 3
 	page += 1;
 	names.push_back(CreateName(page, "BASSCADET"));
 	names.push_back(CreateName(page, "GARGAJ"));
@@ -80,6 +85,7 @@ void TunerFx::Init(float aspectRatio, sync_device* rocket)
 	names.push_back(CreateName(page, "POROCYON"));
 	names.push_back(CreateName(page, "LAMEGUY64"));
 
+	/// PAGE 4
 	page += 1;
 	names.push_back(CreateName(page, "RYOJI IKEDA"));
 	names.push_back(CreateName(page, "DEVKITPRO"));

@@ -17,8 +17,10 @@
 
 void DataCenterFX::Init ( sync_device* rocket )
 {
+#ifndef SYNC_PLAYER
 	data_floorW = sync_get_track(rocket, "data_floorW");
 	data_floorD = sync_get_track(rocket, "data_floorD");
+#endif
 }
 
 void DataCenterFX::Save()
