@@ -1,8 +1,6 @@
 #include "datacenterfx.h"
 
-#include "palette.h"
 #include "crossOpenGL.h"
-#include "crossVector3.h"
 #include "FontGL.h"
 
 #include "rocket/track.h"
@@ -64,11 +62,19 @@ void DataCenterFX::Draw(FontGL* font)
     glDisable(GL_DEPTH_TEST);
 }
 
-static void Quad(const glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& d)
+void DataCenterFX::Quad(ColorName color, glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& d)
 {
+	// bottom
+	PaletteLerpColor3f(color, computerLight, WHITE);
 	glVertex3f(a.x, a.y, a.z);
+
+	// top 1 and 2
+	PaletteColor3f(color);
 	glVertex3f(b.x, b.y, b.z);
 	glVertex3f(c.x, c.y, c.z);
+
+	// bottom2
+	PaletteLerpColor3f(color, computerLight, WHITE);
 	glVertex3f(d.x, d.y, d.z);
 }
 
@@ -146,34 +152,35 @@ void DataCenterFX::DrawComputer(FontGL* font, short number)
 
 	glm::vec3 R = {1.0f, 0.0f, 0.0f};
 	glm::vec3 U = {0.0f, 1.0f, 0.0f};
-	glm::vec3 F = {0.0f, 0.0f, 0.001f};
+	glm::vec3 F = {0.0f, 0.0f, 0.0001f};
 
 	glBegin(GL_QUADS);
 		PaletteLerpColor3f(GREY, 0.95f, BLACK);
 		// left side
-		Quad(bl, tbl, tfl, fl);
+		Quad(BLACK, bl, tbl, tfl, fl);
 		// front
-		Quad(fl, tfl, tfr, fr);
+		Quad(BLACK, fl, tfl, tfr, fr);
 		// right
-		Quad(fr, tfr, tbr, br);
+		Quad(BLACK, fr, tfr, tbr, br);
 		// back
-		Quad(br, tbr, tbl, bl);
+		Quad(BLACK, br, tbr, tbl, bl);
 
 		// ID plate
 		PaletteColor3f(GREY);
 		glm::vec3 id_bl = fl + R * 0.5f + F;
 		glm::vec3 id_tl = tfl + R * 0.5f - U * 0.5f + F;
-		glm::vec3 id_tr = tfr - U * 0.5f + F;
-		glm::vec3 id_fr = fr + F;
-		Quad(id_bl,
+		glm::vec3 id_tr = tfr - R * 0.05f - U * 0.5f + F;
+		glm::vec3 id_fr = fr - R * 0.05f + F;
+		Quad(GREY, id_bl,
 			 id_tl,
 			id_tr,
 			id_fr);
 	glEnd();
 
 	glPushMatrix();
-		glTranslatef(id_bl.x + 0.05f, id_bl.y + 0.2f, id_bl.z + 0.001f);
-		font->Printf(BLACK, 0.2f, LJustify, RJustify, "%.2X", number);
+		glTranslatef(id_bl.x + 0.03f, id_bl.y + 0.25f, id_bl.z + 0.0001f);
+		font->SetSpacingOnce(-0.05f, 0.0f);
+		font->Printf(BLACK, 0.25f, LJustify, RJustify, "%.2X", number);
 	glPopMatrix();
 
 	glPushMatrix();
