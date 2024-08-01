@@ -78,11 +78,11 @@ void TitleFX::DrawLogos(short amount)
 			}
 			else if (w==2)
 			{
-				logo_fcccf.Draw3DCentered(1.0f, false);
+				logo_marmot.Draw3DCentered(1.0f, false);
 			}
 			else if (w==3)
 			{
-				logo_marmot.Draw3DCentered(1.0f, false);
+				logo_fcccf.Draw3DCentered(1.0f, false);
 			}
 		}
 	glPopMatrix();
