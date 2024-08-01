@@ -46,7 +46,7 @@ void TitleFX::Init(sync_device* rocket)
 
 	logo_raccoon.LoadImage("apps/numbers_asm24/logo_raccoon.png", GL_LINEAR);
 	logo_fcccf.LoadImage("apps/numbers_asm24/logo_fcccf.png", GL_LINEAR);
-	logo_marmot.LoadImage("apps/numbers_asm24/logo_fcccf.png", GL_LINEAR);
+	logo_marmot.LoadImage("apps/numbers_asm24/logo_marmot.png", GL_LINEAR);
 }
 
 void TitleFX::Save()
