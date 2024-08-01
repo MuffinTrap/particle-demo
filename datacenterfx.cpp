@@ -178,8 +178,8 @@ void DataCenterFX::DrawComputer(FontGL* font, short number)
 	glEnd();
 
 	glPushMatrix();
-		glTranslatef(id_bl.x + 0.03f, id_bl.y + 0.25f, id_bl.z + 0.0001f);
-		font->SetSpacingOnce(-0.05f, 0.0f);
+		glTranslatef(id_bl.x + 0.01f, id_bl.y + 0.25f, id_bl.z + 0.0001f);
+		font->SetSpacingOnce(-0.07f, 0.0f);
 		font->Printf(BLACK, 0.25f, LJustify, RJustify, "%.2X", number);
 	glPopMatrix();
 
