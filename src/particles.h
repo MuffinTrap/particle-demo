@@ -26,6 +26,14 @@ int sign(float x) {
     if (x < 0) return -1;
     return 0;
 }
+
+
+// Smooth minimum function
+float smin(float a, float b, float k) {
+    float h = fmax(k - fabs(a - b), 0.0f) / k;
+    return fmin(a, b) - h * h * h * k * (1.0f / 6.0f);
+}
+
 // Permutation table
 static int p[512];
 
@@ -111,8 +119,8 @@ float uniform_SdfType;
 // 3000 is safe 60fps on Wii
 #define NUM_PARTICLES 3000
 
-#define SPHERE_RADIUS 1.0f
-#define STICK_DISTANCE 0.01f
+#define SPHERE_RADIUS 5.0f
+#define STICK_DISTANCE 0.1f
 #define FRICTION 0.98f  // Friction coefficient
 #define MAX_LIFETIME 100.0f // Maximum lifetime of a particle
 
@@ -199,7 +207,10 @@ float getDistance(Vector3 position) {
     Vector3 size = {uniform_EffectA, uniform_EffectB, uniform_EffectC};
     switch((int)uniform_SdfType) {
         case 0:
-            return sphereSDF(position.x + uniform_EffectA, position.y + uniform_EffectB, position.z + uniform_EffectC);
+            return smin(
+                sphereSDF(position.x + uniform_EffectA, position.y + uniform_EffectB, position.z + uniform_EffectC),
+                sphereSDF(position.x + uniform_EffectD, position.y + uniform_EffectE, position.z + uniform_EffectF),
+                0.3f);
             break;
         case 1:
             return fBox(position, size);
@@ -242,77 +253,62 @@ const Vector3 world_up = {0.0f, 1.0f, 0.0f};
 const Vector3 world_right = {1.0f, 0.0f, 0.0f};
 const Vector3 world_forward = {0.0f, 0.0f, 1.0f};
 void updateParticles(float dt) {
-    for (int i = 0; i < NUM_PARTICLES/3; i++) {
+    for (int i = 0; i < NUM_PARTICLES; i++) {
         Particle *p = &particles[i];
 
         if (!p->active) {
             initParticle(p);
             continue;
         }
+        {
+            Vector3 direction = getSurfaceNormal(p->position);
+            #ifdef ORBIT_ENABLED
+                Vector3 tangent = Vector3_Cross(&direction, &world_up);
+                Vector3 tangent2 = Vector3_Cross(&direction, &world_right);
+                Vector3 tangent3 = Vector3_Cross(&direction, &world_forward);
+                    
+                tangent = Vector3_Scale(&tangent, uniform_OrbitX);
+                tangent2 = Vector3_Scale(&tangent2, uniform_OrbitY);
+                tangent3 = Vector3_Scale(&tangent3, uniform_OrbitZ);
+                direction = Vector3_Add(&direction, &tangent);
+                direction = Vector3_Add(&direction, &tangent2);
+                direction = Vector3_Add(&direction, &tangent3);
+            #endif
+            // Compute the distance from the particle to the SDF surface
+            float dist = getDistance(p->position);
+            if (dist < 0.0f) {  // If particle is inside the SDF
+                // Compute the surface normal
+                Vector3 normal = getSurfaceNormal(p->position);
 
-        Vector3 direction = getSurfaceNormal(p->position);
-        #ifdef ORBIT_ENABLED
-            Vector3 tangent = Vector3_Cross(&direction, &world_up);
-            Vector3 tangent2 = Vector3_Cross(&direction, &world_right);
-            Vector3 tangent3 = Vector3_Cross(&direction, &world_forward);
-                
-            tangent = Vector3_Scale(&tangent, uniform_OrbitX);
-            tangent2 = Vector3_Scale(&tangent2, uniform_OrbitY);
-            tangent3 = Vector3_Scale(&tangent3, uniform_OrbitZ);
-            direction = Vector3_Add(&direction, &tangent);
-            direction = Vector3_Add(&direction, &tangent2);
-            direction = Vector3_Add(&direction, &tangent3);
-        #endif
-        // Compute the distance from the particle to the SDF surface
-        float dist = getDistance(p->position);
-        if (dist < 0.0f) {  // If particle is inside the SDF
-            // Compute the surface normal
-            Vector3 normal = getSurfaceNormal(p->position);
+                // Move the particle to the surface of the SDF
+                float correctionDistance = -dist;
+                Vector3 corrected = Vector3_Scale(&normal, correctionDistance);
+                p->position = Vector3_Add(&p->position, &corrected);
+            } else {
+                float gravity = -uniform_Gravity / (dist * uniform_GravityPower + 1.0f);
+                float repulsion = uniform_Repulsion / (dist * uniform_RepulsionPower + 1.0f);
 
-            // Move the particle to the surface of the SDF
-            float correctionDistance = -dist;
-            Vector3 corrected = Vector3_Scale(&normal, correctionDistance);
-            p->position = Vector3_Add(&p->position, &corrected);
-        } else {
-            float gravity = -uniform_Gravity / (dist * uniform_GravityPower + 1.0f);
-            float repulsion = uniform_Repulsion / (dist * uniform_RepulsionPower + 1.0f);
-
-            direction = Vector3_Scale(&direction, (gravity+repulsion) * dt);
+                direction = Vector3_Scale(&direction, (gravity+repulsion) * dt);
+            }
+            p->velocity = Vector3_Add(&p->velocity, &direction);
+            p->velocity = Vector3_Scale(&p->velocity, 1.0f - uniform_Friction * dt);
+            p->r = 1.0f;
+            p->g = 1.0f;
+            p->b = 1.0f;
+            p->a = 0.333f;
         }
-        p->velocity = Vector3_Add(&p->velocity, &direction);
-        p->velocity = Vector3_Scale(&p->velocity, 1.0f - uniform_Friction * dt);
         Vector3 velocityScaled = Vector3_Scale(&p->velocity, dt);
-        p->r = 1.0f;
-        p->g = 1.0f;
-        p->b = 1.0f;
-        p->a = 1.0f;
         p->position = Vector3_Add(&p->position,&velocityScaled);
-        particles[i + NUM_PARTICLES/3].position = {
-            p->position.x + 0.03f,
-            p->position.y,
-            p->position.z + 0.1f
-        };
-        particles[i + NUM_PARTICLES/3].r = 0.8f;
-        particles[i + NUM_PARTICLES/3].g = 0.6f;
-        particles[i + NUM_PARTICLES/3].b = 0.1f;
-        particles[i + NUM_PARTICLES/3].a = 0.4f;
-        particles[i + 2*NUM_PARTICLES/3].position = {
-            p->position.x - 0.03f,
-            p->position.y,
-            p->position.z + 0.1f
-        };
-        particles[i + 2*NUM_PARTICLES/3].r = 0.1f;
-        particles[i + 2*NUM_PARTICLES/3].g = 0.8f;
-        particles[i + 2*NUM_PARTICLES/3].b = 0.6f;
-        particles[i + 2*NUM_PARTICLES/3].a = 0.4f;
     }
 }
 
 
 // Function to display particles
 void displayParticles() {
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glColor3f(1.0f,1.0f,1.0f);
-    glPointSize(1.0f);
+    glPointSize(4.0f);
     glBegin(GL_POINTS);
     for (int i = 0; i < NUM_PARTICLES; i++) {
 
@@ -321,9 +317,7 @@ void displayParticles() {
     }
     glEnd();
     if(uniform_EffectF==0) return;
-    glPointSize(1.0f);
-    glEnable(GL_BLEND);
-    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+    glPointSize(4.0f);
     glBegin(GL_LINES);
     for (int i = 0; i < NUM_PARTICLES/3; i+=uniform_EffectF) {
         glColor4f(1.0f,0.4f,0.0f, sin(i+uniform_EffectE)*uniform_EffectD);

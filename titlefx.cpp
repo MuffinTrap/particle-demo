@@ -151,11 +151,11 @@ void TitleFX::Draw ( FontGL* font )
 
 	// What to draw?
 	u32 logoAmount = (u32)floor(sync_get_val(title_logos, R));
-	if (logoAmount > 0)
+	if (logoAmount > 0 && logoAmount<5)
 	{
 		DrawLogos(logoAmount);
 	}
-	else
+	else if(logoAmount <= 0)
 	{
 		DrawName(font);
 	}
