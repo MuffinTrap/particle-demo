@@ -310,7 +310,7 @@ void displayParticles() {
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glColor3f(1.0f,1.0f,1.0f);
     #ifdef GEKKO
-    glPointSize(2.0f);
+    glPointSize(1.0f);
     #else
     glPointSize(4.0f);
     #endif
