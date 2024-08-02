@@ -28,7 +28,7 @@ CXX_FLAGS = -Werror=unused-function -Wall -Wextra -Wpedantic -std=c++11
 # CXX_FLAGS += -DPROFILING
 
 # Show one third rulers
-CXX_FLAGS += -DTHIRDS
+# CXX_FLAGS += -DTHIRDS
 
 # DEBUG!
 # CXX_FLAGS += -ggdb

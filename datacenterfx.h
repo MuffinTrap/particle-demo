@@ -18,7 +18,7 @@ public:
 	void DrawComputer(FontGL* font, short number);
 
 private:
-	void Quad(ColorName color, glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& d);
+	void Quad(ColorName color, glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& d, const glm::vec3& normal);
 	float floorWidth;
 	float floorDepth;
 

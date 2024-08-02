@@ -30,6 +30,13 @@ extern const sync_track WindZ;
 extern const sync_track ParticleCount;
 extern const sync_track SdfType;
 extern const sync_track title_rotY;
+extern const sync_track title_patRows;
+extern const sync_track title_patX;
+extern const sync_track title_patY;
+extern const sync_track title_patScale;
+extern const sync_track title_logos;
+extern const sync_track title_logoX;
+extern const sync_track title_logoBtwn;
 extern const sync_track radar_dots;
 extern const sync_track radar_seed;
 extern const sync_track radar_spread;
@@ -42,5 +49,10 @@ extern const sync_track plotter_impact;
 extern const sync_track plotter_decay;
 extern const sync_track plotter_updateHz;
 extern const sync_track credits_names;
+extern const sync_track data_floorW;
+extern const sync_track data_floorD;
+extern const sync_track data_floorLight;
+extern const sync_track data_logoLight;
+extern const sync_track data_computerLight;
 #endif
  // SYNC_PLAYER

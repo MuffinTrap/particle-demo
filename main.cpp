@@ -8,7 +8,7 @@ int main(int argc, char** argv)
 
     //
 
-    const char* filename = "apps/numbers_asm24/numbers.wav"; // Replace with your WAV file path
+    const char* filename = "numbers.wav"; // Replace with your WAV file path
     demoPlatform.LoadMusic(filename, 92.0, 8);
     //
 

@@ -91,21 +91,6 @@ void Platform::Init ( int argc, char ** argv, ScreenAspect aspectRatio, bool use
 
     gdl::ConsoleMode();
 	demoInstance.Init(gdl::ScreenXres, gdl::ScreenYres, useRocket);
-
-
-    /* Startup debug loop */
-
-    /*
-    while(true)
-    {
-        ReadControllerInput(controller);
-        if (controller.ButtonPress(WPAD_BUTTON_HOME)) {
-            break;
-        }
-        VIDEO_WaitVSync();
-    }
-    */
-
 }
 #pragma GCC diagnostic pop
 
@@ -123,6 +108,20 @@ void Platform::PlayMusic()
 static float deltaTimeS;
 void Platform::RunMainLoop()
 {
+    /* Startup debug loop */
+
+    /*
+    printf("Loaded. Hold A+B to start\n");
+    while(true)
+    {
+        ReadControllerInput(controller);
+        if (controller.ButtonHeld(WPAD_BUTTON_A) && (controller.ButtonHeld(WPAD_BUTTON_B))){
+
+            break;
+        }
+        VIDEO_WaitVSync();
+    }
+    */
 	u64 now = gettime();
 	u64 deltaTimeStart = now;
 	PlayMusic();
