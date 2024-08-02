@@ -47,7 +47,6 @@
 	#include "src/sync_data.h"
 #endif
 
-#include "kawaseblur.h"
 // Pass the particles to the plotter
 #include "src/particles.h"
 
