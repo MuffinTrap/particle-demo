@@ -253,6 +253,7 @@ const Vector3 world_up = {0.0f, 1.0f, 0.0f};
 const Vector3 world_right = {1.0f, 0.0f, 0.0f};
 const Vector3 world_forward = {0.0f, 0.0f, 1.0f};
 void updateParticles(float dt) {
+    if(uniform_OrbitX > 100) { initParticles();}
     for (int i = 0; i < NUM_PARTICLES; i++) {
         Particle *p = &particles[i];
 

@@ -365,7 +365,9 @@
 			<key value="0" row="720" interpolation="0"/>
 			<key value="0.7" row="816" interpolation="0"/>
 			<key value="0.3" row="864" interpolation="0"/>
-			<key value="12" row="896" interpolation="0"/>
+			<key value="0" row="896" interpolation="0"/>
+			<key value="12" row="928" interpolation="0"/>
+			<key value="3" row="960" interpolation="0"/>
 			<key value="0" row="1000" interpolation="0"/>
 			<key value="0" row="1101" interpolation="1"/>
 			<key value="0" row="1240" interpolation="0"/>
@@ -409,6 +411,7 @@
 			<key value="0" row="1047" interpolation="1"/>
 			<key value="-1" row="1060" interpolation="0"/>
 			<key value="-0.5" row="1101" interpolation="0"/>
+			<key value="-12" row="1152" interpolation="0"/>
 			<key value="0" row="1208" interpolation="1"/>
 			<key value="-0.1" row="1240" interpolation="0"/>
 			<key value="-1" row="1256" interpolation="0"/>
@@ -433,6 +436,8 @@
 		</track>
 		<track name="OrbitX">
 			<key value="0" row="0" interpolation="0"/>
+			<key value="101" row="896" interpolation="0"/>
+			<key value="0" row="898" interpolation="0"/>
 		</track>
 		<track name="OrbitY">
 			<key value="0" row="0" interpolation="0"/>
@@ -450,7 +455,6 @@
 			<key value="4" row="632" interpolation="1"/>
 			<key value="1" row="672" interpolation="1"/>
 			<key value="12" row="711" interpolation="0"/>
-			<key value="123" row="896" interpolation="1"/>
 			<key value="12" row="919" interpolation="0"/>
 			<key value="12" row="960" interpolation="0"/>
 		</track>
@@ -475,7 +479,7 @@
 			<key value="5" row="632" interpolation="1"/>
 			<key value="512" row="672" interpolation="1"/>
 			<key value="64" row="711" interpolation="0"/>
-			<key value="64" row="896" interpolation="0"/>
+			<key value="512" row="896" interpolation="0"/>
 		</track>
 		<track name="GravityPower">
 			<key value="0.01" row="0" interpolation="1"/>
@@ -486,7 +490,7 @@
 			<key value="0.1" row="560" interpolation="1"/>
 			<key value="0.1" row="672" interpolation="1"/>
 			<key value="0.03" row="711" interpolation="0"/>
-			<key value="0.3" row="896" interpolation="0"/>
+			<key value="0.01" row="896" interpolation="0"/>
 		</track>
 		<track name="Friction">
 			<key value="0" row="0" interpolation="1"/>
@@ -515,7 +519,8 @@
 			<key value="0" row="960" interpolation="1"/>
 			<key value="-4" row="999" interpolation="0"/>
 			<key value="2" row="1151" interpolation="0"/>
-			<key value="0.4" row="1152" interpolation="0"/>
+			<key value="0.4" row="1152" interpolation="1"/>
+			<key value="4" row="1207" interpolation="0"/>
 		</track>
 		<track name="EffectB">
 			<key value="0" row="0" interpolation="0"/>
@@ -526,6 +531,7 @@
 			<key value="4" row="712" interpolation="0"/>
 			<key value="3" row="896" interpolation="0"/>
 			<key value="0" row="960" interpolation="0"/>
+			<key value="0" row="1152" interpolation="0"/>
 		</track>
 		<track name="EffectC">
 			<key value="0" row="0" interpolation="0"/>
@@ -533,6 +539,7 @@
 			<key value="4" row="712" interpolation="0"/>
 			<key value="3" row="896" interpolation="0"/>
 			<key value="0" row="960" interpolation="0"/>
+			<key value="0" row="1152" interpolation="0"/>
 		</track>
 		<track name="EffectD">
 			<key value="1" row="0" interpolation="0"/>
@@ -655,6 +662,8 @@
 			<key value="2" row="959" interpolation="0"/>
 			<key value="4" row="960" interpolation="1"/>
 			<key value="-0.4" row="999" interpolation="0"/>
+			<key value="-0.4" row="1152" interpolation="1"/>
+			<key value="-4" row="1207" interpolation="0"/>
 		</track>
 		<track name="EffectE">
 			<key value="1" row="0" interpolation="0"/>
@@ -671,6 +680,7 @@
 			<key value="0" row="896" interpolation="0"/>
 			<key value="0" row="960" interpolation="0"/>
 			<key value="123" row="999" interpolation="0"/>
+			<key value="0" row="1152" interpolation="0"/>
 		</track>
 		<track name="EffectF">
 			<key value="0" row="0" interpolation="0"/>
@@ -693,6 +703,7 @@
 			<key value="0" row="896" interpolation="0"/>
 			<key value="0" row="960" interpolation="0"/>
 			<key value="32" row="999" interpolation="0"/>
+			<key value="0" row="1152" interpolation="0"/>
 		</track>
 		<track name="WindX">
 			<key value="0.5" row="0" interpolation="0"/>
