@@ -316,11 +316,11 @@ void displayParticles() {
         glVertex3f(particles[i].position.x, particles[i].position.y, particles[i].position.z);
     }
     glEnd();
-    if(uniform_EffectF==0) return;
-    glPointSize(4.0f);
+    if(uniform_WindZ==0) return;
+    glPointSize(1.0f);
     glBegin(GL_LINES);
-    for (int i = 0; i < NUM_PARTICLES/3; i+=uniform_EffectF) {
-        glColor4f(1.0f,0.4f,0.0f, sin(i+uniform_EffectE)*uniform_EffectD);
+    for (int i = 0; i < NUM_PARTICLES/3; i+=uniform_WindZ) {
+        glColor4f(1.0f,0.4f,0.0f, sin(i+uniform_WindX)*uniform_WindY);
         glVertex3f(particles[i].position.x, particles[i].position.y, particles[i].position.z);
         
     }
