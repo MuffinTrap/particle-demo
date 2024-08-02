@@ -20,9 +20,10 @@ void CreditsFX::Init ( sync_device* rocket )
 	names.push_back("ROOT CAUSES FOUND");
 	names.push_back("HANDLE:            ROLE:");
 	names.push_back("MUFFINHOP           CODE");
-	names.push_back("MUFFINHOP         DESIGN");
 	names.push_back("RACCOONVIOLET      MUSIC");
 	names.push_back("MUFFINTRAP          CODE");
+	names.push_back("RACCOONVIOLET      LOGOS");
+	names.push_back("MUFFINHOP         DESIGN");
 
 #ifndef SYNC_PLAYER
 	credits_names = sync_get_track(rocket, "credits_names");
@@ -39,7 +40,7 @@ void CreditsFX::Draw ( FontGL* font )
 	for (size_t ni = 0; ni < amount; ni++)
 	{
 		font->Printf(WHITE, size, LJustify, LJustify, names[ni].c_str());
-		glTranslatef(0.0f, -size, 0.0f);
+		glTranslatef(0.0f, -size * 1.5f, 0.0f);
 	}
 	glPopMatrix();
 }
