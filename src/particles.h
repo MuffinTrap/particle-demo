@@ -309,7 +309,11 @@ void displayParticles() {
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
     glColor3f(1.0f,1.0f,1.0f);
+    #ifdef GEKKO
+    glPointSize(2.0f);
+    #else
     glPointSize(4.0f);
+    #endif
     glBegin(GL_POINTS);
     for (int i = 0; i < NUM_PARTICLES; i++) {
 
