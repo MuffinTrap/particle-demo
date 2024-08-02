@@ -54,27 +54,56 @@ void DataCenterFX::Update()
 
 void DataCenterFX::Draw(FontGL* font)
 {
-    glEnable(GL_DEPTH_TEST);
+	// glEnable(GL_DEPTH_TEST);
+	// glDepthFunc(GL_LESS);
+
+		glEnable(GL_CULL_FACE);
+		glCullFace(GL_FRONT);
+
+
+		// Test 1. Draw floor only : THIS WORKS
+		// Test 2. Try to draw computers: Works without depth testing: THIS WORKS
+		// Test 3. Test face culling BACK  : THIS IS THE WRONG FACE TO CULL
+		// Test 4  Test face culling FRONT  : THIS WORKS
+		// Test 5. Test Depth test parameters 	: Default :  FAILS
+		// Test 6. Test GL_LESS  : FAILS
+		// Test 7. Test GL_GREATER : Works but wrong
+		// Test 8. Test GL_LEQUAL : FAILS
+			DrawFloor(floorWidth * 2.0f, floorDepth * 2.0f);
+			DrawComputers(font);
+
+
+
+		glDisable(GL_CULL_FACE);
+
+	// glDisable(GL_DEPTH_TEST);
+
+	/* This works on Dolphin and Linux*/
+	/*
+	glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 	DrawFloor(floorWidth * 2.0f, floorDepth * 2.0f);
-	DrawComputers(font);
-	// Draw one computer for one width and depth
     glDisable(GL_DEPTH_TEST);
+    */
 }
 
-void DataCenterFX::Quad(ColorName color, glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& d)
+void DataCenterFX::Quad(ColorName color, glm::vec3& a, const glm::vec3& b, const glm::vec3& c, const glm::vec3& d, const::glm::vec3& normal)
 {
 	// bottom
 	PaletteLerpColor3f(color, computerLight, WHITE);
+	glNormal3f(normal.x, normal.y, normal.z);
 	glVertex3f(a.x, a.y, a.z);
 
 	// top 1 and 2
 	PaletteColor3f(color);
+	glNormal3f(normal.x, normal.y, normal.z);
 	glVertex3f(b.x, b.y, b.z);
+	glNormal3f(normal.x, normal.y, normal.z);
 	glVertex3f(c.x, c.y, c.z);
 
 	// bottom2
 	PaletteLerpColor3f(color, computerLight, WHITE);
+	glNormal3f(normal.x, normal.y, normal.z);
 	glVertex3f(d.x, d.y, d.z);
 }
 
@@ -92,6 +121,12 @@ void DataCenterFX::DrawComputers(FontGL* font)
 	short fw = (short)floor(floorWidth);
 	short fd = (short)floor(floorDepth);
 
+	bool sceneTwo = false;
+	if (getTime() > 30.0f )
+	{
+		sceneTwo = true;
+	}
+
 	// Back left corner
 	if (fw == 1)
 	{
@@ -99,7 +134,15 @@ void DataCenterFX::DrawComputers(FontGL* font)
 	}
 	else
 	{
-		glTranslatef(-floorWidth/2.0f * (size+gap), 0.0f, 0.0f);
+		if (sceneTwo)
+		{
+		// HAX
+		// move right
+		glTranslatef(floorWidth/2.0f * (size+gap), 0.0f, 0.0f);
+		}
+		else{
+			glTranslatef(-floorWidth/2.0f * (size+gap), 0.0f, 0.0f);
+		}
 	}
 	if (fd == 1)
 	{
@@ -111,28 +154,61 @@ void DataCenterFX::DrawComputers(FontGL* font)
 	}
 
 
+
 	for (short d = 0; d < floorDepth; d++)
 	{
-		for (short w = 0; w < floorWidth; w++)
+		// super hack, draw from right to left
+		// because depth buffering does not work
+		if (sceneTwo == false)
 		{
-			// TODO: push and rotate
-			bool rotate = (d > 0 && d%2 == 1);
-			if (rotate)
+			for (short w = 0; w < floorWidth; w++)
 			{
-				glPushMatrix();
-				glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+				// TODO: push and rotate
+				bool rotate = (d > 0 && d%2 == 1);
+				if (rotate)
+				{
+					glPushMatrix();
+					glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+				}
+
+				DrawComputer(font, w + d%2);
+				if (rotate)
+				{
+					glPopMatrix();
+				}
+				glTranslatef((size + gap) * 2.0f, 0.0f, 0.0f);
 			}
 
-			DrawComputer(font, w + d%2);
-			if (rotate)
-			{
-				glPopMatrix();
-			}
-			glTranslatef((size + gap) * 2.0f, 0.0f, 0.0f);
+			// Reset row, advance 2 depths
+			glTranslatef((size+gap)* 2.0f *-floorWidth, 0.0f, (size + gap) * 2.0f);
+
 		}
+		else // Scene two, right to left
+		{
+			// THIS WORKS
+			for (short w = floorWidth-1; w >= 0; w--)
+			{
+				// TODO: push and rotate
+				bool rotate = (d > 0 && d%2 == 1);
+				if (rotate)
+				{
+					glPushMatrix();
+					glRotatef(180.0f, 0.0f, 1.0f, 0.0f);
+				}
 
-		// Reset row, advance 2 depths
-		glTranslatef((size+gap)* 2.0f *-floorWidth, 0.0f, (size + gap) * 2.0f);
+				DrawComputer(font, w + d%2);
+				if (rotate)
+				{
+					glPopMatrix();
+				}
+				// HAX move left
+				glTranslatef((size + gap) * -2.0f, 0.0f, 0.0f);
+			}
+
+			// Reset row, advance 2 depths
+			// HAX move right
+			glTranslatef((size+gap)* 2.0f *floorWidth, 0.0f, (size + gap) * 2.0f);
+		}
 	}
 	glPopMatrix();
 }
@@ -154,16 +230,27 @@ void DataCenterFX::DrawComputer(FontGL* font, short number)
 	glm::vec3 U = {0.0f, 1.0f, 0.0f};
 	glm::vec3 F = {0.0f, 0.0f, 0.0001f};
 
+	glm::vec3 nR = R;
+	glm::vec3 nL = -R;
+	glm::vec3 nF =  {0.0f, 0.0f, 1.0f};
+	glm::vec3 nB =  -F;
+
 	glBegin(GL_QUADS);
 		PaletteLerpColor3f(GREY, 0.95f, BLACK);
 		// left side
-		Quad(BLACK, bl, tbl, tfl, fl);
+		Quad(BLACK, bl, tbl, tfl, fl, nL);
 		// front
-		Quad(BLACK, fl, tfl, tfr, fr);
+		Quad(BLACK, fl, tfl, tfr, fr, nF);
 		// right
-		Quad(BLACK, fr, tfr, tbr, br);
+		Quad(BLACK, fr, tfr, tbr, br, nR);
 		// back
-		Quad(BLACK, br, tbr, tbl, bl);
+		Quad(BLACK, br, tbr, tbl, bl, nB);
+
+		// top
+		float back = computerLight;
+		computerLight = 0.0f;
+		Quad(BLACK, tfl, tbl, tbr, tfr, U);
+		computerLight = back;
 
 		// ID plate
 		PaletteColor3f(GREY);
@@ -174,7 +261,8 @@ void DataCenterFX::DrawComputer(FontGL* font, short number)
 		Quad(GREY, id_bl,
 			 id_tl,
 			id_tr,
-			id_fr);
+			id_fr,
+			nF);
 	glEnd();
 
 	glPushMatrix();
@@ -200,9 +288,13 @@ static void WhiteSquare(float intensity)
 {
 	float y = 0;
 	PaletteLerpColor3f(BLACK, intensity, WHITE);
+	glNormal3f(0.0f, 1.0f, 0.0f);
 	glVertex3f(dx-size/2.0f, y, dz-size/2.0f);
+	glNormal3f(0.0f, 1.0f, 0.0f);
 	glVertex3f(dx+size/2.0f, y, dz-size/2.0f);
+	glNormal3f(0.0f, 1.0f, 0.0f);
 	glVertex3f(dx+size/2.0f, y, dz+size/2.0f);
+	glNormal3f(0.0f, 1.0f, 0.0f);
 	glVertex3f(dx-size/2.0f, y, dz+size/2.0f);
 }
 
@@ -211,9 +303,13 @@ static void BlackSquare()
 	float small = size/4.0f + gap * 2.0f;
 	float y = 0.001f;
 	PaletteColor3f(BLACK);
+	glNormal3f(0.0f, 1.0f, 0.0f);
 	glVertex3f(dx, 			y, 		dz-small/2.0f);
+	glNormal3f(0.0f, 1.0f, 0.0f);
 	glVertex3f(dx+small/2.0f, y, 	dz);
+	glNormal3f(0.0f, 1.0f, 0.0f);
 	glVertex3f(dx, 			y, 		dz+small/2.0f);
+	glNormal3f(0.0f, 1.0f, 0.0f);
 	glVertex3f(dx-small/2.0f, y, 	dz);
 }
 

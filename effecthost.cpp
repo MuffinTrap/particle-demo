@@ -281,7 +281,6 @@ void EffectHost::Draw()
 		glEnd();
 		glDisable(GL_BLEND);
 	}
-	//displayKawase();
 #ifdef PROFILING
 	rocketDebug.DrawFramerate(&font);
 #endif
