@@ -44,9 +44,9 @@ void TitleFX::Init(sync_device* rocket)
 	title_logoBtwn = sync_get_track(rocket, "title:logoBtwn");
 #endif
 
-	logo_raccoon.LoadImage("apps/numbers_asm24/logo_raccoon.png", GL_LINEAR);
-	logo_fcccf.LoadImage("apps/numbers_asm24/logo_fcccf.png", GL_LINEAR);
-	logo_marmot.LoadImage("apps/numbers_asm24/logo_marmot.png", GL_LINEAR);
+	logo_raccoon.LoadImage("logo_raccoon.png", GL_LINEAR);
+	logo_fcccf.LoadImage("logo_fcccf.png", GL_LINEAR);
+	logo_marmot.LoadImage("logo_marmot.png", GL_LINEAR);
 }
 
 void TitleFX::Save()
@@ -74,15 +74,15 @@ void TitleFX::DrawLogos(short amount)
 			glTranslatef(sync_get_val(title_logoBtwn, R), 0.0f, 0.0f);
 			if (w==1)
 			{
-				logo_raccoon.Draw3DCentered(1.0f, false);
+				logo_raccoon.Draw3DCentered(1.0f, true);
 			}
 			else if (w==2)
 			{
-				logo_marmot.Draw3DCentered(1.0f, false);
+				logo_marmot.Draw3DCentered(1.0f, true);
 			}
 			else if (w==3)
 			{
-				logo_fcccf.Draw3DCentered(1.0f, false);
+				logo_fcccf.Draw3DCentered(1.0f, true);
 			}
 		}
 	glPopMatrix();

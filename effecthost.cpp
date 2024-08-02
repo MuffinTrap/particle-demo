@@ -59,7 +59,7 @@ EffectHost::EffectHost()
 void EffectHost::Init(sync_device* rocket)
 {
 	// Needs to be power of 2 image
-	font.LoadFromImage("apps/numbers_asm24/andvari32x32CAPS.png", 32, 32, ' ');
+	font.LoadFromImage("andvari32.png", 32, 32, ' ');
 
 	title.Init(rocket);
     radar.Init(1024, rocket);
@@ -103,7 +103,6 @@ void EffectHost::Init(sync_device* rocket)
 #endif
 
 	activeEffect = fxTitle;
-	initKawase();
 	init_perlin(0x1337);  // a LEET number
 	initParticles();
 	printf("host init done\n");

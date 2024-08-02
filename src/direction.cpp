@@ -8,6 +8,7 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <cmath>
+#include "../crossAssert.h"
 
 static const bool music_enabled = true;
 static double __attribute__((__unused__)) time_secs = 0.0;
@@ -69,7 +70,8 @@ void updateAudio()
 
 void playAudio()
 {
-    musicSound.Play(1.0f, 100.0f);
+    bool started = musicSound.Play(1.0f, 100.0f);
+    gdl_assert_print(started, "Music no start!");
 }
 
 void unloadAudio()
