@@ -58,7 +58,11 @@ void DataCenterFX::Draw(FontGL* font)
 	// glDepthFunc(GL_LESS);
 
 		glEnable(GL_CULL_FACE);
+#ifdef GEKKO
 		glCullFace(GL_FRONT);
+#else
+		glCullFace(GL_BACK);
+#endif
 
 
 		// Test 1. Draw floor only : THIS WORKS
