@@ -1,8 +1,6 @@
 BUILD_DIR = build
 SRC_DIRS := .
 
-# Use only CXX to compile all files
-
 # Use find to gather all .cpp and .c files in SRC_DIRS
 cpp_src := $(shell find $(SRC_DIRS) -name '*.cpp')
 c_src := $(shell find $(SRC_DIRS) -name '*.c')
@@ -60,6 +58,22 @@ ifeq ($(OS_TYPE),linux)
 	GLUT_INCLUDE = -I/usr/include/GL/
 	CXX_FLAGS += $(GLUT_INCLUDE)
 endif
+
+# Windows cross-compilation from macOS
+cross-windows: 
+	$(info Source files: $(src))
+	x86_64-w64-mingw32-g++ $(src) $(CXX_FLAGS) \
+	-I/opt/homebrew/Cellar/libpng/1.6.43/include \
+	-I/opt/homebrew/Cellar/libsndfile/1.2.2/include \
+	-I/opt/homebrew/Cellar/openal-soft/1.23.1/include \
+	-I/opt/homebrew/Cellar/freeglut/3.2.1/include \
+	-L/opt/homebrew/Cellar/libpng/1.6.43/lib \
+	-L/opt/homebrew/Cellar/libsndfile/1.2.2/lib \
+	-L/opt/homebrew/Cellar/openal-soft/1.23.1/lib \
+	-L/opt/homebrew/Cellar/freeglut/3.2.1/lib \
+	-L/opt/homebrew/Cellar/libsndfile/1.2.2/lib \
+	-L/opt/homebrew/Cellar/openal-soft/1.23.1/lib \
+	 -I/Users/sofia.savilampi/Downloads/freeglut-3.6.0/include -L/Users/sofia.savilampi/Downloads/freeglut-3.6.0/lib -lpng -lsndfile -lopenal -lfreeglut -lopengl32 -lglu32 -lws2_32 -Wl,--allow-multiple-definition -o gldemo.exe
 
 .PHONY: clean
 
