@@ -1,21 +1,21 @@
+This an archive of the code that created the demo NUMBERS for the Assembly 2024 Real Wild competition.
+The demo placed first. There was much celebration.
+
+If you want to build the demo for yourself, use the snapshot of the mtek-gdl framework here: [MTEK-GDL-muffintrap nova branch snapshot](https://github.com/MuffinTrap/mtek-gdl/releases/tag/Snapshot)
+The snapshot is the version of the framework that was used to build the demo.
+
 # NUMBERS
 
 ## Credits
-- Group: ???
-- - Revolution R&D
-- - Revolutionary
-- - Three Critters in a Trench Coat
-- - Three of Them
+- Group: Marmot
 - Code & Design: Muffinhop
 - Code: Muffintrap
-- Music: RaccoonViolet
-- Graphics: Free to use assets (see credits.txt)
+- Music & Logos: RaccoonViolet
 
 ## Development
 
 ### Frameworks and libraries
-- [MTEK-GDL-muffintrap nova branch](https://github.com/MuffinTrap/mtek-gdl/tree/nova)
-- [Perlin noise](https://github.com/Reputeless/PerlinNoise/blob/master/PerlinNoise.hpp)
+- [MTEK-GDL-muffintrap fork](https://github.com/MuffinTrap/mtek-gdl)
 - [Rocket](https://github.com/rocket/rocket)
 
 ### Tools:
